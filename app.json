@@ -1,12 +1,18 @@
 {
   "expo": {
-    "name": "stebbins-app",
-    "slug": "stebbins-app",
+    "name": "stebbins",
+    "slug": "stebbins",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/splash-icon.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "stebbinsapp",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "imageHeight": "50",
+      "backgroundColor": "#ffffff",
+      "imageResizeMode": "contain"
+    },
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
@@ -26,7 +32,16 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/images/splash-icon.png",
+          "imageHeight": 50,
+          "imageResizeMode": "contain"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

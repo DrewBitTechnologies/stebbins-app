@@ -3,6 +3,7 @@ import { TouchableOpacity, View, Text, StyleSheet, ImageBackground, ScrollView }
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useApi } from '../../contexts/ApiContext';
 
 interface ButtonItem {
   title: string;
@@ -11,6 +12,7 @@ interface ButtonItem {
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const { homeData, isLoading } = useApi();
 
   const verticalButtons: ButtonItem[] = [
     { title: 'Safety Information', navigateTo: '/safety' },
@@ -25,8 +27,18 @@ export default function HomeScreen() {
     { title: 'Report', navigateTo: '/(tabs)/report' },
   ];
 
-  // Placeholder status instead of Firebase
-  const status = "The reserve is currently open. Weather conditions are good. Please follow all trail rules and safety guidelines. Have a great visit!";
+  // Use API data or fallback
+  const status = homeData?.reserve_status || "Loading reserve status...";
+  
+  // Determine background image source
+  const getBackgroundSource = () => {
+    if (homeData?.backgroundPath) {
+      // Use cached image file
+      return { uri: homeData.backgroundPath };
+    }
+    // Fallback to bundled image
+    return require('../../assets/dev/fallback.jpeg');
+  };
 
   const handleNavigation = (route: string) => {
     router.push(route as any);
@@ -35,7 +47,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.parentView}>
       <ImageBackground 
-        source={require('../../assets/dev/home.jpeg')}
+        source={getBackgroundSource()}
         style={styles.backgroundImage}
       >
         <View style={styles.reserveStatus}>

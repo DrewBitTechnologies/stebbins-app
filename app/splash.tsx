@@ -1,16 +1,20 @@
 import { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import { useApi } from '../contexts/ApiContext';
 
-export default function CustomSplashScreen() {
+export default function SplashScreen() {
+  const { fetchHomeData } = useApi();
+
   useEffect(() => {
-    // Simple timer to navigate after 2 seconds
-    const timer = setTimeout(() => {
+    const loadDataAndNavigate = async () => {
+      // Fetch data first
+      await fetchHomeData();
+      
       router.replace('/(tabs)/home');
-    }, 2000);
+    };
 
-    // Clear the timeout if the component unmounts
-    return () => clearTimeout(timer);
+    loadDataAndNavigate();
   }, []);
 
   return (
@@ -32,7 +36,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   image: {
-    width: 200,
-    height: 200,
+    height: 50,
   },
 });

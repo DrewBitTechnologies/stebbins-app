@@ -41,3 +41,7 @@ app-example
 .vscode/
 android/
 ios/
+
+.env
+.env.local
+.env.production
