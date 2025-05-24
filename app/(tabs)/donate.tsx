@@ -1,32 +1,101 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React from 'react';
+import { View, Text, StyleSheet, ImageBackground, ScrollView, TouchableOpacity } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
 
-export default function DonateScreen() {
-  const insets = useSafeAreaInsets();
-  
-  return (
-    <View style={[styles.container, { paddingTop: insets.top || 20 }]}>
-      <Text style={styles.title}>Donate Screen</Text>
-      <Text style={styles.description}>This is the donate tab!</Text>
-    </View>
-  );
+export default function DonateScreen(): JSX.Element {
+    const handleDonatePress = async (): Promise<void> => {
+        try {
+            await WebBrowser.openBrowserAsync('https://give.ucdavis.edu/Donate/YourGift/STEGIFT');
+        } catch (error) {
+            console.error('Error opening browser:', error);
+        }
+    };
+
+    return (
+        <ImageBackground 
+            source={require("../../assets/dev/fallback.jpeg")} 
+            resizeMode="cover"
+            style={styles.backGroundImage}
+            blurRadius={0}
+        >
+            <ScrollView contentContainerStyle={{ flex: 1 }}>
+                <View style={styles.mainContainer}>
+                    <View style={styles.donateContainer}>
+                        <View style={{ width: '90%' }}>
+                            <View style={{ margin: 10 }}>
+                                <Text style={styles.donateTitle}>Donate</Text>
+                                <Text style={styles.donateText}>
+                                    Donations to Stebbins Cold Canyon go towards trail maintenance and improvements, enhancing the visitor experience and safety with interpretative signage and messaging, and supporting educational programming.
+                                </Text>
+                            </View>
+                        </View>
+
+                        <TouchableOpacity 
+                            onPress={handleDonatePress}
+                            style={{ width: '90%' }}
+                        >
+                            <View style={[styles.donateButton, styles.shadowProp]}>
+                                <Text style={styles.donateButtonText}>Donate here</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </ScrollView>
+        </ImageBackground>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  description: {
-    fontSize: 16,
-    color: '#555',
-    textAlign: 'center',
-  },
+    backGroundImage: {
+        flex: 1,
+    },
+    mainContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: 20,
+    },
+    donateContainer: {
+        flex: 0,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        width: '100%',
+        paddingTop: 10,
+        paddingBottom: 20,
+        borderRadius: 15,
+    },
+    donateTitle: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        paddingBottom: 10,
+    },
+    donateText: {
+        textAlign: 'left',
+        fontSize: 20,
+        lineHeight: 30,
+    },
+    donateButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(243, 196, 54, 1.0)',
+        margin: 10,
+        padding: 20,
+        borderRadius: 15,
+    },
+    donateButtonText: {
+        fontSize: 20,
+        color: 'black',
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
+    shadowProp: {
+        shadowColor: '#171717',
+        shadowOffset: { width: -4, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 5,
+        elevation: 5,
+    },
 });

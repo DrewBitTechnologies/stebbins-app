@@ -23,7 +23,7 @@ export default function HomeScreen() {
 
   const horizontalButtons: ButtonItem[] = [
     { title: 'Emergency', navigateTo: '/emergency' },
-    { title: 'Guides', navigateTo: '/(tabs)/guides' },
+    { title: 'Guides', navigateTo: '/(tabs)/guide' },
     { title: 'Report', navigateTo: '/(tabs)/report' },
   ];
 
