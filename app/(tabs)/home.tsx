@@ -3,7 +3,7 @@ import { TouchableOpacity, View, Text, StyleSheet, ImageBackground, ScrollView }
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useApi } from '../../contexts/ApiContext';
+import { useScreen, HomeData } from '../../contexts/ApiContext';
 
 interface ButtonItem {
   title: string;
@@ -12,7 +12,7 @@ interface ButtonItem {
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { homeData, isLoading } = useApi();
+  const { data: homeData, backgroundPath } = useScreen<HomeData>('home');
 
   const verticalButtons: ButtonItem[] = [
     { title: 'Safety Information', navigateTo: '/safety' },
@@ -28,15 +28,13 @@ export default function HomeScreen() {
   ];
 
   // Use API data or fallback
-  const status = homeData?.reserve_status || "Loading reserve status...";
+  const status = homeData?.reserve_status || "Unable to load reserve status"
   
   // Determine background image source
   const getBackgroundSource = () => {
-    if (homeData?.backgroundPath) {
-      // Use cached image file
-      return { uri: homeData.backgroundPath };
+    if (backgroundPath) {
+      return { uri: backgroundPath };
     }
-    // Fallback to bundled image
     return require('../../assets/dev/fallback.jpeg');
   };
 

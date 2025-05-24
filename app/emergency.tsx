@@ -1,6 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity } from 'react-native';
-import { makePhoneCall } from '../utility/linking';
+import * as Linking from 'expo-linking';
+
+const openPhoneNumber = (phoneNumber: string) => {
+  Linking.openURL(`tel:${phoneNumber}`).catch((err) => console.error('An error occurred', err));
+};
 
 interface DispatchInfo {
     text: string;
@@ -12,15 +16,6 @@ interface EmergencyData {
 }
 
 export default function EmergencyScreen() {
-
-    const handleDispatchCall = (): void => {
-        makePhoneCall('(707)421-7090');
-    };
-
-    const handle911Call = (): void => {
-        makePhoneCall('911');
-    };
-
     return (
         <ImageBackground 
             source={require('../assets/dev/fallback.jpeg')}
@@ -37,7 +32,7 @@ export default function EmergencyScreen() {
                         </Text>
 
                         <TouchableOpacity 
-                            onPress={handleDispatchCall}
+                            onPress={() => openPhoneNumber("7074217090")}
                             style={{ width: '90%' }}
                         >
                             <View style={[styles.button, styles.shadowProp]}>
@@ -52,7 +47,7 @@ export default function EmergencyScreen() {
                         </Text>
 
                         <TouchableOpacity 
-                            onPress={handle911Call}
+                            onPress={() => openPhoneNumber("911")}
                             style={{ width: '90%' }}
                         >
                             <View style={[styles.button, styles.shadowProp]}>

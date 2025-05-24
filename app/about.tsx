@@ -1,19 +1,37 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, ImageBackground } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
+import { useScreen, AboutData } from '../contexts/ApiContext';
 
 export default function AboutScreen() {
+    const { data: aboutData, backgroundPath } = useScreen<AboutData>('about');
+
     const handleWebsitePress = async (): Promise<void> => {
         try {
-            await WebBrowser.openBrowserAsync('https://naturalreserves.ucdavis.edu/stebbins-cold-canyon');
+            // Use API link if available, otherwise fallback
+            const url = aboutData?.link || 'https://naturalreserves.ucdavis.edu/stebbins-cold-canyon';
+            await WebBrowser.openBrowserAsync(url);
         } catch (error) {
             console.error('Error opening browser:', error);
         }
     };
 
+    // Determine background image source
+    const getBackgroundSource = () => {
+        if (backgroundPath) {
+            return { uri: backgroundPath };
+        }
+        return require("../assets/dev/fallback.jpeg");
+    };
+
+    // Use API data or fallback content
+    const aboutText = aboutData?.text || "Stebbins Cold Canyon Reserve is part of the University of California Natural Reserve System's protected wildlands network which is dedicated to research, teaching, and public service. This App serves as a guide and information tool to the site. The Map shows your location on the trail and features distances and nature trail markers and descriptions. The Field Guide provides images and information on some of the common species that occur in the reserve. For more detailed information about the history of the site, volunteer opportunities, and species lists, please visit the";
+    
+    const linkText = aboutData?.link_text || "Reserve Website.";
+
     return (
         <ImageBackground 
-            source={require("../assets/dev/fallback.jpeg")} 
+            source={getBackgroundSource()}
             resizeMode="cover"
             style={styles.backGroundImage}
         >
@@ -22,9 +40,9 @@ export default function AboutScreen() {
                     <ScrollView>
                         <View>
                           <Text style={styles.sectionTitleText}>About</Text>
-                          <Text style={styles.sectionInfoText}>Stebbins Cold Canyon Reserve is part of the University of California Natural Reserve System’s  protected wildlands network which is dedicated to research, teaching, and public service. This App serves as a guide and information tool to the site. The Map shows your location on the trail and features distances and nature trail markers and descriptions. The Field Guide provides images and information on some of the common species that occur in the reserve. For more detailed information about the history of the site, volunteer opportunities, and species lists, please visit the</Text>
+                          <Text style={styles.sectionInfoText}>{aboutText}</Text>
                           <Text style={styles.hyperlink} onPress={handleWebsitePress}>
-                              Reserve Website.
+                              {linkText}
                           </Text>
                       </View>
                     </ScrollView>
