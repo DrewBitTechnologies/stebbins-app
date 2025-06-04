@@ -1,24 +1,30 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity } from 'react-native';
 import * as Linking from 'expo-linking';
+import { useScreen, EmergencyData } from '@/contexts/ApiContext'
 
 const openPhoneNumber = (phoneNumber: string) => {
   Linking.openURL(`tel:${phoneNumber}`).catch((err) => console.error('An error occurred', err));
 };
 
-interface DispatchInfo {
-    text: string;
-    phone: string;
-}
-
-interface EmergencyData {
-    dispatch: DispatchInfo;
-}
-
 export default function EmergencyScreen() {
+
+    const { data: emergencyData, backgroundPath } = useScreen<EmergencyData>('emergency');
+    const text1 = emergencyData?.contact_1_message || 'For Emergencies contact Solano County Dispatch';
+    const phone1 = emergencyData?.contact_1_number || '7074217090';
+    const text2 = emergencyData?.contact_2_message || 'IF YOU HAVE NO SERVICE TRY CALLING 911';
+    const phone2 = emergencyData?.contact_2_number || '911';
+
+    const getBackgroundSource = () => {
+        if(backgroundPath){
+            return {uri: backgroundPath};
+        }
+        return require('@/assets/dev/fallback.jpeg');
+    }
+    
     return (
         <ImageBackground 
-            source={require('../assets/dev/fallback.jpeg')}
+            source={getBackgroundSource()}
             resizeMode="cover"
             style={styles.backGroundImage}
         >
@@ -27,31 +33,29 @@ export default function EmergencyScreen() {
                     <View style={styles.emergencyContainer}>
                         <Text style={styles.emergencyTitle}>Emergency Contact</Text>
 
-                        <Text style={styles.textTitle}>
-                            For Emergencies contact Solano County Dispatch
-                        </Text>
+                        <Text style={styles.textTitle}>{text1}</Text>
 
                         <TouchableOpacity 
-                            onPress={() => openPhoneNumber("7074217090")}
+                            onPress={() => openPhoneNumber(phone1)}
                             style={{ width: '90%' }}
                         >
                             <View style={[styles.button, styles.shadowProp]}>
                                 <Text style={styles.buttonText}>
-                                    (707)421-7090
+                                    {phone1.slice(0,3) + '-' + phone1.slice(3,6) + '-' + phone1.slice(6)}
                                 </Text>
                             </View>
                         </TouchableOpacity>
 
-                        <Text style={styles.textTitle}>
-                            IF YOU HAVE NO SERVICE TRY CALLING 911
-                        </Text>
+                        <Text style={styles.textTitle}>{text2}</Text>
 
                         <TouchableOpacity 
-                            onPress={() => openPhoneNumber("911")}
+                            onPress={() => openPhoneNumber(phone2)}
                             style={{ width: '90%' }}
                         >
                             <View style={[styles.button, styles.shadowProp]}>
-                                <Text style={styles.buttonText}>911</Text>
+                                <Text style={styles.buttonText}>
+                                    {phone2}
+                                </Text>
                             </View>
                         </TouchableOpacity>
                     </View>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, ImageBackground } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
-import { useScreen, AboutData } from '../contexts/ApiContext';
+import { useScreen, AboutData } from '@/contexts/ApiContext';
 
 export default function AboutScreen() {
     const { data: aboutData, backgroundPath } = useScreen<AboutData>('about');

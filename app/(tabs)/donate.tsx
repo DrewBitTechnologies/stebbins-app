@@ -1,19 +1,34 @@
 import React from 'react';
 import { View, Text, StyleSheet, ImageBackground, ScrollView, TouchableOpacity } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
+import { useScreen, DonateData } from '@/contexts/ApiContext';
 
-export default function DonateScreen(): JSX.Element {
+export default function DonateScreen() {
+
+    const { data: donateData, backgroundPath } = useScreen<DonateData>('donate');
+
     const handleDonatePress = async (): Promise<void> => {
         try {
-            await WebBrowser.openBrowserAsync('https://give.ucdavis.edu/Donate/YourGift/STEGIFT');
+            const url = donateData?.link || 'https://give.ucdavis.edu/Donate/YourGift/STEGIFT';
+            await WebBrowser.openBrowserAsync(url);
         } catch (error) {
             console.error('Error opening browser:', error);
         }
     };
 
+    const getBackgroundSource = () => {
+        if(backgroundPath){
+            return {uri: backgroundPath}
+        }
+
+        return require("@/assets/dev/fallback.jpeg");
+    };
+
+    const donateText = donateData?.text || 'Donations to Stebbins Cold Canyon go towards trail maintenance and improvements, enhancing the visitor experience and safety with interpretative signage and messaging, and supporting educational programming.';
+
     return (
         <ImageBackground 
-            source={require("../../assets/dev/fallback.jpeg")} 
+            source={getBackgroundSource()}
             resizeMode="cover"
             style={styles.backGroundImage}
             blurRadius={0}
@@ -24,9 +39,7 @@ export default function DonateScreen(): JSX.Element {
                         <View style={{ width: '90%' }}>
                             <View style={{ margin: 10 }}>
                                 <Text style={styles.donateTitle}>Donate</Text>
-                                <Text style={styles.donateText}>
-                                    Donations to Stebbins Cold Canyon go towards trail maintenance and improvements, enhancing the visitor experience and safety with interpretative signage and messaging, and supporting educational programming.
-                                </Text>
+                                <Text style={styles.donateText}>{donateText}</Text>
                             </View>
                         </View>
 

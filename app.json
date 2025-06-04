@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash-icon.png",
-      "imageHeight": "50",
+      "height": "50",
       "backgroundColor": "#ffffff",
       "imageResizeMode": "contain"
     },
@@ -38,7 +38,7 @@
         {
           "backgroundColor": "#ffffff",
           "image": "./assets/images/splash-icon.png",
-          "imageHeight": 50,
+          "height": "50",
           "imageResizeMode": "contain"
         }
       ]

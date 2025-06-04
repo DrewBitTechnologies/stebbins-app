@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ImageBackground, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useScreen, GuideData } from '@/contexts/ApiContext';
 
 interface ButtonItem {
   title: string;
@@ -16,13 +17,23 @@ export default function GuideScreen() {
     { title: 'Trail Tracks', navigateTo: '/trail-tracks' },
   ];
 
+  const { backgroundPath } = useScreen<GuideData>('guide');
+
+  const getBackgroundSource = () => {
+    if(backgroundPath){
+      return { uri: backgroundPath };
+    }
+
+    return require('@/assets/dev/fallback.jpeg');
+  };
+
   const handleNavigation = (route: string): void => {
     router.push(route as any);
   };
 
   return (
     <ImageBackground 
-      source={require("../../assets/dev/fallback.jpeg")}
+      source={getBackgroundSource()}
       style={styles.fieldGuideMainImage}
     >
       <ScrollView contentContainerStyle={{ flex: 1, justifyContent: 'flex-end' }}>

@@ -13,7 +13,7 @@ export default function SplashScreen() {
         setLoadingText('Loading app data...');
         
         // Fetch all screen data upfront
-        const screens = ['home', 'about']; // Add more screens as needed
+        const screens = ['home', 'about', 'donate', 'guide', 'emergency']; // Add more screens here
         
         await Promise.all(
           screens.map(async (screenName) => {

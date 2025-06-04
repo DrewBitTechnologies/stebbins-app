@@ -15,14 +15,30 @@ export interface AboutData {
 }
 
 // Add more screen data types as needed
-// interface RulesData {
-//   title: string;
-//   rules: string[];
-//   background?: string;
-// }
+export interface DonateData {
+  text: string;
+  link: string;
+  background?: string;
+}
+
+export interface GuideData{
+  background?: string;
+}
+
+export interface EmergencyData{
+  contact_1_message: string;
+  contact_1_number: string;
+  contact_2_message: string;
+  contact_2_number: string;
+  background?: string;
+}
 
 // Union type for all screen data
-type ScreenData = HomeData | AboutData;
+type ScreenData = HomeData 
+                  | AboutData 
+                  | DonateData
+                  | GuideData
+                  | EmergencyData
 
 // Screen configuration
 interface ScreenConfig {
@@ -52,7 +68,7 @@ const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
 const CACHE_DIR = FileSystem.documentDirectory + 'cache/';
 
-// Screen configurations - easy to add new screens here
+// Screen configurations
 const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
   home: {
     endpoint: '/items/home/',
@@ -62,10 +78,22 @@ const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
     endpoint: '/items/about/',
     cacheKey: 'about_data'
   },
+  donate: {
+    endpoint: '/items/donate',
+    cacheKey: 'donate_data'
+  },
+  guide: {
+   endpoint: '/items/guide',
+   cacheKey: 'guide_data'
+  },
+  emergency: {
+    endpoint: '/items/emergency',
+    cacheKey: 'emergency_data'
+  }
   // Add new screens like this:
-  // rules: {
-  //   endpoint: '/items/rules/',
-  //   cacheKey: 'rules_data'
+  // screen: {
+  //   endpoint: '/items/screen/',
+  //   cacheKey: 'screen_data'
   // },
 };
 
