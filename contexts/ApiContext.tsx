@@ -33,6 +33,12 @@ export interface EmergencyData{
   background?: string;
 }
 
+export interface RulesData{
+  background?: string;
+  rules_image: string;
+  rules: [{icon: string, text: string}];
+}
+
 // Union type for all screen data
 type ScreenData = HomeData 
                   | AboutData 
@@ -89,6 +95,10 @@ const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
   emergency: {
     endpoint: '/items/emergency',
     cacheKey: 'emergency_data'
+  },
+  rules: {
+    endpoint: '/rules/',
+    cacheKey: 'rules_data'
   }
   // Add new screens like this:
   // screen: {
@@ -147,7 +157,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   };
 
   // Download and cache background image
-  const downloadBackgroundImage = async (screenName: string, imageName: string): Promise<string | undefined> => {
+  const downloadImage = async (screenName: string, imageName: string): Promise<string | undefined> => {
     try {
       await ensureCacheDir();
       
@@ -174,7 +184,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return localPath;
       }
     } catch (error) {
-      console.log(`Error downloading background image for ${screenName}:`, error);
+      console.log(`Error downloading image for ${screenName}:`, error);
     }
     return undefined;
   };
@@ -187,6 +197,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   // Main fetch function
   const fetchScreenData = async <T extends ScreenData>(screenName: string): Promise<T | null> => {
     const config = SCREEN_CONFIGS[screenName];
+
     if (!config) {
       console.log(`No configuration found for screen: ${screenName}`);
       return null;
@@ -220,7 +231,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       // Handle background image if it exists
       let backgroundPath: string | undefined;
       if ('background' in screenData && screenData.background) {
-        backgroundPath = await downloadBackgroundImage(screenName, screenData.background);
+        backgroundPath = await downloadImage(screenName, screenData.background);
       }
 
       const cacheData: CachedScreenData = {
