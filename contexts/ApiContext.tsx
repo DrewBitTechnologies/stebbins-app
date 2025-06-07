@@ -75,6 +75,17 @@ export interface SafetyData {
   safety_bulletpoints: string;
 }
 
+export interface ReportData {
+  id: number;
+  date_created: string;
+  date_updated: string;
+  background?: string;
+  instruction_text: string;
+  file_upload_text: string;
+  contact_info_text: string;
+  description_text: string;
+}
+
 // Union type for all screen data
 type ScreenData = HomeData 
                   | AboutData 
@@ -82,7 +93,8 @@ type ScreenData = HomeData
                   | GuideData
                   | EmergencyData
                   | RulesData
-                  | SafetyData;
+                  | SafetyData
+                  | ReportData;
 
 // Screen configuration
 interface ScreenConfig {
@@ -141,6 +153,10 @@ const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
   safety: {
     endpoint: '/items/safety/',
     cacheKey: 'safety_data'
+  },
+  report: {
+    endpoint: '/items/reports/',
+    cacheKey: 'report_data'
   }
 
   // Add new screens like this:
