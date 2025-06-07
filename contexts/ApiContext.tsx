@@ -3,11 +3,17 @@ import * as FileSystem from 'expo-file-system';
 
 // Screen-specific data interfaces
 export interface HomeData {
+  id: number;
+  date_created: string;
+  date_updated: string;
   reserve_status: string;
   background?: string;
 }
 
 export interface AboutData {
+  id: number;
+  date_created: string;
+  date_updated: string;
   text: string;
   link_text: string;
   link: string;
@@ -16,16 +22,25 @@ export interface AboutData {
 
 // Add more screen data types as needed
 export interface DonateData {
+  id: number;
+  date_created: string;
+  date_updated: string;
   text: string;
   link: string;
   background?: string;
 }
 
 export interface GuideData{
+  id: number;
+  date_created: string;
+  date_updated: string;
   background?: string;
 }
 
 export interface EmergencyData{
+  id: number;
+  date_created: string;
+  date_updated: string;
   contact_1_message: string;
   contact_1_number: string;
   contact_2_message: string;
@@ -33,10 +48,31 @@ export interface EmergencyData{
   background?: string;
 }
 
+export interface Rule {
+  id: number;
+  date_created: string;
+  date_updated: string | null;
+  icon: string;
+  text: string;
+}
+
 export interface RulesData{
+  id: number;
+  date_created: string;
+  date_updated: string;
   background?: string;
-  rules_image: string;
-  rules: [{icon: string, text: string}];
+  rules_image?: string;
+  rules: Rule[];
+}
+
+export interface SafetyData {
+  id: number;
+  date_created: string;
+  date_updated: string;
+  background?: string;
+  safety_image?: string;
+  emergency_contact: string;
+  safety_bulletpoints: string;
 }
 
 // Union type for all screen data
@@ -45,6 +81,8 @@ type ScreenData = HomeData
                   | DonateData
                   | GuideData
                   | EmergencyData
+                  | RulesData
+                  | SafetyData;
 
 // Screen configuration
 interface ScreenConfig {
@@ -52,17 +90,17 @@ interface ScreenConfig {
   cacheKey: string;
 }
 
-// Context state for cached data
+// Context state for cached data - simplified with unified image handling
 interface CachedScreenData {
   data: ScreenData;
-  backgroundPath?: string;
+  imagePaths?: Record<string, string>; // All images including background
   timestamp: number;
 }
 
 interface ApiContextType {
   getScreenData: <T extends ScreenData>(screenName: string) => T | null;
   fetchScreenData: <T extends ScreenData>(screenName: string) => Promise<T | null>;
-  getBackgroundPath: (screenName: string) => string | undefined;
+  getImagePath: (screenName: string, imageName: string) => string | undefined; // Unified image getter
   isLoading: (screenName: string) => boolean;
 }
 
@@ -99,10 +137,15 @@ const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
   rules: {
     endpoint: '/rules/',
     cacheKey: 'rules_data'
+  },
+  safety: {
+    endpoint: '/items/safety/',
+    cacheKey: 'safety_data'
   }
+
   // Add new screens like this:
   // screen: {
-  //   endpoint: '/items/screen/',
+  //   endpoint: '/endpoint/screen/',
   //   cacheKey: 'screen_data'
   // },
 };
@@ -156,7 +199,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Download and cache background image
+  // Download and cache image
   const downloadImage = async (screenName: string, imageName: string): Promise<string | undefined> => {
     try {
       await ensureCacheDir();
@@ -184,7 +227,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return localPath;
       }
     } catch (error) {
-      console.log(`Error downloading image for ${screenName}:`, error);
+      console.log(`Error downloading image ${imageName} for ${screenName}:`, error);
     }
     return undefined;
   };
@@ -228,15 +271,57 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       const res = await response.json();
       const screenData = res.data as T;
 
-      // Handle background image if it exists
-      let backgroundPath: string | undefined;
+      // Handle all screen images in one unified approach
+      let imagePaths: Record<string, string> = {};
+
+      // Handle background image if it exists (use 'background' as key)
       if ('background' in screenData && screenData.background) {
-        backgroundPath = await downloadImage(screenName, screenData.background);
+        const backgroundPath = await downloadImage(screenName, screenData.background);
+        if (backgroundPath) {
+          imagePaths['background'] = backgroundPath;
+        }
+      }
+
+      // Handle screen-specific images
+
+      // Handle screen-specific images
+      if (screenName === 'rules') {
+        // Handle rules image
+        if ('rules_image' in screenData && screenData.rules_image) {
+          const rulesImagePath = await downloadImage(screenName, screenData.rules_image);
+          if (rulesImagePath) {
+            imagePaths['rules_image'] = rulesImagePath;
+          }
+        }
+
+        // Handle rules icons
+        if ('rules' in screenData && Array.isArray((screenData as RulesData).rules)) {
+          const rules = (screenData as RulesData).rules;
+          for (const rule of rules) {
+            if (rule.icon) {
+              const iconPath = await downloadImage(screenName, rule.icon);
+              if (iconPath) {
+                imagePaths[rule.icon] = iconPath;
+              }
+            }
+          }
+        }
+      }
+
+      // Add safety screen handling
+      if (screenName === 'safety') {
+        // Handle safety image
+        if ('safety_image' in screenData && screenData.safety_image) {
+          const safetyImagePath = await downloadImage(screenName, screenData.safety_image);
+          if (safetyImagePath) {
+            imagePaths['safety_image'] = safetyImagePath;
+          }
+        }
       }
 
       const cacheData: CachedScreenData = {
         data: screenData,
-        backgroundPath,
+        imagePaths: Object.keys(imagePaths).length > 0 ? imagePaths : undefined,
         timestamp: Date.now(),
       };
 
@@ -270,9 +355,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     return cached ? (cached.data as T) : null;
   };
 
-  // Get background path for a screen
-  const getBackgroundPath = (screenName: string): string | undefined => {
-    return screenDataCache[screenName]?.backgroundPath;
+  // Unified function to get any image path by name
+  const getImagePath = (screenName: string, imageName: string): string | undefined => {
+    return screenDataCache[screenName]?.imagePaths?.[imageName];
   };
 
   // Check if screen is loading
@@ -283,7 +368,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const value: ApiContextType = {
     getScreenData,
     fetchScreenData,
-    getBackgroundPath,
+    getImagePath, // Unified image path getter
     isLoading,
   };
 
@@ -309,7 +394,7 @@ export function useScreen<T extends ScreenData>(screenName: string) {
   
   return {
     data: api.getScreenData<T>(screenName),
-    backgroundPath: api.getBackgroundPath(screenName),
+    getImagePath: (imageName: string) => api.getImagePath(screenName, imageName), // Get any image by name
     isLoading: api.isLoading(screenName),
     fetch: () => api.fetchScreenData<T>(screenName),
   };

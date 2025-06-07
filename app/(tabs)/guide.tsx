@@ -17,9 +17,11 @@ export default function GuideScreen() {
     { title: 'Trail Tracks', navigateTo: '/trail-tracks' },
   ];
 
-  const { backgroundPath } = useScreen<GuideData>('guide');
+  const { getImagePath } = useScreen<GuideData>('guide');
 
   const getBackgroundSource = () => {
+    const backgroundPath = getImagePath('background');
+    
     if(backgroundPath){
       return { uri: backgroundPath };
     }

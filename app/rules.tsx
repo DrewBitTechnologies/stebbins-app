@@ -1,30 +1,62 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Image, ImageBackground, ListRenderItem } from 'react-native';
-
-interface RuleItem {
-    rule: string;
-}
-
-interface RulesData {
-    rule_group: RuleItem[];
-}
+import { useScreen, RulesData, Rule } from '@/contexts/ApiContext';
 
 export default function RulesScreen() {
+    const { data: rulesData, getImagePath } = useScreen<RulesData>('rules');
+
+    const getBackgroundSource = () => {
+        const backgroundPath = getImagePath('background');
+        
+        if (backgroundPath) {
+            return { uri: backgroundPath };
+        }
+        return require("../assets/dev/fallback.jpeg");
+    };
+
+    const getRulesImageSource = () => {
+        const imagePath = getImagePath('rules_image');
+
+        if (imagePath) {
+            return { uri: imagePath };
+        }
+        return require("../assets/dev/fallback.jpeg");
+    };
+
+    const getIconSource = (iconName: string) => {
+        const iconPath = getImagePath(iconName);
+
+        if (iconPath) {
+            return { uri: iconPath };
+        }
+       
+        return require("../assets/dev/fallback.jpeg");
+    };
+
+    const renderRule: ListRenderItem<Rule> = ({ item }) => (
+        <View style={styles.rules}>
+            <Image source={getIconSource(item.icon)} style={styles.icon} />
+            <Text style={styles.iconText}>{item.text}</Text>
+        </View>
+    );
 
     return (
         <ImageBackground 
-            source={require("../assets/dev/fallback.jpeg")} 
+            source={getBackgroundSource()}
             resizeMode="cover"
             style={styles.backGroundImage}
             blurRadius={0}
         >
             <View style={styles.mainContainer}>
                 <View style={styles.rulesContainer}>
-                    <Image style={styles.rulesImage} source={require("../assets/dev/fallback.jpeg")} />
+                    <Image style={styles.rulesImage} source={getRulesImageSource()} />
                 </View>
 
                 <FlatList
                     style={styles.list}
+                    data={rulesData?.rules || []}
+                    renderItem={renderRule}
+                    keyExtractor={(item) => item.id.toString()}
                 />
             </View>
         </ImageBackground>

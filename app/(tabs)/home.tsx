@@ -12,7 +12,7 @@ interface ButtonItem {
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { data: homeData, backgroundPath } = useScreen<HomeData>('home');
+  const { data: homeData, getImagePath } = useScreen<HomeData>('home');
 
   const verticalButtons: ButtonItem[] = [
     { title: 'Safety Information', navigateTo: '/safety' },
@@ -32,6 +32,8 @@ export default function HomeScreen() {
   
   // Determine background image source
   const getBackgroundSource = () => {
+    const backgroundPath = getImagePath('background');
+    
     if (backgroundPath) {
       return { uri: backgroundPath };
     }

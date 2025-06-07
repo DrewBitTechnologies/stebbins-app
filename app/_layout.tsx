@@ -10,7 +10,7 @@ export default function RootLayout() {
         <Stack screenOptions={{
           headerTitle: () => (
             <Image
-            source={require('../assets/images/splash-icon.png')}
+            source={require('@/assets/images/splash-icon.png')}
             style={{ height: 35, resizeMode: 'contain'}}/>
           ),
         }}>

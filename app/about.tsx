@@ -4,7 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useScreen, AboutData } from '@/contexts/ApiContext';
 
 export default function AboutScreen() {
-    const { data: aboutData, backgroundPath } = useScreen<AboutData>('about');
+    const { data: aboutData, getImagePath } = useScreen<AboutData>('about');
 
     const handleWebsitePress = async (): Promise<void> => {
         try {
@@ -18,6 +18,8 @@ export default function AboutScreen() {
 
     // Determine background image source
     const getBackgroundSource = () => {
+        const backgroundPath = getImagePath('background');
+        
         if (backgroundPath) {
             return { uri: backgroundPath };
         }

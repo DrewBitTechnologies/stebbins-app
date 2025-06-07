@@ -5,7 +5,7 @@ import { useScreen, DonateData } from '@/contexts/ApiContext';
 
 export default function DonateScreen() {
 
-    const { data: donateData, backgroundPath } = useScreen<DonateData>('donate');
+    const { data: donateData, getImagePath } = useScreen<DonateData>('donate');
 
     const handleDonatePress = async (): Promise<void> => {
         try {
@@ -17,6 +17,8 @@ export default function DonateScreen() {
     };
 
     const getBackgroundSource = () => {
+        const backgroundPath = getImagePath('background');
+
         if(backgroundPath){
             return {uri: backgroundPath}
         }
