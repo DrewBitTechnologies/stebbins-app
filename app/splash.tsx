@@ -20,7 +20,7 @@ export default function SplashScreen() {
                         'emergency', 
                         'rules', 
                         'safety',
-                        'report']; // Add more screens here
+                        'report'];
         
         await Promise.all(
           screens.map(async (screenName) => {

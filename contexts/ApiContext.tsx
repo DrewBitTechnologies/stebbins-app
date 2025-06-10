@@ -135,15 +135,15 @@ const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
     cacheKey: 'about_data'
   },
   donate: {
-    endpoint: '/items/donate',
+    endpoint: '/items/donate/',
     cacheKey: 'donate_data'
   },
   guide: {
-   endpoint: '/items/guide',
+   endpoint: '/items/guide/',
    cacheKey: 'guide_data'
   },
   emergency: {
-    endpoint: '/items/emergency',
+    endpoint: '/items/emergency/',
     cacheKey: 'emergency_data'
   },
   rules: {
