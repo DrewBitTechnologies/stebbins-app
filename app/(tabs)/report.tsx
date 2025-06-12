@@ -5,8 +5,11 @@ import {
 import { useScreen, ReportData } from '@/contexts/ApiContext';
 import * as ImagePicker from 'expo-image-picker';
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
+
 export default function ReportScreen() {
-  const { data, getImagePath } = useScreen<ReportData>('report');
+  const { data, getImagePath, fetch: fetchScreenData } = useScreen<ReportData>('report');
   const [description, setDescription] = useState('');
   const [files, setFiles] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [contact, setContact] = useState({
@@ -15,15 +18,16 @@ export default function ReportScreen() {
     email: '',
     phone: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Define getBackgroundSource as a proper function
-  const getBackgroundSource = () => { // <--- This line was missing or malformed
+  // Fetch screen data on mount
+  useEffect(() => {
+    fetchScreenData();
+  }, []);
+
+  const getBackgroundSource = () => {
     const backgroundPath = getImagePath('background');
-    
-    if (backgroundPath) {
-      return { uri: backgroundPath };
-    }
-    return require("@/assets/dev/fallback.jpeg");
+    return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
   };
 
   const pickFile = async () => {
@@ -38,7 +42,7 @@ export default function ReportScreen() {
         mediaTypes: ['images', 'videos'],
         allowsEditing: false,
         quality: 1,
-        allowsMultipleSelection: true, // Enable multiple selection
+        allowsMultipleSelection: true,
       });
 
       if (result.canceled) {
@@ -65,7 +69,6 @@ export default function ReportScreen() {
         }
 
         if (validFiles.length > 0) {
-          // Add new files to existing files array
           setFiles(prevFiles => [...prevFiles, ...validFiles]);
           console.log(`${validFiles.length} file(s) selected`);
         }
@@ -109,20 +112,152 @@ export default function ReportScreen() {
     return sizeInMB > 1 ? `${sizeInMB.toFixed(1)}MB` : `${(fileSize / 1024).toFixed(0)}KB`;
   };
 
-  const handleSubmit = () => {
-    // You can customize this function to handle the form submission
-    // For now, it just shows the collected data
-    const formData = {
-      files: files,
-      description: description,
-      contact: contact
-    };
+const REPORT_FILES_FOLDER_ID = '0f678859-460f-4401-b7d0-55a33bb8c3ee';
+
+const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
+    const formData = new FormData();
     
-    console.log('Submitting form data:', formData);
-    Alert.alert('Form Submitted', `Successfully submitted with ${files.length} file(s)`);
+    const fileName = file.fileName || `upload_${Date.now()}.${file.type?.split('/')[1] || 'jpg'}`;
+    const mimeType = file.type || 'application/octet-stream';
+    
+    formData.append('folder', REPORT_FILES_FOLDER_ID);
+    formData.append('file', {
+      uri: file.uri,
+      name: fileName,
+      type: mimeType,
+    } as any);
+
+    console.log(`Uploading file: ${fileName}, type: ${mimeType} to folder: ${REPORT_FILES_FOLDER_ID}`);
+
+    const response = await fetch(`${API_URL}/files`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${BEARER_TOKEN}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`File upload failed: ${response.status} - ${errorText}`);
+    }
+
+    const json = await response.json();
+    console.log('File uploaded successfully:', json.data.id);
+    return json.data.id;
   };
-    // The previous 'return' statements here were part of an incomplete function definition.
-    // They are now correctly placed inside the `getBackgroundSource` function defined above.
+
+  const createReport = async () => {
+    const reportData = {
+      description,
+      first_name: contact.firstName,
+      last_name: contact.lastName,
+      email: contact.email,
+      phone_number: contact.phone,
+    };
+
+    console.log('Creating report with data:', reportData);
+
+    const response = await fetch(`${API_URL}/items/report`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${BEARER_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(reportData),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Report creation failed: ${response.status} - ${errorText}`);
+    }
+
+    const json = await response.json();
+    console.log('Report created successfully:', json.data.id);
+    return json.data.id;
+  };
+
+  const linkFileToReport = async (reportId: number, fileId: string) => {
+    const linkData = {
+      report_id: reportId,
+      directus_files_id: fileId,
+    };
+
+    console.log('Linking file to report:', linkData);
+
+    const response = await fetch(`${API_URL}/items/report_files`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${BEARER_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(linkData),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`File linking failed: ${response.status} - ${errorText}`);
+    }
+
+    console.log('File linked successfully');
+  };
+
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      console.log(`Starting submission with ${files.length} files...`);
+      
+      // Step 1: Upload all files and get their IDs
+      const fileIds: string[] = [];
+      if (files.length > 0) {
+        console.log('Uploading files...');
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          console.log(`Uploading file ${i + 1}/${files.length}: ${file.fileName}`);
+          const fileId = await uploadFile(file);
+          fileIds.push(fileId);
+        }
+        console.log('All files uploaded successfully');
+      }
+
+      // Step 2: Create the report
+      console.log('Creating report...');
+      const reportId = await createReport();
+
+      // Step 3: Link files to report
+      if (fileIds.length > 0) {
+        console.log('Linking files to report...');
+        for (const fileId of fileIds) {
+          await linkFileToReport(reportId, fileId);
+        }
+        console.log('All files linked successfully');
+      }
+
+      // Success!
+      Alert.alert(
+        'Success', 
+        `Report submitted successfully with ${fileIds.length} file(s)`,
+        [{ text: 'OK', onPress: () => {
+          // Reset form
+          setFiles([]);
+          setDescription('');
+          setContact({ firstName: '', lastName: '', email: '', phone: '' });
+        }}]
+      );
+
+    } catch (error) {
+      console.error('Submission error:', error);
+      Alert.alert(
+        'Error', 
+        `Failed to submit report: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const renderThumbnail = (file: ImagePicker.ImagePickerAsset, index: number) => {
     const isVideo = file.type?.includes('video');
@@ -183,7 +318,7 @@ export default function ReportScreen() {
             
             {renderFilesList()}
             
-            <TouchableOpacity onPress={pickFile} style={styles.uploadButton}>
+            <TouchableOpacity onPress={pickFile} style={styles.uploadButton} disabled={isSubmitting}>
               <Text style={styles.uploadButtonText}>
                 {files.length === 0 ? 'Select Files' : 'Add More Files'}
               </Text>
@@ -199,6 +334,7 @@ export default function ReportScreen() {
               value={description}
               onChangeText={setDescription}
               placeholder="Enter description (optional)"
+              editable={!isSubmitting}
             />
           </View>
 
@@ -209,12 +345,14 @@ export default function ReportScreen() {
               placeholder="First Name (optional)"
               value={contact.firstName}
               onChangeText={(text) => setContact({ ...contact, firstName: text })}
+              editable={!isSubmitting}
             />
             <TextInput
               style={styles.input}
               placeholder="Last Name (optional)"
               value={contact.lastName}
               onChangeText={(text) => setContact({ ...contact, lastName: text })}
+              editable={!isSubmitting}
             />
             <TextInput
               style={styles.input}
@@ -222,6 +360,7 @@ export default function ReportScreen() {
               keyboardType="email-address"
               value={contact.email}
               onChangeText={(text) => setContact({ ...contact, email: text })}
+              editable={!isSubmitting}
             />
             <TextInput
               style={styles.input}
@@ -229,11 +368,18 @@ export default function ReportScreen() {
               keyboardType="phone-pad"
               value={contact.phone}
               onChangeText={(text) => setContact({ ...contact, phone: text })}
+              editable={!isSubmitting}
             />
           </View>
 
-          <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-            <Text style={styles.submitButtonText}>Submit Report</Text>
+          <TouchableOpacity 
+            onPress={handleSubmit} 
+            style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+            disabled={isSubmitting}
+          >
+            <Text style={styles.submitButtonText}>
+              {isSubmitting ? 'Submitting...' : 'Submit Report'}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -286,6 +432,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
+  },
+  submitButtonDisabled: {
+    backgroundColor: 'rgba(243, 196, 54, 0.5)',
   },
   submitButtonText: {
     fontSize: 16,
