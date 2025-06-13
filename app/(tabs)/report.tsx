@@ -112,7 +112,7 @@ export default function ReportScreen() {
     return sizeInMB > 1 ? `${sizeInMB.toFixed(1)}MB` : `${(fileSize / 1024).toFixed(0)}KB`;
   };
 
-const REPORT_FILES_FOLDER_ID = '0f678859-460f-4401-b7d0-55a33bb8c3ee';
+const REPORT_FILES_FOLDER_ID = process.env.EXPO_PUBLIC_REPORT_FILES_FOLDER_ID;//Make sure to get new folder id
 
 const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
     const formData = new FormData();
@@ -120,7 +120,14 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
     const fileName = file.fileName || `upload_${Date.now()}.${file.type?.split('/')[1] || 'jpg'}`;
     const mimeType = file.type || 'application/octet-stream';
     
-    formData.append('folder', REPORT_FILES_FOLDER_ID);
+    if (REPORT_FILES_FOLDER_ID) {
+      formData.append('folder', REPORT_FILES_FOLDER_ID);
+      console.log(`Uploading file: ${fileName}, type: ${mimeType} to folder: ${REPORT_FILES_FOLDER_ID}`);
+    } else {
+      console.log(`Uploading file: ${fileName}, type: ${mimeType} to root folder`);
+      console.warn('EXPO_PUBLIC_REPORT_FILES_FOLDER_ID not set - files will go to root folder');
+    }
+
     formData.append('file', {
       uri: file.uri,
       name: fileName,
