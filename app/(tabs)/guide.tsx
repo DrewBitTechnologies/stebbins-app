@@ -11,10 +11,10 @@ interface ButtonItem {
 
 export default function GuideScreen() {
   const verticalButtons: ButtonItem[] = [
-    { title: 'Animals', navigateTo: '/animals' },
-    { title: 'Trees and Shrubs', navigateTo: '/trees-and-shrubs' },
-    { title: 'Wildflowers', navigateTo: '/wildflowers' },
-    { title: 'Trail Tracks', navigateTo: '/trail-tracks' },
+    { title: 'Animals', navigateTo: '/guides/animals' },
+    { title: 'Trees and Shrubs', navigateTo: '/guides/trees-and-shrubs' },
+    { title: 'Wildflowers', navigateTo: '/guides/wildflowers' },
+    { title: 'Trail Tracks', navigateTo: '/guides/trail-tracks' },
   ];
 
   const { getImagePath } = useScreen<GuideData>('guide');

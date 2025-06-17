@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar"
-import { Image } from "react-native"
+import { Image, View } from "react-native"
 import { ApiProvider } from "@/contexts/ApiContext";
 
 export default function RootLayout() {
@@ -9,9 +9,12 @@ export default function RootLayout() {
       <StatusBar style="auto"/>
         <Stack screenOptions={{
           headerTitle: () => (
-            <Image
-            source={require('@/assets/images/splash-icon.png')}
-            style={{ height: 35, resizeMode: 'contain'}}/>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+              <Image
+                source={require('@/assets/images/splash-icon.png')}
+                style={{ height: 35, width: 250, resizeMode: 'contain' }}
+              />
+            </View>
           ),
         }}>
           <Stack.Screen name="(tabs)"/>

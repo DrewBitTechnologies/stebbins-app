@@ -37,6 +37,20 @@ export interface GuideData{
   background?: string;
 }
 
+export interface GuideDataItem{
+  id: number;
+  date_created: string;
+  date_updated: string;
+  common_name: string;
+  latin_name: string;
+  description: string;
+  color: string[];
+  season: string[];
+  image: string | null;
+}
+
+export type GuideDataItems = GuideDataItem[];
+
 export interface EmergencyData{
   id: number;
   date_created: string;
@@ -94,7 +108,9 @@ type ScreenData = HomeData
                   | EmergencyData
                   | RulesData
                   | SafetyData
-                  | ReportData;
+                  | ReportData
+                  | GuideDataItem
+                  | GuideDataItems;
 
 // Screen configuration
 interface ScreenConfig {
@@ -157,13 +173,35 @@ const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
   report: {
     endpoint: '/items/reports/',
     cacheKey: 'report_data'
-  }
-
-  // Add new screens like this:
-  // screen: {
-  //   endpoint: '/endpoint/screen/',
-  //   cacheKey: 'screen_data'
-  // },
+  },
+  guide_wildflower: {
+    endpoint: '/items/wildflower/',
+    cacheKey: 'guide_wildflower'
+  },
+  guide_tree_shrub: {
+    endpoint: '/items/tree_shrub/',
+    cacheKey: 'guide_tree_shrub'
+  },
+  guide_bird: {
+    endpoint: '/items/bird/',
+    cacheKey: 'guide_bird'
+  },
+  guide_mammal: {
+    endpoint: '/items/mammal/',
+    cacheKey: 'guide_mammal'
+  },
+  guide_invertebrate: {
+    endpoint: '/items/invertebrate/',
+    cacheKey: 'guide_invertebrate'
+  },
+  guide_track: {
+    endpoint: '/items/track/',
+    cacheKey: 'guide_track'
+  },
+  guide_herp: {
+    endpoint: '/items/herp/',
+    cacheKey: 'guide_herp'
+  },
 };
 
 export function ApiProvider({ children }: { children: ReactNode }) {
@@ -287,10 +325,24 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       const res = await response.json();
       const screenData = res.data as T;
 
-      // Handle all screen images in one unified approach
+      let parsedData = screenData;
       let imagePaths: Record<string, string> = {};
 
-      // Handle background image if it exists (use 'background' as key)
+      if (Array.isArray(screenData)) {
+        parsedData = await Promise.all(
+          screenData.map(async (item: any) => {
+            if (item.image) {
+              const localPath = await downloadImage(screenName, item.image);
+              if (localPath) {
+                imagePaths[item.image] = localPath;
+                item.image = localPath;
+              }
+            }
+            return item;
+          })
+        ) as T;
+      }
+
       if ('background' in screenData && screenData.background) {
         const backgroundPath = await downloadImage(screenName, screenData.background);
         if (backgroundPath) {
@@ -298,11 +350,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // Handle screen-specific images
-
-      // Handle screen-specific images
       if (screenName === 'rules') {
-        // Handle rules image
         if ('rules_image' in screenData && screenData.rules_image) {
           const rulesImagePath = await downloadImage(screenName, screenData.rules_image);
           if (rulesImagePath) {
@@ -310,7 +358,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        // Handle rules icons
         if ('rules' in screenData && Array.isArray((screenData as RulesData).rules)) {
           const rules = (screenData as RulesData).rules;
           for (const rule of rules) {
@@ -324,7 +371,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // Add safety screen handling
       if (screenName === 'safety') {
         // Handle safety image
         if ('safety_image' in screenData && screenData.safety_image) {
@@ -336,7 +382,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       }
 
       const cacheData: CachedScreenData = {
-        data: screenData,
+        data: parsedData,
         imagePaths: Object.keys(imagePaths).length > 0 ? imagePaths : undefined,
         timestamp: Date.now(),
       };

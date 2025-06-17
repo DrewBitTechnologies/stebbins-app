@@ -12,22 +12,36 @@ export default function SplashScreen() {
       try {
         setLoadingText('Loading app data...');
         
-        // Fetch all screen data upfront
-        const screens = ['home', 
-                        'about', 
-                        'donate', 
-                        'guide', 
-                        'emergency', 
-                        'rules', 
-                        'safety',
-                        'report'];
+        const screens = [
+          'home', 
+          'about', 
+          'donate', 
+          'guide', 
+          'emergency', 
+          'rules', 
+          'safety',
+          'report',
+          'guide_wildflower',
+          'guide_tree_shrub',
+          'guide_bird',
+          'guide_mammal',
+          'guide_invertebrate',
+          'guide_track',
+          'guide_herp'
+        ];
         
+        // Load data with progress updates
+        let completed = 0;
         await Promise.all(
           screens.map(async (screenName) => {
             try {
               await fetchScreenData(screenName);
+              completed++;
+              setLoadingText(`Loading data... ${completed}/${screens.length}`);
             } catch (error) {
               console.log(`Failed to fetch ${screenName} data:`, error);
+              completed++;
+              setLoadingText(`Loading data... ${completed}/${screens.length}`);
               // Continue with other screens even if one fails
             }
           })
