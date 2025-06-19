@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, Image, ImageBackground, ListRenderItem } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, ImageBackground, ListRenderItem, ScrollView } from 'react-native';
 import { useScreen, RulesData, Rule } from '@/contexts/ApiContext';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function RulesScreen() {
     const { data: rulesData, getImagePath } = useScreen<RulesData>('rules');
@@ -33,10 +35,17 @@ export default function RulesScreen() {
         return require("../assets/dev/fallback.jpeg");
     };
 
-    const renderRule: ListRenderItem<Rule> = ({ item }) => (
-        <View style={styles.rules}>
-            <Image source={getIconSource(item.icon)} style={styles.icon} />
-            <Text style={styles.iconText}>{item.text}</Text>
+    const renderRule: ListRenderItem<Rule> = ({ item, index }) => (
+        <View style={[
+            styles.ruleCard,
+            { marginBottom: index === (rulesData?.rules?.length || 0) - 1 ? 0 : 16 }
+        ]}>
+            <View style={styles.ruleContent}>
+                <View style={styles.iconContainer}>
+                    <Image source={getIconSource(item.icon)} style={styles.ruleIcon} />
+                </View>
+                <Text style={styles.ruleText}>{item.text}</Text>
+            </View>
         </View>
     );
 
@@ -44,87 +53,241 @@ export default function RulesScreen() {
         <ImageBackground 
             source={getBackgroundSource()}
             resizeMode="cover"
-            style={styles.backGroundImage}
-            blurRadius={0}
+            style={styles.container}
         >
-            <View style={styles.mainContainer}>
-                <View style={styles.rulesContainer}>
+            {/* Gradient overlay */}
+            <LinearGradient
+                colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
+                style={styles.gradientOverlay}
+            />
+
+            <ScrollView 
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                {/* Header Section */}
+                <View style={styles.headerSection}>
+                    <View style={styles.titleContainer}>
+                        <Ionicons 
+                            name="document-text"
+                            size={36} 
+                            color="white" 
+                            style={styles.headerIcon}
+                        />
+                        <Text style={styles.headerTitle}>Trail Rules</Text>
+                    </View>
+                    <Text style={styles.headerSubtitle}>Please follow these guidelines to help preserve the reserve</Text>
+                </View>
+
+                
+
+                {/* Rules Image Card */}
+                <View style={styles.imageCard}>
                     <Image style={styles.rulesImage} source={getRulesImageSource()} />
                 </View>
 
-                <FlatList
-                    style={styles.list}
-                    data={rulesData?.rules || []}
-                    renderItem={renderRule}
-                    keyExtractor={(item) => item.id.toString()}
-                />
-            </View>
+                {/* Rules List Card */}
+                <View style={styles.rulesListCard}>
+                    <View style={styles.rulesHeader}>
+                        <Ionicons name="checkmark-circle-outline" size={24} color="#374151" />
+                        <Text style={styles.rulesHeaderTitle}>Guidelines to Follow</Text>
+                    </View>
+                    
+                    <View style={styles.rulesContainer}>
+                        {rulesData?.rules?.map((item, index) => (
+                            <View key={item.id} style={[
+                                styles.ruleItem,
+                                { marginBottom: index === (rulesData?.rules?.length || 0) - 1 ? 0 : 20 }
+                            ]}>
+                                <View style={styles.ruleIconContainer}>
+                                    <Image source={getIconSource(item.icon)} style={styles.ruleIcon} />
+                                </View>
+                                <Text style={styles.ruleText}>{item.text}</Text>
+                            </View>
+                        )) || []}
+                    </View>
+                </View>
+
+                {/* Footer Message */}
+                <View style={styles.footerCard}>
+                    <View style={styles.footerContent}>
+                        <Ionicons name="heart" size={24} color="#dc2626" />
+                        <Text style={styles.footerText}>
+                            Thank you for helping us protect and preserve this natural space for future generations.
+                        </Text>
+                    </View>
+                </View>
+            </ScrollView>
         </ImageBackground>
     );
 }
 
 const styles = StyleSheet.create({
-    backGroundImage: {
+    container: {
         flex: 1,
     },
-    mainContainer: {
+    gradientOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 1,
+    },
+    scrollView: {
         flex: 1,
-        justifyContent: 'space-between',
+        zIndex: 2,
+    },
+    scrollContent: {
+        paddingTop: 60,
+        paddingBottom: 40,
+        paddingHorizontal: 20,
+    },
+    headerSection: {
         alignItems: 'center',
+        marginBottom: 24,
     },
-    rulesContainer: {
-        flex: 1,
-        borderRadius: 15,
-        flexDirection: 'column',
+    titleContainer: {
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        width: '90%',
-        backgroundColor: 'white',
-        marginBottom: 20,
-        marginTop: 20,
+        marginBottom: 8,
     },
-    rulesImage: {
-        resizeMode: 'contain',
-        width: '100%',
-        flex: 1,
+    headerIcon: {
+        marginRight: 12,
     },
-    rulesTitle: {
+    headerTitle: {
         fontSize: 28,
         fontWeight: 'bold',
+        color: 'white',
+        textShadowColor: 'rgba(0,0,0,0.5)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 3,
+    },
+    headerSubtitle: {
+        fontSize: 16,
+        color: 'rgba(255,255,255,0.9)',
         textAlign: 'center',
+        textShadowColor: 'rgba(0,0,0,0.5)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
     },
-    list: {
-        flex: 1,
-        width: '90%',
-        backgroundColor: 'white',
-        borderRadius: 15,
+    imageCard: {
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderRadius: 16,
+        padding: 16,
         marginBottom: 20,
-        marginRight: 20,
-        marginLeft: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 8,
     },
-    icon: {
-        width: 70,
-        height: 70,
+    rulesImage: {
+        width: '100%',
+        minHeight: 200,
+        maxHeight: 400,
+        borderRadius: 12,
+        resizeMode: 'contain',
+        aspectRatio: undefined,
     },
-    iconText: {
-        textAlign: 'left',
-        fontSize: 20,
-        lineHeight: 30,
-        width: '90%',
+    rulesListCard: {
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 8,
     },
-    rules: {
-        flex: 1,
+    rulesHeader: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 10,
-        width: '90%',
+        marginBottom: 20,
+        paddingBottom: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(0, 0, 0, 0.1)',
     },
-    shadowProp: {
-        shadowColor: '#171717',
-        shadowOffset: { width: -4, height: 4 },
-        shadowOpacity: 0.25,
-        shadowRadius: 5,
-        elevation: 5,
+    rulesHeaderTitle: {
+        fontSize: 20,
+        fontWeight: '600',
+        color: '#374151',
+        marginLeft: 12,
+    },
+    rulesContainer: {
+        gap: 20,
+    },
+    ruleItem: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+    },
+    ruleIconContainer: {
+        width: 85,
+        height: 85,
+        borderRadius: 45,
+        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 16,
+        flexShrink: 0,
+    },
+    ruleIcon: {
+        width: 75,
+        height: 75,
+        resizeMode: 'cover',
+    },
+    ruleText: {
+        fontSize: 16,
+        lineHeight: 24,
+        color: '#374151',
+        flex: 1,
+        marginTop: 2,
+    },
+    footerCard: {
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderRadius: 16,
+        padding: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+    footerContent: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+    },
+    footerText: {
+        fontSize: 16,
+        lineHeight: 24,
+        color: '#374151',
+        flex: 1,
+        marginLeft: 12,
+        fontStyle: 'italic',
+    },
+    ruleCard: {
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    ruleContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+    },
+    iconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
     },
 });
