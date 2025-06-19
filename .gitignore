@@ -45,3 +45,5 @@ ios/
 .env
 .env.local
 .env.production
+
+eas.json

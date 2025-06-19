@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "stebbins",
-    "slug": "stebbins",
-    "version": "1.0.0",
+    "name": "Stebbins",
+    "slug": "stebbins-app",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "stebbinsapp",
@@ -16,7 +16,13 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.stebbins-app"
+      "bundleIdentifier": "com.anonymous.stebbins-app",
+      "buildNumber": "2",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "The app uses precise location to display geographic position on the reserve map.",
+        "NSLocationWhenInUseUsageDescription": "The app uses precise location to display geographic position on the reserve map."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +30,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.stebbinsapp"
+      "package": "com.anonymous.stebbinsapp",
+      "versionCode": 2
     },
     "web": {
       "bundler": "metro",
@@ -45,6 +52,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "96e0a0e5-a320-4098-8b31-2cb1a29ebaa8"
+      }
+    },
+    "owner": "stebbins-app"
   }
 }

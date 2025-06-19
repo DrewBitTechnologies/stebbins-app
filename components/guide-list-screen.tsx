@@ -463,8 +463,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterChipSelected: {
-    backgroundColor: '#4CAF50',
-    borderColor: '#4CAF50',
+    backgroundColor: '#FFBF00',
+    borderColor: '#FFBF00',
   },
   filterChipText: {
     fontSize: 14,
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterChipTextSelected: {
-    color: '#fff',
+    color: '#022851',
   },
   clearButton: {
     alignSelf: 'flex-start',
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
   },
   moreButtonText: {
     fontSize: 14,
-    color: '#4CAF50',
+    color: '#022851',
     fontWeight: '600',
   },
   tagContainer: {
