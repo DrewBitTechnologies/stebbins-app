@@ -6,7 +6,7 @@ export default function TreesAndShrubsGuidePage() {
   const routeParams = {
     params: {
       screenName: 'guide_tree_shrub', // The API key from ApiContext.tsx
-      title: 'Trees and Shrubs',            // The title to display on the screen
+      title: 'Tree and Shrub',            // The title to display on the screen
     },
   };
 

@@ -6,7 +6,7 @@ export default function WildflowerGuidePage() {
   const routeParams = {
     params: {
       screenName: 'guide_wildflower', // The API key from ApiContext.tsx
-      title: 'Wildflowers',            // The title to display on the screen
+      title: 'Wildflower',            // The title to display on the screen
     },
   };
 

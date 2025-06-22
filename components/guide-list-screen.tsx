@@ -14,28 +14,28 @@ import {
     View,
 } from 'react-native';
 import { GuideDataItem, useScreen } from '../contexts/ApiContext';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-// Filter chip component
+// Simplified Filter chip component with softer styling
 const FilterChip = ({ 
   label, 
   selected, 
   onPress, 
-  color 
 }: { 
   label: string; 
   selected: boolean; 
   onPress: () => void; 
-  color?: string;
 }) => (
   <TouchableOpacity
     style={[
       styles.filterChip,
       selected && styles.filterChipSelected,
-      color && { backgroundColor: color, borderColor: color }
     ]}
     onPress={onPress}
+    activeOpacity={0.8}
   >
     <Text style={[
       styles.filterChipText,
@@ -50,20 +50,15 @@ const ExpandableText = ({ text, maxLines = 3 }: { text: string; maxLines?: numbe
   const [expanded, setExpanded] = useState(false);
   const [showMoreButton, setShowMoreButton] = useState(false);
 
-  // This function runs after the text has been laid out
   const onTextLayout = (event: any) => {
-    // If we are not expanded, check if the number of rendered lines is >= maxLines.
-    // This tells us if the text was truncated.
     if (!expanded && event.nativeEvent.lines.length >= maxLines) {
       setShowMoreButton(true);
     }
-    // If the text is expanded, we never need the button.
     if (expanded) {
       setShowMoreButton(false);
     }
   };
 
-  // When the user presses the button, toggle the expanded state.
   const toggleText = () => {
     setExpanded(!expanded);
   };
@@ -80,18 +75,20 @@ const ExpandableText = ({ text, maxLines = 3 }: { text: string; maxLines?: numbe
       {showMoreButton && !expanded && (
         <TouchableOpacity onPress={toggleText} style={styles.moreButton}>
           <Text style={styles.moreButtonText}>More</Text>
+          <Ionicons name="chevron-down" size={12} color="#2d5016" style={styles.moreButtonIcon} />
         </TouchableOpacity>
       )}
       {expanded && (
          <TouchableOpacity onPress={toggleText} style={styles.moreButton}>
           <Text style={styles.moreButtonText}>Less</Text>
+          <Ionicons name="chevron-up" size={12} color="#2d5016" style={styles.moreButtonIcon} />
         </TouchableOpacity>
       )}
     </View>
   );
 };
 
-// Zoomable image modal
+// Simplified Zoomable image modal
 const ZoomableImageModal = ({ 
   visible, 
   imageUri, 
@@ -118,7 +115,9 @@ const ZoomableImageModal = ({
             />
           </ScrollView>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>✕</Text>
+            <View style={styles.closeButtonBackground}>
+              <Ionicons name="close" size={20} color="#1a1a1a" />
+            </View>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -126,13 +125,9 @@ const ZoomableImageModal = ({
   </Modal>
 );
 
-
-// Main component, now generalized
+// Main component with softer styling
 export default function GuideListScreen({ route }: { route: any }) {
-  // Use props to make the component reusable
   const { screenName, title } = route.params;
-
-  // Fetch data dynamically based on the screenName prop
   const guideData = useScreen<GuideDataItem[]>(screenName);
   
   const [filteredData, setFilteredData] = useState<GuideDataItem[]>([]);
@@ -142,20 +137,18 @@ export default function GuideListScreen({ route }: { route: any }) {
   const [allColors, setAllColors] = useState<string[]>([]);
   const [allSeasons, setAllSeasons] = useState<string[]>([]);
 
-  // Month mapping for season conversion. This can be moved to a constants file if used elsewhere.
   const monthMap: Record<string, string> = {
     '0': 'None', '1': 'January', '2': 'February', '3': 'March', 
     '4': 'April', '5': 'May', '6': 'June', '7': 'July', '8': 'August', 
     '9': 'September', '10': 'October', '11': 'November', '12': 'December',
   };
 
-  // Extract unique colors and seasons from data. This logic is already dynamic.
   useEffect(() => {
     if (guideData.data) {
       const colors = new Set<string>();
       const seasons = new Set<string>();
 
-      colors.add('None'); // Always add "None" for color filtering
+      colors.add('None');
 
       guideData.data.forEach(item => {
         if (item.color && item.color.length > 0) {
@@ -186,7 +179,6 @@ export default function GuideListScreen({ route }: { route: any }) {
     }
   }, [guideData.data]);
 
-  // Filter data based on selected filters. This logic is also dynamic.
   useEffect(() => {
     if (!guideData.data) {
       setFilteredData([]);
@@ -243,89 +235,109 @@ export default function GuideListScreen({ route }: { route: any }) {
   };
 
   const renderItem = ({ item }: { item: GuideDataItem }) => (
-    <View style={styles.card}>
-      {item.image && (
-        <TouchableOpacity onPress={() => setZoomedImage(item.image)}>
-          <Image
-            source={{ uri: item.image }}
-            style={styles.cardImage}
-            resizeMode="cover"
-          />
-          <View style={styles.zoomIndicator}>
-            <Text style={styles.zoomIndicatorText}>🔍</Text>
-          </View>
-        </TouchableOpacity>
-      )}
-      
-      <View style={styles.cardContent}>
-        <Text style={styles.commonName}>{item.common_name}</Text>
-        <Text style={styles.latinName}>{item.latin_name}</Text>
-        
-        <ExpandableText text={item.description} />
-        
-        {item.color && item.color.length > 0 && (
-          <View style={styles.tagContainer}>
-            <Text style={styles.tagLabel}>Colors:</Text>
-            <View style={styles.tagList}>
-              {item.color.map((color, index) => (
-                <View key={index} style={[styles.tag, styles.colorTag]}>
-                  <Text style={styles.tagText}>
-                    {color.charAt(0).toUpperCase() + color.slice(1).toLowerCase()}
-                  </Text>
-                </View>
-              ))}
+    <View style={styles.cardContainer}>
+      <View style={styles.card}>
+        {item.image && (
+          <TouchableOpacity onPress={() => setZoomedImage(item.image)} style={styles.imageContainer}>
+            <Image
+              source={{ uri: item.image }}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
+            <View style={styles.zoomIndicator}>
+              <Ionicons name="expand" size={16} color="#2d5016" />
             </View>
-          </View>
+          </TouchableOpacity>
         )}
-        {(!item.color || item.color.length === 0) && (
-          <View style={styles.tagContainer}>
-            <Text style={styles.tagLabel}>Colors:</Text>
-            <View style={styles.tagList}>
-              <View style={[styles.tag, styles.colorTag]}>
-                <Text style={styles.tagText}>None</Text>
+        
+        <View style={styles.cardContent}>
+          <View style={styles.titleSection}>
+            <Text style={styles.commonName}>{item.common_name}</Text>
+            <Text style={styles.latinName}>{item.latin_name}</Text>
+          </View>
+          
+          <ExpandableText text={item.description} />
+          
+          {item.color && item.color.length > 0 && (
+            <View style={styles.tagContainer}>
+              <View style={styles.tagHeader}>
+                <Ionicons name="color-palette" size={16} color="#2d5016" />
+                <Text style={styles.tagLabel}>Colors</Text>
               </View>
-            </View>
-          </View>
-        )}
-        
-        {item.season && item.season.length > 0 && (
-          <View style={styles.tagContainer}>
-            <Text style={styles.tagLabel}>Seasons:</Text>
-            <View style={styles.tagList}>
-              {item.season.map((season, index) => {
-                const monthName = monthMap[season.toString()];
-                const displaySeason = monthName || season.charAt(0).toUpperCase() + season.slice(1).toLowerCase();
-                return (
-                  <View key={index} style={[styles.tag, styles.seasonTag]}>
-                    <Text style={styles.tagText}>{displaySeason}</Text>
+              <View style={styles.tagList}>
+                {item.color.map((color, index) => (
+                  <View key={index} style={styles.colorTag}>
+                    <Text style={styles.tagText}>
+                      {color.charAt(0).toUpperCase() + color.slice(1).toLowerCase()}
+                    </Text>
                   </View>
-                );
-              })}
-            </View>
-          </View>
-        )}
-        {(!item.season || item.season.length === 0) && (
-          <View style={styles.tagContainer}>
-            <Text style={styles.tagLabel}>Seasons:</Text>
-            <View style={styles.tagList}>
-              <View style={[styles.tag, styles.seasonTag]}>
-                <Text style={styles.tagText}>None</Text>
+                ))}
               </View>
             </View>
-          </View>
-        )}
+          )}
+          {(!item.color || item.color.length === 0) && (
+            <View style={styles.tagContainer}>
+              <View style={styles.tagHeader}>
+                <Ionicons name="color-palette" size={16} color="#2d5016" />
+                <Text style={styles.tagLabel}>Colors</Text>
+              </View>
+              <View style={styles.tagList}>
+                <View style={styles.emptyTag}>
+                  <Text style={styles.emptyTagText}>None</Text>
+                </View>
+              </View>
+            </View>
+          )}
+          
+          {item.season && item.season.length > 0 && (
+            <View style={styles.tagContainer}>
+              <View style={styles.tagHeader}>
+                <Ionicons name="leaf" size={16} color="#2d5016" />
+                <Text style={styles.tagLabel}>Seasons</Text>
+              </View>
+              <View style={styles.tagList}>
+                {item.season.map((season, index) => {
+                  const monthName = monthMap[season.toString()];
+                  const displaySeason = monthName || season.charAt(0).toUpperCase() + season.slice(1).toLowerCase();
+                  return (
+                    <View key={index} style={styles.seasonTag}>
+                      <Text style={styles.tagText}>{displaySeason}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+          )}
+          {(!item.season || item.season.length === 0) && (
+            <View style={styles.tagContainer}>
+              <View style={styles.tagHeader}>
+                <Ionicons name="leaf" size={16} color="#2d5016" />
+                <Text style={styles.tagLabel}>Seasons</Text>
+              </View>
+              <View style={styles.tagList}>
+                <View style={styles.emptyTag}>
+                  <Text style={styles.emptyTagText}>None</Text>
+                </View>
+              </View>
+            </View>
+          )}
+        </View>
       </View>
     </View>
   );
 
   const renderHeader = () => (
     <View style={styles.header}>
-      {/* Use the title from props */}
-      <Text style={styles.headerTitle}>{title} Guide</Text>
+      <View style={styles.headerTitleContainer}>
+        <Text style={styles.headerTitle}>{title} Guide</Text>
+      </View>
       
       {allColors.length > 0 && (
         <View style={styles.filterSection}>
-          <Text style={styles.filterTitle}>Filter by Color</Text>
+          <View style={styles.filterTitleContainer}>
+            <Ionicons name="color-filter" size={16} color="#2d5016" />
+            <Text style={styles.filterTitle}>Filter by Color</Text>
+          </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.filterRow}>
               {allColors.map(color => (
@@ -343,7 +355,10 @@ export default function GuideListScreen({ route }: { route: any }) {
       
       {allSeasons.length > 0 && (
         <View style={styles.filterSection}>
-          <Text style={styles.filterTitle}>Filter by Season</Text>
+          <View style={styles.filterTitleContainer}>
+            <Ionicons name="calendar" size={16} color="#2d5016" />
+            <Text style={styles.filterTitle}>Filter by Season</Text>
+          </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.filterRow}>
               {allSeasons.map(season => (
@@ -361,153 +376,209 @@ export default function GuideListScreen({ route }: { route: any }) {
       
       {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
         <TouchableOpacity style={styles.clearButton} onPress={clearAllFilters}>
+          <Ionicons name="close-circle" size={14} color="#666" />
           <Text style={styles.clearButtonText}>Clear All Filters</Text>
         </TouchableOpacity>
       )}
       
-      <Text style={styles.resultsCount}>
-        {filteredData.length} {filteredData.length === 1 ? 'result' : 'results'}
-      </Text>
+      <View style={styles.resultsContainer}>
+        <Ionicons name="list" size={14} color="#2d5016" />
+        <Text style={styles.resultsCount}>
+          {filteredData.length} {filteredData.length === 1 ? 'result' : 'results'}
+        </Text>
+      </View>
     </View>
   );
 
-  // Use dynamic text in the loading indicator
   if (guideData.isLoading && !guideData.data) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#4CAF50" />
-        <Text style={styles.loadingText}>Loading {title.toLowerCase()}...</Text>
-      </View>
+      <LinearGradient
+        colors={['#f8f9fa', '#e9ecef']}
+        style={styles.backgroundGradient}
+      >
+        <View style={styles.loadingContainer}>
+          <View style={styles.loadingCard}>
+            <ActivityIndicator size="large" color="#2d5016" />
+            <Text style={styles.loadingText}>Loading {title.toLowerCase()}...</Text>
+          </View>
+        </View>
+      </LinearGradient>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      
-      <FlatList
-        data={filteredData}
-        keyExtractor={item => item.id.toString()}
-        renderItem={renderItem}
-        ListHeaderComponent={renderHeader}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
-      
-      {zoomedImage && (
-        <ZoomableImageModal
-          visible={!!zoomedImage}
-          imageUri={zoomedImage}
-          onClose={() => setZoomedImage(null)}
+    <LinearGradient
+      colors={['#f8f9fa', '#e9ecef']}
+      style={styles.backgroundGradient}
+    >
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+        
+        <FlatList
+          data={filteredData}
+          keyExtractor={item => item.id.toString()}
+          renderItem={renderItem}
+          ListHeaderComponent={renderHeader}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
-      )}
-    </SafeAreaView>
+        
+        {zoomedImage && (
+          <ZoomableImageModal
+            visible={!!zoomedImage}
+            imageUri={zoomedImage}
+            onClose={() => setZoomedImage(null)}
+          />
+        )}
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
-// NOTE: Styles are unchanged.
 const styles = StyleSheet.create({
+  backgroundGradient: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+  },
+  loadingCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 16,
+    padding: 32,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#666',
+    color: '#2d5016',
+    fontWeight: '500',
   },
   listContent: {
     paddingBottom: 20,
   },
   header: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: 'rgba(45, 80, 22, 0.1)',
+  },
+  headerTitleContainer: {
+    alignItems: 'flex-start',
+    marginBottom: 20,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: 20,
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#1a1a1a',
   },
   filterSection: {
     marginBottom: 16,
   },
-  filterTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#495057',
+  filterTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
+  },
+  filterTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#2d5016',
+    marginLeft: 6,
   },
   filterRow: {
     flexDirection: 'row',
     paddingRight: 16,
   },
   filterChip: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#e9ecef',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderWidth: 1,
-    borderColor: '#dee2e6',
+    borderColor: 'rgba(45, 80, 22, 0.2)',
     marginRight: 8,
   },
   filterChipSelected: {
-    backgroundColor: '#FFBF00',
-    borderColor: '#FFBF00',
+    backgroundColor: 'rgba(45, 80, 22, 0.1)',
+    borderColor: '#2d5016',
   },
   filterChipText: {
-    fontSize: 14,
-    color: '#495057',
+    fontSize: 13,
+    color: '#2d5016',
     fontWeight: '500',
   },
   filterChipTextSelected: {
-    color: '#022851',
-  },
-  clearButton: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#dc3545',
-    borderRadius: 20,
-    marginBottom: 12,
-  },
-  clearButtonText: {
-    color: '#fff',
-    fontSize: 14,
+    color: '#2d5016',
     fontWeight: '600',
   },
-  resultsCount: {
-    fontSize: 14,
-    color: '#6c757d',
+  clearButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginBottom: 12,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderWidth: 1,
+    borderColor: 'rgba(102, 102, 102, 0.3)',
+  },
+  clearButtonText: {
+    color: '#666',
+    fontSize: 13,
     fontWeight: '500',
+    marginLeft: 4,
+  },
+  resultsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    backgroundColor: 'rgba(45, 80, 22, 0.1)',
+  },
+  resultsCount: {
+    fontSize: 13,
+    color: '#2d5016',
+    fontWeight: '500',
+    marginLeft: 6,
   },
   separator: {
     height: 12,
   },
-  card: {
-    backgroundColor: '#fff',
-    marginHorizontal: 16,
-    borderRadius: 12,
+  cardContainer: {
+    marginHorizontal: 20,
+    borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  card: {
+    borderRadius: 16,
     overflow: 'hidden',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderWidth: 1,
+    borderColor: 'rgba(45, 80, 22, 0.1)',
+  },
+  imageContainer: {
+    position: 'relative',
   },
   cardImage: {
     width: '100%',
@@ -515,33 +586,32 @@ const styles = StyleSheet.create({
   },
   zoomIndicator: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 16,
+    top: 12,
+    right: 12,
     width: 32,
     height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  zoomIndicatorText: {
-    color: '#fff',
-    fontSize: 16,
   },
   cardContent: {
     padding: 16,
   },
+  titleSection: {
+    marginBottom: 12,
+  },
   commonName: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    fontWeight: '600',
+    color: '#1a1a1a',
     marginBottom: 4,
   },
   latinName: {
-    fontSize: 16,
+    fontSize: 15,
     fontStyle: 'italic',
-    color: '#6c757d',
-    marginBottom: 12,
+    color: '#666',
+    marginBottom: 2,
   },
   description: {
     fontSize: 15,
@@ -549,52 +619,78 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 4,
   },
-  readMoreText: {
-    fontSize: 14,
-    color: '#4CAF50',
-    fontWeight: '600',
-    marginBottom: 12,
-  },
   moreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-start',
     marginTop: 4,
     marginBottom: 8,
   },
   moreButtonText: {
     fontSize: 14,
-    color: '#022851',
-    fontWeight: '600',
+    color: '#2d5016',
+    fontWeight: '500',
+  },
+  moreButtonIcon: {
+    marginLeft: 4,
   },
   tagContainer: {
-    marginTop: 12,
+    marginTop: 16,
+  },
+  tagHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   tagLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#495057',
-    marginBottom: 6,
+    fontWeight: '500',
+    color: '#2d5016',
+    marginLeft: 6,
   },
   tagList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  tag: {
+  colorTag: {
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderRadius: 12,
     marginRight: 6,
     marginBottom: 4,
-  },
-  colorTag: {
-    backgroundColor: '#e3f2fd',
+    backgroundColor: 'rgba(45, 80, 22, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(45, 80, 22, 0.2)',
   },
   seasonTag: {
-    backgroundColor: '#fff3e0',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginRight: 6,
+    marginBottom: 4,
+    backgroundColor: 'rgba(45, 80, 22, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(45, 80, 22, 0.2)',
+  },
+  emptyTag: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginRight: 6,
+    marginBottom: 4,
+    backgroundColor: 'rgba(108, 117, 125, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(108, 117, 125, 0.2)',
   },
   tagText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#495057',
+    color: '#2d5016',
+  },
+  emptyTagText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#6c757d',
   },
   modalOverlay: {
     flex: 1,
@@ -621,16 +717,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 40,
     right: 20,
+    borderRadius: 25,
+  },
+  closeButtonBackground: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  closeButtonText: {
-    fontSize: 20,
-    color: '#333',
-    fontWeight: 'bold',
   },
 });

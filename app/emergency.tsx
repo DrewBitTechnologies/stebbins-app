@@ -73,7 +73,7 @@ export default function EmergencyScreen() {
                         <View style={styles.alertIconContainer}>
                             <Ionicons 
                                 name="alert-circle" 
-                                size={32} 
+                                size={36} 
                                 color="white" 
                             />
                         </View>

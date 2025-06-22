@@ -20,7 +20,6 @@ interface ButtonItem {
 }
 
 export default function HomeScreen() {
-  const insets = useSafeAreaInsets();
   const { data: homeData, getImagePath, fetch, isLoading } = useScreen<HomeData>('home');
 
   const mainButtons: ButtonItem[] = [
@@ -113,7 +112,7 @@ export default function HomeScreen() {
       resizeMode="cover"
     >
       <LinearGradient
-        colors={['rgba(0,0,0,0.2)', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.6)']}
+        colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
         style={styles.gradientOverlay}
       />
 
@@ -122,13 +121,6 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* <View style={styles.headerSection}>
-            <View style={styles.headerTitleContainer}>
-              <Ionicons name="leaf" size={32} color="white" style={styles.headerIcon} />
-              <Text style={styles.headerTitle}>Stebbins</Text>
-            </View>
-            <Text style={styles.headerSubtitle}>Your official guide to Stebbins Cold Canyon Reserve</Text>
-        </View> */}
 
         <ReserveStatusCard />
 
@@ -234,7 +226,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   statusCard: {
-    backgroundColor: 'rgba(255, 191, 0, 0.9)',
+    backgroundColor: 'rgba(255, 191, 0, 0.85)',
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,

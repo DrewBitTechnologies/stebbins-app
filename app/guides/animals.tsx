@@ -22,25 +22,25 @@ interface AnimalGuide {
 const animalGuides: AnimalGuide[] = [
   {
     id: 'mammals',
-    title: 'Mammals',
+    title: 'Mammal',
     screenName: 'guide_mammal',
     icon: '🐾',
   },
   {
     id: 'birds',
-    title: 'Birds',
+    title: 'Bird',
     screenName: 'guide_bird',
     icon: '🐦',
   },
   {
     id: 'herps',
-    title: 'Herps',
+    title: 'Herp',
     screenName: 'guide_herp',
     icon: '🦎',
   },
   {
     id: 'invertebrates',
-    title: 'Invertebrates',
+    title: 'Invertebrate',
     screenName: 'guide_invertebrate',
     icon: '🦋',
   },

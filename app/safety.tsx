@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View, Text, Image, ImageBackground, TouchableOp
 import { useScreen, SafetyData } from '@/contexts/ApiContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 
 export default function SafetyScreen() {
     const { data: safetyData, getImagePath, isLoading, fetch } = useScreen<SafetyData>('safety');
@@ -44,9 +45,8 @@ export default function SafetyScreen() {
         });
     };
 
-    const handleEmergencyCall = () => {
-        const phoneNumber = '707-421-7096';
-        Linking.openURL(`tel:${phoneNumber}`);
+    const navigateToEmergency = () => {
+       router.push("emergency" as any)
     };
 
     if (isLoading && !safetyData) {
@@ -60,7 +60,6 @@ export default function SafetyScreen() {
         );
     }
 
-    const emergencyContact = safetyData?.emergency_contact?.trim() || "FOR EMERGENCIES CONTACT SOLANO COUNTY DISPATCH: 707-421-7096";
     const safetyBulletpoints = safetyData ? parseSafetyText(safetyData.safety_bulletpoints) : [];
 
     return (
@@ -102,21 +101,16 @@ export default function SafetyScreen() {
                 {/* Emergency Contact Card */}
                 <TouchableOpacity 
                     style={styles.emergencyCard}
-                    onPress={handleEmergencyCall}
+                    onPress={navigateToEmergency}
                     activeOpacity={0.8}
                 >
-                    <View style={styles.emergencyHeader}>
+                    <View style={styles.emergencyContent}>
                         <View style={styles.emergencyIconContainer}>
                             <Ionicons name="call" size={24} color="white" />
                         </View>
-                        <View style={styles.emergencyTextContainer}>
-                            <Text style={styles.emergencyTitle}>Emergency Contact</Text>
-                            <Text style={styles.emergencySubtitle}>Tap to call immediately</Text>
-                        </View>
+                        <Text style={styles.emergencyTitle}>Emergency Contacts</Text>
                         <Ionicons name="chevron-forward" size={24} color="white" />
                     </View>
-                    <Text style={styles.emergencyNumber}>707-421-7096</Text>
-                    <Text style={styles.emergencyDescription}>Solano County Dispatch</Text>
                 </TouchableOpacity>
 
                 {/* Safety Guidelines Card */}
@@ -201,12 +195,13 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.15,
         shadowRadius: 8,
         elevation: 8,
+        alignItems: 'center',
     },
     safetyImage: {
         width: '100%',
-        height: 200,
+        aspectRatio: 1,
         borderRadius: 12,
-        resizeMode: 'contain',
+        resizeMode: 'cover',
     },
     emergencyCard: {
         backgroundColor: '#dc2626',
@@ -219,10 +214,10 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 8,
     },
-    emergencyHeader: {
+    emergencyContent: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 12,
+        justifyContent: 'space-between',
     },
     emergencyIconContainer: {
         width: 40,
@@ -231,16 +226,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 12,
-    },
-    emergencyTextContainer: {
-        flex: 1,
     },
     emergencyTitle: {
         fontSize: 18,
         fontWeight: '600',
         color: 'white',
-        marginBottom: 2,
+        flex: 1,
+        textAlign: 'center',
+        marginHorizontal: 16,
     },
     emergencySubtitle: {
         fontSize: 14,

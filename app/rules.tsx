@@ -182,14 +182,13 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.15,
         shadowRadius: 8,
         elevation: 8,
+        alignItems: 'center',
     },
     rulesImage: {
         width: '100%',
-        minHeight: 200,
-        maxHeight: 400,
+        aspectRatio: 1,
         borderRadius: 12,
-        resizeMode: 'contain',
-        aspectRatio: undefined,
+        resizeMode: 'cover',
     },
     rulesListCard: {
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -239,7 +238,8 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
     },
     ruleText: {
-        fontSize: 16,
+        fontSize: 18,
+        
         lineHeight: 24,
         color: '#374151',
         flex: 1,

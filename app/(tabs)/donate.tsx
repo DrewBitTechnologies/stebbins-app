@@ -60,7 +60,7 @@ export default function DonateScreen() {
         >
             {/* Gradient overlay */}
             <LinearGradient
-                colors={['rgba(45, 80, 22, 0.3)', 'rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.6)']}
+                colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
                 style={styles.gradientOverlay}
             />
             
@@ -69,21 +69,18 @@ export default function DonateScreen() {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Header Section */}
+
                 <View style={styles.headerSection}>
                     <View style={styles.titleContainer}>
-                        <View style={styles.heartIconContainer}>
-                            <Ionicons 
-                                name="heart" 
-                                size={32} 
-                                color="white" 
-                            />
-                        </View>
+                        <Ionicons 
+                            name="heart" 
+                            size={36} 
+                            color="white" 
+                            style={styles.headerIcon}
+                        />
                         <Text style={styles.headerTitle}>Support Our Mission</Text>
                     </View>
-                    <Text style={styles.headerSubtitle}>
-                        Help preserve and enhance Stebbins Cold Canyon for future generations
-                    </Text>
+                    <Text style={styles.headerSubtitle}>Help preserve and enhance Stebbins for future generations</Text>
                 </View>
 
                 {/* Main Donation Card */}
@@ -212,20 +209,14 @@ const styles = StyleSheet.create({
     },
     headerSection: {
         alignItems: 'center',
-        marginBottom: 30,
-        paddingHorizontal: 20,
+        marginBottom: 24,
     },
     titleContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 12,
+        marginBottom: 8,
     },
-    heartIconContainer: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        justifyContent: 'center',
-        alignItems: 'center',
+    headerIcon: {
         marginRight: 12,
     },
     headerTitle: {
@@ -243,7 +234,6 @@ const styles = StyleSheet.create({
         textShadowColor: 'rgba(0,0,0,0.5)',
         textShadowOffset: { width: 0, height: 1 },
         textShadowRadius: 2,
-        lineHeight: 22,
     },
     donationCard: {
         backgroundColor: 'rgba(255, 255, 255, 0.95)',

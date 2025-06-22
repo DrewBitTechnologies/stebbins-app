@@ -85,7 +85,6 @@ export interface SafetyData {
   date_updated: string;
   background?: string;
   safety_image?: string;
-  emergency_contact: string;
   safety_bulletpoints: string;
 }
 

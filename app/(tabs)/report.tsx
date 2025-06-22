@@ -327,7 +327,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
     <ImageBackground source={getBackgroundSource()} style={styles.backgroundImage} resizeMode="cover">
       {/* Gradient overlay */}
       <LinearGradient
-        colors={['rgba(45, 80, 22, 0.2)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.5)']}
+        colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
         style={styles.gradientOverlay}
       />
       
@@ -342,7 +342,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
             <View style={styles.reportIconContainer}>
               <Ionicons 
                 name="flag" 
-                size={32} 
+                size={36} 
                 color="white" 
               />
             </View>

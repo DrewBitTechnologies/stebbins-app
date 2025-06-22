@@ -11,7 +11,7 @@ export default function RootLayout() {
           headerTitle: () => (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
               <Image
-                source={require('@/assets/images/splash-icon.png')}
+                source={require('@/assets/dev/bat-horizontal.png')}
                 style={{ height: 35, width: 250, resizeMode: 'contain' }}
               />
             </View>

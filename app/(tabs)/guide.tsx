@@ -63,7 +63,7 @@ export default function GuideScreen() {
     >
       {/* Gradient overlay for better text readability */}
       <LinearGradient
-        colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.6)']}
+        colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
         style={styles.gradientOverlay}
       />
       
@@ -72,12 +72,8 @@ export default function GuideScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        
         {/* Header Section */}
-        {/* <View style={styles.headerSection}>
-          <Text style={styles.headerTitle}>Stebbins Field Guide</Text>
-          <Text style={styles.headerSubtitle}>Explore the natural world around you</Text>
-        </View> */}
-
         <View style={styles.headerSection}>
             <View style={styles.titleContainer}>
                 <Ionicons 

@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   image: {
-    height: 50,
-    marginBottom: 20,
+    height: 200,
+    width: 200,
   },
   loadingText: {
     fontSize: 16,

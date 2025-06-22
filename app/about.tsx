@@ -69,7 +69,7 @@ export default function AboutScreen() {
         >
             {/* Gradient overlay for better text readability */}
             <LinearGradient
-                colors={['rgba(0,0,0,0.2)', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.6)']}
+                colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
                 style={styles.gradientOverlay}
             />
             
@@ -82,7 +82,7 @@ export default function AboutScreen() {
                 <View style={styles.headerSection}>
                     <View style={styles.titleContainer}>
                         <Ionicons 
-                            name="information-circle-outline" 
+                            name="information-circle" 
                             size={36} 
                             color="white" 
                             style={styles.headerIcon}
