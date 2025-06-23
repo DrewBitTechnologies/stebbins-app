@@ -5,7 +5,6 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "preinstall": "npx npm-force-resolutions",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
@@ -22,7 +21,9 @@
     "@expo/config-plugins": "10.0.0",
     "@expo/prebuild-config": "9.0.0",
     "@expo/vector-icons": "^14.1.0",
+    "@likashefqet/react-native-image-zoom": "^4.3.0",
     "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-native-community/netinfo": "11.4.1",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
@@ -48,11 +49,14 @@
     "react-dom": "19.0.0",
     "react-native": "0.79.4",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-modal": "^14.0.0-rc.1",
+    "react-native-offline": "^6.0.2",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
     "react-native-web": "~0.20.0",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "expo-location": "~18.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
