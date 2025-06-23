@@ -4,7 +4,7 @@ import { ExpoConfig } from 'expo/config';
 
 export default ({ config }: { config: ExpoConfig }): ExpoConfig => {
   return {
-    ...config,
+    // ...config,
     name: "Stebbins",
     slug: "stebbins-cold-canyon-reserve-app",
     version: "2.0.0",
