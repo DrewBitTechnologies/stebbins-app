@@ -27,7 +27,7 @@ export default (): ExpoConfig => {
         ITSAppUsesNonExemptEncryption: false,
         NSLocationAlwaysAndWhenInUseUsageDescription: "The app uses precise location to display geographic position on the reserve map.",
         NSLocationWhenInUseUsageDescription: "The app uses precise location to display geographic position on the reserve map.",
-        NSPhotoLibraryUsageDescription: "This app needs access to the photo library to enable uploading images and videos when creating a report."
+        NSPhotoLibraryUsageDescription: "This app needs access to the photo library to enable uploading images and videos when creating reports."
       }
     },
     android: {

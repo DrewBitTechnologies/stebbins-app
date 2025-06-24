@@ -27,7 +27,13 @@ export default function SplashScreen() {
           'guide_mammal',
           'guide_invertebrate',
           'guide_track',
-          'guide_herp'
+          'guide_herp',
+          'trail_homestead',
+          'trail_blue_ridge',
+          'trail_annies',
+          'trail_tuleyome',
+          'trail_homestead_to_blue_ridge'
+
         ];
         
         // Load data with progress updates
