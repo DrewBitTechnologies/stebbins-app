@@ -9,6 +9,8 @@ import * as ImagePicker from 'expo-image-picker';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
+const REPORT_FILES_FOLDER_ID = process.env.EXPO_PUBLIC_REPORT_FILES_FOLDER_ID;
+
 
 export default function ReportScreen() {
   const { data, getImagePath, fetch: fetchScreenData } = useScreen<ReportData>('report');
@@ -113,8 +115,6 @@ export default function ReportScreen() {
     const sizeInMB = fileSize / (1024 * 1024);
     return sizeInMB > 1 ? `${sizeInMB.toFixed(1)}MB` : `${(fileSize / 1024).toFixed(0)}KB`;
   };
-
-const REPORT_FILES_FOLDER_ID = process.env.EXPO_PUBLIC_REPORT_FILES_FOLDER_ID;//Make sure to get new folder id
 
 const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
     const formData = new FormData();

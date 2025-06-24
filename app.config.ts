@@ -1,10 +1,8 @@
-// app.config.ts
-import 'dotenv/config'; // This line is crucial to load variables from .env
+import 'dotenv/config';
 import { ExpoConfig } from 'expo/config';
 
-export default ({ config }: { config: ExpoConfig }): ExpoConfig => {
+export default (): ExpoConfig => {
   return {
-    // ...config,
     name: "Stebbins",
     slug: "stebbins-cold-canyon-reserve-app",
     version: "2.0.0",
@@ -15,6 +13,8 @@ export default ({ config }: { config: ExpoConfig }): ExpoConfig => {
     splash: {
       image: "./assets/images/splash-icon.png",
       resizeMode: "contain",
+      width: "200",
+      height: "200",
       backgroundColor: "#ffffff"
     },
     assetBundlePatterns: [
