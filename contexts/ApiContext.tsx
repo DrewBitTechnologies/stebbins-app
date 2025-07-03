@@ -97,14 +97,24 @@ export interface ReportData {
   description_text: string;
 }
 
-// Trail data interface
-export interface TrailData {
-  geojson: any; // GeoJSON object
+export interface NatureTrailMarkerData {
+  id: number;
+  date_created: string;
+  date_updated: string;
+  latitude: number;
+  longitude: number;
+  common_name: string;
+  latin_name: string;
+  description: string;
+  image: string | null;
+  marker_id: string;
+  color: string[];
+  season: string[];
 }
 
 // Union type for all screen data
-type ScreenData = HomeData 
-                  | AboutData 
+type ScreenData = HomeData
+                  | AboutData
                   | DonateData
                   | GuideData
                   | EmergencyData
@@ -113,13 +123,12 @@ type ScreenData = HomeData
                   | ReportData
                   | GuideDataItem
                   | GuideDataItems
-                  | TrailData;
+                  | NatureTrailMarkerData;
 
 // Screen configuration
 interface ScreenConfig {
   endpoint: string;
   cacheKey: string;
-  isTrail?: boolean; // Flag to identify trail endpoints
 }
 
 // Context state for cached data - simplified with unified image handling
@@ -134,10 +143,6 @@ interface ApiContextType {
   fetchScreenData: <T extends ScreenData>(screenName: string) => Promise<T | null>;
   getImagePath: (screenName: string, imageName: string) => string | undefined; // Unified image getter
   isLoading: (screenName: string) => boolean;
-  // Trail-specific methods
-  getTrailGeoJSON: (trailId: string) => any | null;
-  fetchAllTrails: () => Promise<void>;
-  getAllTrailGeoJSONs: () => Record<string, any>;
 }
 
 // Create context
@@ -210,65 +215,11 @@ const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
     endpoint: '/items/herp/',
     cacheKey: 'guide_herp'
   },
-  trail_homestead: {
-    endpoint: '/items/homestead_trail_coordinates',
-    cacheKey: 'trail_homestead',
-    isTrail: true
-  },
-  trail_blue_ridge: {
-    endpoint: '/items/blue_ridge_trail_coordinates',
-    cacheKey: 'trail_blue_ridge',
-    isTrail: true
-  },
-  trail_homestead_to_blue_ridge: {
-    endpoint: '/items/homestead_to_blue_ridge_connection_trail_coordinates',
-    cacheKey: 'trail_homestead_to_blue_ridge',
-    isTrail: true
-  },
-  trail_annies: {
-    endpoint: '/items/annies_trail_coordinates',
-    cacheKey: 'trail_annies',
-    isTrail: true
-  },
-  trail_tuleyome: {
-    endpoint: '/items/tuleyome_trail_coordinates',
-    cacheKey: 'trail_tuleyome',
-    isTrail: true
-  },
+  nature_trail_marker: {
+    endpoint: '/items/nature_trail_marker',
+    cacheKey: 'nature_trail_marker'
+  }
 };
-
-export const TRAIL_CONFIGS = [
-  {
-    id: 'homestead',
-    endpoint: 'homestead_trail_coordinates',
-    style: { lineColor: '#FF6347', lineWidth: 4, lineOpacity: 0.8 },
-    labelMinZoom: 13,
-  },
-  {
-    id: 'blue_ridge',
-    endpoint: 'blue_ridge_trail_coordinates',
-    style: { lineColor: '#00BFFF', lineWidth: 4, lineOpacity: 0.8 },
-    labelMinZoom: 13,
-  },
-  {
-    id: 'homestead_to_blue_ridge',
-    endpoint: 'homestead_to_blue_ridge_connection_trail_coordinates',
-    style: { lineColor: '#32CD32', lineWidth: 3, lineOpacity: 0.8 },
-    labelMinZoom: 14,
-  },
-  {
-    id: 'annies',
-    endpoint: 'annies_trail_coordinates',
-    style: { lineColor: '#FFD700', lineWidth: 4, lineOpacity: 0.8 },
-    labelMinZoom: 14,
-  },
-  {
-    id: 'tuleyome',
-    endpoint: 'tuleyome_trail_coordinates',
-    style: { lineColor: '#8A2BE2', lineWidth: 4, lineOpacity: 0.8 },
-    labelMinZoom: 15,
-  },
-];
 
 export function ApiProvider({ children }: { children: ReactNode }) {
   const [screenDataCache, setScreenDataCache] = useState<Record<string, CachedScreenData>>({});
@@ -294,7 +245,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
       const filePath = getDataFilePath(config.cacheKey);
       const fileInfo = await FileSystem.getInfoAsync(filePath);
-      
+
       if (fileInfo.exists) {
         const cachedData = await FileSystem.readAsStringAsync(filePath);
         return JSON.parse(cachedData) as CachedScreenData;
@@ -323,9 +274,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const downloadImage = async (screenName: string, imageName: string): Promise<string | undefined> => {
     try {
       await ensureCacheDir();
-      
+
       const localPath = getImageFilePath(screenName, imageName);
-      
+
       // Check if image already exists
       const imageInfo = await FileSystem.getInfoAsync(localPath);
       if (imageInfo.exists) {
@@ -357,31 +308,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     setLoadingStates(prev => ({ ...prev, [screenName]: loading }));
   };
 
-  // Fetch trail data
-  const fetchTrailData = async (screenName: string): Promise<TrailData | null> => {
-    const config = SCREEN_CONFIGS[screenName];
-    if (!config || !config.isTrail) return null;
-
-    try {
-      const response = await fetch(`${API_BASE_URL}${config.endpoint}`, {
-        headers: {
-          Authorization: `Bearer ${BEARER_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const json = await response.json();
-      return { geojson: json.data.geojson } as TrailData;
-    } catch (error) {
-      console.log(`Failed to fetch trail data for ${screenName}:`, error);
-      return null;
-    }
-  };
-
   // Main fetch function
   const fetchScreenData = async <T extends ScreenData>(screenName: string): Promise<T | null> => {
     const config = SCREEN_CONFIGS[screenName];
@@ -400,23 +326,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         setScreenDataCache(prev => ({ ...prev, [screenName]: cachedData }));
       }
 
-      // Handle trail data differently
-      if (config.isTrail) {
-        const trailData = await fetchTrailData(screenName);
-        if (trailData) {
-          const cacheData: CachedScreenData = {
-            data: trailData,
-            timestamp: Date.now(),
-          };
-
-          await saveToCache(screenName, cacheData);
-          setScreenDataCache(prev => ({ ...prev, [screenName]: cacheData }));
-          return trailData as T;
-        }
-        return null;
-      }
-
-      // Fetch fresh data from API (existing logic for non-trail screens)
+      // Fetch fresh data from API
       const response = await fetch(`${API_BASE_URL}${config.endpoint}`, {
         method: 'GET',
         headers: {
@@ -502,7 +412,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
     } catch (error) {
       console.log(`Error fetching data for ${screenName}:`, error);
-      
+
       // If fetch fails and we don't have cached data yet, try to load it
       if (!screenDataCache[screenName]) {
         const cachedData = await loadCachedData(screenName);
@@ -518,48 +428,10 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Fetch all trails at once
-  const fetchAllTrails = async () => {
-    const trailScreenNames = Object.keys(SCREEN_CONFIGS).filter(
-      key => SCREEN_CONFIGS[key].isTrail
-    );
-
-    await Promise.all(
-      trailScreenNames.map(async (screenName) => {
-        try {
-          await fetchScreenData<TrailData>(screenName);
-        } catch (error) {
-          console.log(`Failed to fetch trail ${screenName}:`, error);
-        }
-      })
-    );
-  };
-
   // Get screen data
   const getScreenData = <T extends ScreenData>(screenName: string): T | null => {
     const cached = screenDataCache[screenName];
     return cached ? (cached.data as T) : null;
-  };
-
-  // Get trail GeoJSON by trail ID (for backward compatibility)
-  const getTrailGeoJSON = (trailId: string): any | null => {
-    const screenName = `trail_${trailId}`;
-    const trailData = getScreenData<TrailData>(screenName);
-    return trailData?.geojson || null;
-  };
-
-  // Get all trail GeoJSONs as a record (for backward compatibility)
-  const getAllTrailGeoJSONs = (): Record<string, any> => {
-    const result: Record<string, any> = {};
-    
-    TRAIL_CONFIGS.forEach(trail => {
-      const geojson = getTrailGeoJSON(trail.id);
-      if (geojson) {
-        result[trail.id] = geojson;
-      }
-    });
-
-    return result;
   };
 
   // Unified function to get any image path by name
@@ -577,10 +449,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     fetchScreenData,
     getImagePath, // Unified image path getter
     isLoading,
-    // Trail-specific methods
-    getTrailGeoJSON,
-    fetchAllTrails,
-    getAllTrailGeoJSONs,
   };
 
   return (
@@ -602,23 +470,11 @@ export function useApi() {
 // Convenience hook for any screen
 export function useScreen<T extends ScreenData>(screenName: string) {
   const api = useApi();
-  
+
   return {
     data: api.getScreenData<T>(screenName),
     getImagePath: (imageName: string) => api.getImagePath(screenName, imageName), // Get any image by name
     isLoading: api.isLoading(screenName),
     fetch: () => api.fetchScreenData<T>(screenName),
-  };
-}
-
-// Convenience hook for trails
-export function useTrails() {
-  const api = useApi();
-  
-  return {
-    trailGeoJSONs: api.getAllTrailGeoJSONs(),
-    getTrailGeoJSON: api.getTrailGeoJSON,
-    fetchAllTrails: api.fetchAllTrails,
-    isLoading: (trailId: string) => api.isLoading(`trail_${trailId}`),
   };
 }

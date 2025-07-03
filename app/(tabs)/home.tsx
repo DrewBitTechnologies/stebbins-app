@@ -1,15 +1,9 @@
 import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet, ImageBackground, ScrollView, LayoutAnimation, UIManager, Platform, ActivityIndicator } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useScreen, HomeData } from '../../contexts/ApiContext';
 import { LinearGradient } from 'expo-linear-gradient';
-
-// Enable LayoutAnimation for Android
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 interface ButtonItem {
   title: string;
