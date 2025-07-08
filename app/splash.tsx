@@ -29,6 +29,7 @@ export default function SplashScreen() {
           'guide_track',
           'guide_herp',
           'nature_trail_marker',
+          'mile_marker',
 
         ];
         

@@ -112,6 +112,17 @@ export interface NatureTrailMarkerData {
   season: string[];
 }
 
+export interface MileMarkerTrailData {
+  id: number;
+  date_created: string;
+  date_updated: string;
+  latitude: number;
+  longitude: number;
+  value: number;
+}
+
+export type MileMarkers = MileMarkerTrailData[];
+
 // Union type for all screen data
 type ScreenData = HomeData
                   | AboutData
@@ -123,7 +134,9 @@ type ScreenData = HomeData
                   | ReportData
                   | GuideDataItem
                   | GuideDataItems
-                  | NatureTrailMarkerData;
+                  | NatureTrailMarkerData
+                  | MileMarkerTrailData
+                  | MileMarkers;
 
 // Screen configuration
 interface ScreenConfig {
@@ -218,7 +231,12 @@ const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
   nature_trail_marker: {
     endpoint: '/items/nature_trail_marker',
     cacheKey: 'nature_trail_marker'
+  },
+  mile_marker: {
+    endpoint: '/items/mile_marker',
+    cacheKey: 'mile_marker'
   }
+
 };
 
 export function ApiProvider({ children }: { children: ReactNode }) {
@@ -447,7 +465,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const value: ApiContextType = {
     getScreenData,
     fetchScreenData,
-    getImagePath, // Unified image path getter
+    getImagePath,
     isLoading,
   };
 
