@@ -6,7 +6,7 @@ import { useScreen, DonateData } from '@/contexts/ApiContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function DonateScreen() {
-    const { data: donateData, getImagePath } = useScreen<DonateData>('donate');
+    const { data: donateData } = useScreen<DonateData>('donate');
 
     const handleDonatePress = async (): Promise<void> => {
         try {
@@ -18,13 +18,8 @@ export default function DonateScreen() {
     };
 
     const getBackgroundSource = () => {
-        const backgroundPath = getImagePath('background');
-
-        if(backgroundPath){
-            return {uri: backgroundPath}
-        }
-
-        return require("@/assets/dev/fallback.jpeg");
+        const backgroundPath = donateData?.background
+        return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
     };
 
     const donateText = donateData?.text || 'Donations to Stebbins Cold Canyon go towards trail maintenance and improvements, enhancing the visitor experience and safety with interpretative signage and messaging, and supporting educational programming.';

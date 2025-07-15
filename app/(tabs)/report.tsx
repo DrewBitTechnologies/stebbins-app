@@ -24,8 +24,10 @@ export default function ReportScreen() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { data: guideData } = useScreen<ReportData>('report');
+  
   const getBackgroundSource = () => {
-    const backgroundPath = getImagePath('background');
+    const backgroundPath = guideData?.background
     return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
   };
 

@@ -6,7 +6,7 @@ import { useScreen, AboutData } from '@/contexts/ApiContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function AboutScreen() {
-    const { data: aboutData, getImagePath } = useScreen<AboutData>('about');
+    const { data: aboutData } = useScreen<AboutData>('about');
 
     const handleWebsitePress = async (): Promise<void> => {
         try {
@@ -18,14 +18,9 @@ export default function AboutScreen() {
         }
     };
 
-    // Determine background image source
     const getBackgroundSource = () => {
-        const backgroundPath = getImagePath('background');
-        
-        if (backgroundPath) {
-            return { uri: backgroundPath };
-        }
-        return require("../assets/dev/fallback.jpeg");
+        const backgroundPath = aboutData?.background;
+        return backgroundPath ? { uri: backgroundPath } : require("../assets/dev/fallback.jpeg");
     };
 
     // Use API data or fallback content

@@ -9,21 +9,13 @@ export default function SafetyScreen() {
     const { data: safetyData, getImagePath, isLoading, fetch } = useScreen<SafetyData>('safety');
 
     const getBackgroundSource = () => {
-        const backgroundPath = getImagePath('background');
-        
-        if (backgroundPath) {
-            return { uri: backgroundPath };
-        }
-        return require("../assets/dev/fallback.jpeg");
+        const backgroundPath = safetyData?.background;
+        return backgroundPath ? { uri: backgroundPath } : require("../assets/dev/fallback.jpeg");
     };
-
+    
     const getSafetyImageSource = () => {
-        const imagePath = getImagePath('safety_image');
-
-        if (imagePath) {
-            return { uri: imagePath };
-        }
-        return require("../assets/dev/fallback.jpeg");
+        const imagePath = safetyData?.safety_image;
+        return imagePath ? { uri: imagePath } : require("../assets/dev/fallback.jpeg");
     };
 
     // Function to parse the safety text and create bullet points

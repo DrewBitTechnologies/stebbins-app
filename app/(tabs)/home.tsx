@@ -14,7 +14,7 @@ interface ButtonItem {
 }
 
 export default function HomeScreen() {
-  const { data: homeData, getImagePath, isLoading } = useScreen<HomeData>('home');
+  const { data: homeData, isLoading } = useScreen<HomeData>('home');
   const { checkAllScreensForUpdates } = useApi(); // Get the global update function
 
   const mainButtons: ButtonItem[] = [
@@ -84,9 +84,7 @@ export default function HomeScreen() {
   const status = homeData?.reserve_status || "Loading status...";
 
   const getBackgroundSource = () => {
-    // The getImagePath function is already provided by the useScreen hook.
-    const backgroundPath = getImagePath('background');
-    // The fallback image is a local asset required by the app.
+    const backgroundPath = homeData?.background;
     return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
   };
 

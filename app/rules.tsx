@@ -1,53 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, Image, ImageBackground, ListRenderItem, ScrollView } from 'react-native';
-import { useScreen, RulesData, Rule } from '@/contexts/ApiContext';
+import { View, Text, StyleSheet, Image, ImageBackground, ScrollView } from 'react-native';
+import { useScreen, RulesData } from '@/contexts/ApiContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function RulesScreen() {
-    const { data: rulesData, getImagePath } = useScreen<RulesData>('rules');
+    const { data: rulesData } = useScreen<RulesData>('rules');
 
     const getBackgroundSource = () => {
-        const backgroundPath = getImagePath('background');
-        
-        if (backgroundPath) {
-            return { uri: backgroundPath };
-        }
-        return require("../assets/dev/fallback.jpeg");
+        const backgroundPath = rulesData?.background;
+        return backgroundPath ? { uri: backgroundPath } : require("../assets/dev/fallback.jpeg");
     };
 
     const getRulesImageSource = () => {
-        const imagePath = getImagePath('rules_image');
-
-        if (imagePath) {
-            return { uri: imagePath };
-        }
-        return require("../assets/dev/fallback.jpeg");
+        const imagePath = rulesData?.rules_image;
+        return imagePath ? { uri: imagePath } : require("../assets/dev/fallback.jpeg");
     };
-
-    const getIconSource = (iconName: string) => {
-        const iconPath = getImagePath(iconName);
-
-        if (iconPath) {
-            return { uri: iconPath };
-        }
-       
-        return require("../assets/dev/fallback.jpeg");
-    };
-
-    const renderRule: ListRenderItem<Rule> = ({ item, index }) => (
-        <View style={[
-            styles.ruleCard,
-            { marginBottom: index === (rulesData?.rules?.length || 0) - 1 ? 0 : 16 }
-        ]}>
-            <View style={styles.ruleContent}>
-                <View style={styles.iconContainer}>
-                    <Image source={getIconSource(item.icon)} style={styles.ruleIcon} />
-                </View>
-                <Text style={styles.ruleText}>{item.text}</Text>
-            </View>
-        </View>
-    );
 
     return (
         <ImageBackground 
@@ -101,7 +69,8 @@ export default function RulesScreen() {
                                 { marginBottom: index === (rulesData?.rules?.length || 0) - 1 ? 0 : 20 }
                             ]}>
                                 <View style={styles.ruleIconContainer}>
-                                    <Image source={getIconSource(item.icon)} style={styles.ruleIcon} />
+                                    {/* The item.icon property now holds the local URI */}
+                                    <Image source={{ uri: item.icon }} style={styles.ruleIcon} />
                                 </View>
                                 <Text style={styles.ruleText}>{item.text}</Text>
                             </View>

@@ -10,19 +10,15 @@ const openPhoneNumber = (phoneNumber: string) => {
 };
 
 export default function EmergencyScreen() {
-    const { data: emergencyData, getImagePath } = useScreen<EmergencyData>('emergency');
+    const { data: emergencyData } = useScreen<EmergencyData>('emergency');
     const text1 = emergencyData?.contact_1_message || 'For Emergencies contact Solano County Dispatch';
     const phone1 = emergencyData?.contact_1_number || '7074217090';
     const text2 = emergencyData?.contact_2_message || 'IF YOU HAVE NO SERVICE TRY CALLING 911';
     const phone2 = emergencyData?.contact_2_number || '911';
 
     const getBackgroundSource = () => {
-        const backgroundPath = getImagePath('background');
-        
-        if (backgroundPath) {
-            return { uri: backgroundPath };
-        }
-        return require('@/assets/dev/fallback.jpeg');
+        const backgroundPath = emergencyData?.background;
+        return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
     };
 
     const formatPhoneNumber = (phone: string) => {

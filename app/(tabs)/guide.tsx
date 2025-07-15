@@ -40,16 +40,11 @@ export default function GuideScreen() {
     },
   ];
 
-  const { getImagePath } = useScreen<GuideData>('guide');
+  const { data: guideData } = useScreen<GuideData>('guide');
 
   const getBackgroundSource = () => {
-    const backgroundPath = getImagePath('background');
-    
-    if(backgroundPath){
-      return { uri: backgroundPath };
-    }
-
-    return require('@/assets/dev/fallback.jpeg');
+    const backgroundPath = guideData?.background
+    return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
   };
 
   const handleNavigation = (route: string): void => {
