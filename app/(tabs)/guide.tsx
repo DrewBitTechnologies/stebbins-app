@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, ScrollView, TouchableOpacity } from 'react-native';
+import { GuideData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useScreen, GuideData } from '@/contexts/ApiContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import React from 'react';
+import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface ButtonItem {
   title: string;
@@ -40,11 +40,20 @@ export default function GuideScreen() {
     },
   ];
 
-  const { data: guideData } = useScreen<GuideData>('guide');
+  const { data: guideData, getImagePath } = useScreen<GuideData>('guide');
 
   const getBackgroundSource = () => {
-    const backgroundPath = guideData?.background
-    return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
+    const backgroundId = guideData?.background;
+
+    if (backgroundId) {
+      
+      const localUri = getImagePath(backgroundId);
+      if (localUri) {
+        return { uri: localUri };
+      }
+    }
+
+    return require('@/assets/dev/fallback.jpeg');
   };
 
   const handleNavigation = (route: string): void => {

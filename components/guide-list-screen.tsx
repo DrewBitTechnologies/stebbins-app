@@ -1,33 +1,32 @@
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Dimensions,
-    FlatList,
-    Image,
-    Modal,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Image,
+  Modal,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { GuideDataItem, useScreen } from '../contexts/ApiContext';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import { GuideDataItem, useScreen } from '../contexts/api';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-// Simplified Filter chip component with softer styling
-const FilterChip = ({ 
-  label, 
-  selected, 
-  onPress, 
-}: { 
-  label: string; 
-  selected: boolean; 
-  onPress: () => void; 
+const FilterChip = ({
+  label,
+  selected,
+  onPress,
+}: {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
 }) => (
   <TouchableOpacity
     style={[
@@ -65,8 +64,8 @@ const ExpandableText = ({ text, maxLines = 3 }: { text: string; maxLines?: numbe
 
   return (
     <View>
-      <Text 
-        style={styles.description} 
+      <Text
+        style={styles.description}
         numberOfLines={expanded ? undefined : maxLines}
         onTextLayout={onTextLayout}
       >
@@ -88,14 +87,13 @@ const ExpandableText = ({ text, maxLines = 3 }: { text: string; maxLines?: numbe
   );
 };
 
-// Simplified Zoomable image modal
-const ZoomableImageModal = ({ 
-  visible, 
-  imageUri, 
-  onClose 
-}: { 
-  visible: boolean; 
-  imageUri: string; 
+const ZoomableImageModal = ({
+  visible,
+  imageUri,
+  onClose
+}: {
+  visible: boolean;
+  imageUri: string;
   onClose: () => void;
 }) => (
   <Modal visible={visible} transparent={true} animationType="fade">
@@ -125,11 +123,10 @@ const ZoomableImageModal = ({
   </Modal>
 );
 
-// Main component with softer styling
 export default function GuideListScreen({ route }: { route: any }) {
   const { screenName, title } = route.params;
-  const guideData = useScreen<GuideDataItem[]>(screenName);
-  
+  const { data, getImagePath, isLoading } = useScreen<GuideDataItem[]>(screenName);
+
   const [filteredData, setFilteredData] = useState<GuideDataItem[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSeasons, setSelectedSeasons] = useState<string[]>([]);
@@ -138,19 +135,19 @@ export default function GuideListScreen({ route }: { route: any }) {
   const [allSeasons, setAllSeasons] = useState<string[]>([]);
 
   const monthMap: Record<string, string> = {
-    '0': 'None', '1': 'January', '2': 'February', '3': 'March', 
-    '4': 'April', '5': 'May', '6': 'June', '7': 'July', '8': 'August', 
+    '0': 'None', '1': 'January', '2': 'February', '3': 'March',
+    '4': 'April', '5': 'May', '6': 'June', '7': 'July', '8': 'August',
     '9': 'September', '10': 'October', '11': 'November', '12': 'December',
   };
 
   useEffect(() => {
-    if (guideData.data) {
+    if (data) {
       const colors = new Set<string>();
       const seasons = new Set<string>();
 
       colors.add('None');
 
-      guideData.data.forEach(item => {
+      data.forEach(item => {
         if (item.color && item.color.length > 0) {
           item.color.forEach(color => {
             colors.add(color.charAt(0).toUpperCase() + color.slice(1).toLowerCase());
@@ -173,19 +170,19 @@ export default function GuideListScreen({ route }: { route: any }) {
         if (b === 'None') return 1;
         return a.localeCompare(b);
       });
-      
+
       setAllColors(sortedColors);
       setAllSeasons(Array.from(seasons).sort());
     }
-  }, [guideData.data]);
+  }, [data]);
 
   useEffect(() => {
-    if (!guideData.data) {
+    if (!data) {
       setFilteredData([]);
       return;
     }
 
-    let filtered = guideData.data;
+    let filtered = data;
 
     if (selectedColors.length > 0) {
       filtered = filtered.filter(item => {
@@ -194,7 +191,7 @@ export default function GuideListScreen({ route }: { route: any }) {
             return true;
           }
         }
-        return item.color?.some(color => 
+        return item.color?.some(color =>
           selectedColors.includes(color.charAt(0).toUpperCase() + color.slice(1).toLowerCase())
         );
       });
@@ -211,7 +208,7 @@ export default function GuideListScreen({ route }: { route: any }) {
     }
 
     setFilteredData(filtered);
-  }, [guideData.data, selectedColors, selectedSeasons]);
+  }, [data, selectedColors, selectedSeasons]);
 
   const toggleColorFilter = (color: string) => {
     setSelectedColors(prev =>
@@ -234,98 +231,102 @@ export default function GuideListScreen({ route }: { route: any }) {
     setSelectedSeasons([]);
   };
 
-  const renderItem = ({ item }: { item: GuideDataItem }) => (
-    <View style={styles.cardContainer}>
-      <View style={styles.card}>
-        {item.image && (
-          <TouchableOpacity onPress={() => setZoomedImage(item.image)} style={styles.imageContainer}>
-            <Image
-              source={{ uri: item.image }}
-              style={styles.cardImage}
-              resizeMode="cover"
-            />
-            <View style={styles.zoomIndicator}>
-              <Ionicons name="expand" size={16} color="#2d5016" />
-            </View>
-          </TouchableOpacity>
-        )}
-        
-        <View style={styles.cardContent}>
-          <View style={styles.titleSection}>
-            <Text style={styles.commonName}>{item.common_name}</Text>
-            <Text style={styles.latinName}>{item.latin_name}</Text>
-          </View>
-          
-          <ExpandableText text={item.description} />
-          
-          {item.color && item.color.length > 0 && (
-            <View style={styles.tagContainer}>
-              <View style={styles.tagHeader}>
-                <Ionicons name="color-palette" size={16} color="#2d5016" />
-                <Text style={styles.tagLabel}>Colors</Text>
+  const renderItem = ({ item }: { item: GuideDataItem }) => {
+    const imageUri = item.image ? getImagePath(item.image) : null;
+
+    return (
+      <View style={styles.cardContainer}>
+        <View style={styles.card}>
+          {imageUri && (
+            <TouchableOpacity onPress={() => setZoomedImage(imageUri)} style={styles.imageContainer}>
+              <Image
+                source={{ uri: imageUri }}
+                style={styles.cardImage}
+                resizeMode="cover"
+              />
+              <View style={styles.zoomIndicator}>
+                <Ionicons name="expand" size={16} color="#2d5016" />
               </View>
-              <View style={styles.tagList}>
-                {item.color.map((color, index) => (
-                  <View key={index} style={styles.colorTag}>
-                    <Text style={styles.tagText}>
-                      {color.charAt(0).toUpperCase() + color.slice(1).toLowerCase()}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </View>
+            </TouchableOpacity>
           )}
-          {(!item.color || item.color.length === 0) && (
-            <View style={styles.tagContainer}>
-              <View style={styles.tagHeader}>
-                <Ionicons name="color-palette" size={16} color="#2d5016" />
-                <Text style={styles.tagLabel}>Colors</Text>
-              </View>
-              <View style={styles.tagList}>
-                <View style={styles.emptyTag}>
-                  <Text style={styles.emptyTagText}>None</Text>
+
+          <View style={styles.cardContent}>
+            <View style={styles.titleSection}>
+              <Text style={styles.commonName}>{item.common_name}</Text>
+              <Text style={styles.latinName}>{item.latin_name}</Text>
+            </View>
+
+            <ExpandableText text={item.description} />
+
+            {item.color && item.color.length > 0 && (
+              <View style={styles.tagContainer}>
+                <View style={styles.tagHeader}>
+                  <Ionicons name="color-palette" size={16} color="#2d5016" />
+                  <Text style={styles.tagLabel}>Colors</Text>
                 </View>
-              </View>
-            </View>
-          )}
-          
-          {item.season && item.season.length > 0 && (
-            <View style={styles.tagContainer}>
-              <View style={styles.tagHeader}>
-                <Ionicons name="leaf" size={16} color="#2d5016" />
-                <Text style={styles.tagLabel}>Seasons</Text>
-              </View>
-              <View style={styles.tagList}>
-                {item.season.map((season, index) => {
-                  const monthName = monthMap[season.toString()];
-                  const displaySeason = monthName || season.charAt(0).toUpperCase() + season.slice(1).toLowerCase();
-                  return (
-                    <View key={index} style={styles.seasonTag}>
-                      <Text style={styles.tagText}>{displaySeason}</Text>
+                <View style={styles.tagList}>
+                  {item.color.map((color, index) => (
+                    <View key={index} style={styles.colorTag}>
+                      <Text style={styles.tagText}>
+                        {color.charAt(0).toUpperCase() + color.slice(1).toLowerCase()}
+                      </Text>
                     </View>
-                  );
-                })}
-              </View>
-            </View>
-          )}
-          {(!item.season || item.season.length === 0) && (
-            <View style={styles.tagContainer}>
-              <View style={styles.tagHeader}>
-                <Ionicons name="leaf" size={16} color="#2d5016" />
-                <Text style={styles.tagLabel}>Seasons</Text>
-              </View>
-              <View style={styles.tagList}>
-                <View style={styles.emptyTag}>
-                  <Text style={styles.emptyTagText}>None</Text>
+                  ))}
                 </View>
               </View>
-            </View>
-          )}
+            )}
+            {(!item.color || item.color.length === 0) && (
+              <View style={styles.tagContainer}>
+                <View style={styles.tagHeader}>
+                  <Ionicons name="color-palette" size={16} color="#2d5016" />
+                  <Text style={styles.tagLabel}>Colors</Text>
+                </View>
+                <View style={styles.tagList}>
+                  <View style={styles.emptyTag}>
+                    <Text style={styles.emptyTagText}>None</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+
+            {item.season && item.season.length > 0 && (
+              <View style={styles.tagContainer}>
+                <View style={styles.tagHeader}>
+                  <Ionicons name="leaf" size={16} color="#2d5016" />
+                  <Text style={styles.tagLabel}>Seasons</Text>
+                </View>
+                <View style={styles.tagList}>
+                  {item.season.map((season, index) => {
+                    const monthName = monthMap[season.toString()];
+                    const displaySeason = monthName || season.charAt(0).toUpperCase() + season.slice(1).toLowerCase();
+                    return (
+                      <View key={index} style={styles.seasonTag}>
+                        <Text style={styles.tagText}>{displaySeason}</Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+            {(!item.season || item.season.length === 0) && (
+              <View style={styles.tagContainer}>
+                <View style={styles.tagHeader}>
+                  <Ionicons name="leaf" size={16} color="#2d5016" />
+                  <Text style={styles.tagLabel}>Seasons</Text>
+                </View>
+                <View style={styles.tagList}>
+                  <View style={styles.emptyTag}>
+                    <Text style={styles.emptyTagText}>None</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+          </View>
         </View>
       </View>
-    </View>
-  );
-
+    );
+  };
+  
   const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.headerTitleContainer}>
@@ -390,7 +391,7 @@ export default function GuideListScreen({ route }: { route: any }) {
     </View>
   );
 
-  if (guideData.isLoading && !guideData.data) {
+  if (isLoading && !data) {
     return (
       <LinearGradient
         colors={['#f8f9fa', '#e9ecef']}

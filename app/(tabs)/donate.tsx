@@ -1,12 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, ScrollView, TouchableOpacity } from 'react-native';
+import { DonateData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
-import { useScreen, DonateData } from '@/contexts/ApiContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as WebBrowser from 'expo-web-browser';
+import React from 'react';
+import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function DonateScreen() {
-    const { data: donateData } = useScreen<DonateData>('donate');
+    const { data: donateData, getImagePath} = useScreen<DonateData>('donate');
 
     const handleDonatePress = async (): Promise<void> => {
         try {
@@ -18,9 +18,18 @@ export default function DonateScreen() {
     };
 
     const getBackgroundSource = () => {
-        const backgroundPath = donateData?.background
-        return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
-    };
+    const backgroundId = donateData?.background;
+
+    if (backgroundId) {
+      
+      const localUri = getImagePath(backgroundId);
+      if (localUri) {
+        return { uri: localUri };
+      }
+    }
+
+    return require('@/assets/dev/fallback.jpeg');
+  };
 
     const donateText = donateData?.text || 'Donations to Stebbins Cold Canyon go towards trail maintenance and improvements, enhancing the visitor experience and safety with interpretative signage and messaging, and supporting educational programming.';
 

@@ -1,15 +1,14 @@
-import { useRef, useState, useEffect } from 'react';
-import { StyleSheet, View, Dimensions, Pressable, Modal, Text, ScrollView, Alert, Image, TouchableOpacity, Animated } from 'react-native';
-import MapboxGL from "@rnmapbox/maps";
-import { useIsConnected } from 'react-native-offline';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { ImageZoom } from '@likashefqet/react-native-image-zoom';
+import { MileMarkerTrailData, NatureTrailMarkerData, useScreen } from '@/contexts/api';
 import { FontAwesome6 as FontAwesomeIcon, Ionicons } from '@expo/vector-icons';
-import { useScreen, NatureTrailMarkerData, MileMarkerTrailData } from '@/contexts/ApiContext';
+import { ImageZoom } from '@likashefqet/react-native-image-zoom';
+import MapboxGL from "@rnmapbox/maps";
+import { useEffect, useRef, useState } from 'react';
+import { Alert, Animated, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useIsConnected } from 'react-native-offline';
 
 MapboxGL.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN);
 
-// --- Constants ---
 const CENTER_LATITUDE = 38.493;
 const CENTER_LONGITUDE = -122.104;
 const BOUNDS = { ne: [-122.084, 38.525], sw: [-122.124, 38.4623] };
@@ -22,9 +21,12 @@ const DEVICE_WIDTH = Dimensions.get('window').width;
 const DEVICE_HEIGHT = Dimensions.get('window').height;
 const BLUE = '#1D4776';
 
-// --- Prop Types & Helper Components ---
 type InfoModalProps = { visible: boolean; onClose: () => void; };
-type MarkerDetailModalProps = { marker: NatureTrailMarkerData | null; onClose: () => void; };
+type MarkerDetailModalProps = {
+  marker: NatureTrailMarkerData | null;
+  imageUri: string | null | undefined;
+  onClose: () => void;
+};
 
 interface DisplayMarker {
   id: number;
@@ -62,9 +64,8 @@ const InfoModal = ({ visible, onClose }: InfoModalProps) => {
     );
 };
 
-const MarkerDetailModal = ({ marker, onClose }: MarkerDetailModalProps) => {
+const MarkerDetailModal = ({ marker, imageUri, onClose }: MarkerDetailModalProps) => {
   if (!marker) return null;
-  const imageUri = marker.image;
 
   return (
     <Modal animationType="slide" transparent={true} visible={!!marker} onRequestClose={onClose}>
@@ -91,7 +92,6 @@ const MarkerDetailModal = ({ marker, onClose }: MarkerDetailModalProps) => {
   );
 };
 
-// --- Main Screen Component ---
 export default function MapScreen() {
   const mapview = useRef<MapboxGL.MapView | null>(null);
   const camera = useRef<MapboxGL.Camera | null>(null);
@@ -104,18 +104,20 @@ export default function MapScreen() {
 
   const [activeMarkerType, setActiveMarkerType] = useState<'nature' | 'mile'>('nature');
   const [displayedMarkers, setDisplayedMarkers] = useState<DisplayMarker[]>([]);
-  
+
   const slideAnimation = useRef(new Animated.Value(0)).current;
   const [natureButtonWidth, setNatureButtonWidth] = useState(0);
   const [mileButtonWidth, setMileButtonWidth] = useState(0);
 
-  const { data: natureTrailMarkers } = useScreen<NatureTrailMarkerData[]>('nature_trail_marker');
+  const { data: natureTrailMarkers, getImagePath } = useScreen<NatureTrailMarkerData[]>('nature_trail_marker');
   const { data: mileMarkers } = useScreen<MileMarkerTrailData[]>('mile_marker');
   
+  const selectedMarkerImageUri = selectedMarker?.image ? getImagePath(selectedMarker.image) : null;
+
   useEffect(() => {
     Animated.spring(slideAnimation, {
       toValue: activeMarkerType === 'nature' ? 0 : 1,
-      useNativeDriver: false, // Required for animating width/translateX
+      useNativeDriver: false,
       bounciness: 8,
     }).start();
   }, [activeMarkerType]);
@@ -236,7 +238,7 @@ export default function MapScreen() {
       checkMapState();
     }
   }, [isMapCached]);
-  
+
   const onCameraChanged = (event: any) => {
     setZoomLevel(event.properties.zoom);
   };
@@ -247,20 +249,20 @@ export default function MapScreen() {
     return (
       <View style={styles.page}>
         <InfoModal visible={isInfoModalVisible} onClose={toggleInfoModal} />
-        <MarkerDetailModal marker={selectedMarker} onClose={() => setSelectedMarker(null)} />
+        <MarkerDetailModal marker={selectedMarker} imageUri={selectedMarkerImageUri} onClose={() => setSelectedMarker(null)} />
         <View style={styles.container}>
-          <MapboxGL.MapView 
-            key={mapKey} 
-            ref={mapview} 
-            style={styles.map} 
-            styleURL={STYLE_URL} 
+          <MapboxGL.MapView
+            key={mapKey}
+            ref={mapview}
+            style={styles.map}
+            styleURL={STYLE_URL}
             rotateEnabled={true}
             onCameraChanged={onCameraChanged}
           >
-            <MapboxGL.Camera 
-              ref={camera} 
-              defaultSettings={{ centerCoordinate: [CENTER_LONGITUDE, CENTER_LATITUDE], zoomLevel: DEFAULT_ZOOM }} 
-              maxBounds={BOUNDS} 
+            <MapboxGL.Camera
+              ref={camera}
+              defaultSettings={{ centerCoordinate: [CENTER_LONGITUDE, CENTER_LATITUDE], zoomLevel: DEFAULT_ZOOM }}
+              maxBounds={BOUNDS}
               minZoomLevel={MIN_ZOOM}
             />
             {displayedMarkers.map((marker) => (
@@ -323,7 +325,6 @@ export default function MapScreen() {
   }
 }
 
-// --- Styles ---
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: '#f0f0f0' },
   container: { flex: 1, overflow: 'hidden' },

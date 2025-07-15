@@ -1,0 +1,38 @@
+import * as FileSystem from 'expo-file-system';
+
+// --- Constants ---
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+export const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
+export const CACHE_DIR = FileSystem.documentDirectory + 'cache/';
+export const IMAGE_FIELD_KEYS = ['image', 'background', 'rules_image', 'safety_image', 'icon'];
+
+// --- Screen Configuration ---
+export interface ScreenConfig {
+  endpoint: string;
+  cacheKey: string;
+  isCollection: boolean;
+}
+
+export const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
+  home: { endpoint: '/items/home/', cacheKey: 'home_data', isCollection: false },
+  about: { endpoint: '/items/about/', cacheKey: 'about_data', isCollection: false },
+  donate: { endpoint: '/items/donate/', cacheKey: 'donate_data', isCollection: false },
+  guide: { endpoint: '/items/guide/', cacheKey: 'guide_data', isCollection: false },
+  emergency: { endpoint: '/items/emergency/', cacheKey: 'emergency_data', isCollection: false },
+  rules: { endpoint: '/rules/', cacheKey: 'rules_data', isCollection: false },
+  safety: { endpoint: '/items/safety/', cacheKey: 'safety_data', isCollection: false },
+  report: { endpoint: '/items/reports/', cacheKey: 'report_data', isCollection: false },
+  guide_wildflower: { endpoint: '/items/wildflower/', cacheKey: 'guide_wildflower', isCollection: true },
+  guide_tree_shrub: { endpoint: '/items/tree_shrub/', cacheKey: 'guide_tree_shrub', isCollection: true },
+  guide_bird: { endpoint: '/items/bird/', cacheKey: 'guide_bird', isCollection: true },
+  guide_mammal: { endpoint: '/items/mammal/', cacheKey: 'guide_mammal', isCollection: true },
+  guide_invertebrate: { endpoint: '/items/invertebrate/', cacheKey: 'guide_invertebrate', isCollection: true },
+  guide_track: { endpoint: '/items/track/', cacheKey: 'guide_track', isCollection: true },
+  guide_herp: { endpoint: '/items/herp/', cacheKey: 'guide_herp', isCollection: true },
+  nature_trail_marker: { endpoint: '/items/nature_trail_marker/', cacheKey: 'nature_trail_marker', isCollection: true },
+  mile_marker: { endpoint: '/items/mile_marker/', cacheKey: 'mile_marker', isCollection: true }
+};
+
+// --- Helper Functions for Paths ---
+export const getDataFilePath = (cacheKey: string) => `${CACHE_DIR}${cacheKey}.json`;
+export const getImageFilePath = (screenName: string, imageName: string) => `${CACHE_DIR}${screenName}_${imageName}`;

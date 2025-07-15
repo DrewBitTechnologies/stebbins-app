@@ -1,12 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity } from 'react-native';
+import { AboutData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
-import { useScreen, AboutData } from '@/contexts/ApiContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as WebBrowser from 'expo-web-browser';
+import React from 'react';
+import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function AboutScreen() {
-    const { data: aboutData } = useScreen<AboutData>('about');
+    const { data: aboutData, getImagePath } = useScreen<AboutData>('about');
 
     const handleWebsitePress = async (): Promise<void> => {
         try {
@@ -19,9 +19,18 @@ export default function AboutScreen() {
     };
 
     const getBackgroundSource = () => {
-        const backgroundPath = aboutData?.background;
-        return backgroundPath ? { uri: backgroundPath } : require("../assets/dev/fallback.jpeg");
-    };
+    const backgroundId = aboutData?.background;
+
+    if (backgroundId) {
+      
+      const localUri = getImagePath(backgroundId);
+      if (localUri) {
+        return { uri: localUri };
+      }
+    }
+
+    return require('@/assets/dev/fallback.jpeg');
+  };
 
     // Use API data or fallback content
     const aboutText = aboutData?.text || "Stebbins Cold Canyon Reserve is part of the University of California Natural Reserve System's protected wildlands network which is dedicated to research, teaching, and public service. This App serves as a guide and information tool to the site. The Map shows your location on the trail and features distances and nature trail markers and descriptions. The Field Guide provides images and information on some of the common species that occur in the reserve. For more detailed information about the history of the site, volunteer opportunities, and species lists, please visit the";

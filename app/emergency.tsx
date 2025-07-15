@@ -1,25 +1,34 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity } from 'react-native';
+import { EmergencyData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
-import * as Linking from 'expo-linking';
-import { useScreen, EmergencyData } from '@/contexts/ApiContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Linking from 'expo-linking';
+import React from 'react';
+import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const openPhoneNumber = (phoneNumber: string) => {
     Linking.openURL(`tel:${phoneNumber}`).catch((err) => console.error('An error occurred', err));
 };
 
 export default function EmergencyScreen() {
-    const { data: emergencyData } = useScreen<EmergencyData>('emergency');
+    const { data: emergencyData, getImagePath } = useScreen<EmergencyData>('emergency');
     const text1 = emergencyData?.contact_1_message || 'For Emergencies contact Solano County Dispatch';
     const phone1 = emergencyData?.contact_1_number || '7074217090';
     const text2 = emergencyData?.contact_2_message || 'IF YOU HAVE NO SERVICE TRY CALLING 911';
     const phone2 = emergencyData?.contact_2_number || '911';
 
     const getBackgroundSource = () => {
-        const backgroundPath = emergencyData?.background;
-        return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
-    };
+    const backgroundId = emergencyData?.background;
+
+    if (backgroundId) {
+      
+      const localUri = getImagePath(backgroundId);
+      if (localUri) {
+        return { uri: localUri };
+      }
+    }
+
+    return require('@/assets/dev/fallback.jpeg');
+  };
 
     const formatPhoneNumber = (phone: string) => {
         if (phone === '911') return phone;

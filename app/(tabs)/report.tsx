@@ -1,11 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, ImageBackground, Image, Alert
-} from 'react-native';
+import { ReportData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
-import { useScreen, ReportData } from '@/contexts/ApiContext';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState } from 'react';
+import {
+  Alert,
+  Image,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
@@ -13,7 +21,7 @@ const REPORT_FILES_FOLDER_ID = process.env.EXPO_PUBLIC_REPORT_FILES_FOLDER_ID;
 
 
 export default function ReportScreen() {
-  const { data, getImagePath } = useScreen<ReportData>('report');
+  const { data: reportData, getImagePath } = useScreen<ReportData>('report');
   const [description, setDescription] = useState('');
   const [files, setFiles] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [contact, setContact] = useState({
@@ -23,12 +31,19 @@ export default function ReportScreen() {
     phone: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const { data: guideData } = useScreen<ReportData>('report');
   
   const getBackgroundSource = () => {
-    const backgroundPath = guideData?.background
-    return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
+    const backgroundId = reportData?.background;
+
+    if (backgroundId) {
+      
+      const localUri = getImagePath(backgroundId);
+      if (localUri) {
+        return { uri: localUri };
+      }
+    }
+
+    return require('@/assets/dev/fallback.jpeg');
   };
 
   const pickFile = async () => {
@@ -346,7 +361,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
             <Text style={styles.headerTitle}>Report an Issue</Text>
           </View>
           <Text style={styles.headerSubtitle}>
-            {data?.instruction_text || 'Help us keep the trails safe and maintained'}
+            {reportData?.instruction_text || 'Help us keep the trails safe and maintained'}
           </Text>
         </View>
 
@@ -358,7 +373,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
             </View>
             <View style={styles.sectionHeaderText}>
               <Text style={styles.sectionTitle}>
-                {data?.file_upload_text || 'Add Photos or Videos'}
+                {reportData?.file_upload_text || 'Add Photos or Videos'}
               </Text>
               <Text style={styles.sectionSubtitle}>
                 Visual evidence helps us understand the issue better
@@ -395,7 +410,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
             </View>
             <View style={styles.sectionHeaderText}>
               <Text style={styles.sectionTitle}>
-                {data?.description_text || 'Description'}
+                {reportData?.description_text || 'Description'}
               </Text>
               <Text style={styles.sectionSubtitle}>
                 Provide details about what you observed
@@ -423,7 +438,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
             </View>
             <View style={styles.sectionHeaderText}>
               <Text style={styles.sectionTitle}>
-                {data?.contact_info_text || 'Contact Information'}
+                {reportData?.contact_info_text || 'Contact Information'}
               </Text>
               <Text style={styles.sectionSubtitle}>
                 Optional - in case we need to follow up

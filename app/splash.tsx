@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
-import { View, Image, StyleSheet, Animated } from 'react-native';
+import { useApi } from '@/contexts/api';
+import { SCREEN_CONFIGS } from '@/contexts/api.config';
 import { router } from 'expo-router';
-import { useApi, SCREEN_CONFIGS } from '@/contexts/ApiContext';
+import { useEffect, useRef } from 'react';
+import { Animated, Image, StyleSheet, View } from 'react-native';
 
 export default function SplashScreen() {
   const { checkAllScreensForUpdates } = useApi();
@@ -30,7 +31,6 @@ export default function SplashScreen() {
           duration: 200,
           useNativeDriver: false,
         }).start(() => {
-          // Wait a moment before navigating
           setTimeout(() => {
             router.replace('/(tabs)/home');
           }, 300);

@@ -1,9 +1,9 @@
-import React from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, ImageBackground, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useScreen, HomeData, useApi } from '../../contexts/ApiContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import React from 'react';
+import { ActivityIndicator, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { HomeData, useApi, useScreen } from '../../contexts/api';
 
 interface ButtonItem {
   title: string;
@@ -14,8 +14,8 @@ interface ButtonItem {
 }
 
 export default function HomeScreen() {
-  const { data: homeData, isLoading } = useScreen<HomeData>('home');
-  const { checkAllScreensForUpdates } = useApi(); // Get the global update function
+  const { data: homeData, isLoading, getImagePath } = useScreen<HomeData>('home');
+  const { checkAllScreensForUpdates } = useApi();
 
   const mainButtons: ButtonItem[] = [
     {
@@ -72,11 +72,10 @@ export default function HomeScreen() {
     },
   ];
   
-  // The handler for the refresh button, which now syncs the entire app.
   const handleManualRefresh = async () => {
     console.log("Starting full app sync from home screen...");
     await checkAllScreensForUpdates((message) => {
-        console.log(message); // For debugging purposes
+        console.log(message);
     });
     console.log("Full app sync complete.");
   };
@@ -84,8 +83,17 @@ export default function HomeScreen() {
   const status = homeData?.reserve_status || "Loading status...";
 
   const getBackgroundSource = () => {
-    const backgroundPath = homeData?.background;
-    return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
+    const backgroundId = homeData?.background;
+
+    if (backgroundId) {
+      
+      const localUri = getImagePath(backgroundId);
+      if (localUri) {
+        return { uri: localUri };
+      }
+    }
+
+    return require('@/assets/dev/fallback.jpeg');
   };
 
   const handleNavigation = (route: string) => {

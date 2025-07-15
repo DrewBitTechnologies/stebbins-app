@@ -1,24 +1,41 @@
-import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, View, Text, Image, ImageBackground, TouchableOpacity, Linking } from 'react-native';
-import { useScreen, SafetyData } from '@/contexts/ApiContext';
+import { SafetyData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import React from 'react';
+import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function SafetyScreen() {
-    const { data: safetyData, getImagePath, isLoading, fetch } = useScreen<SafetyData>('safety');
+    const { data: safetyData, getImagePath, isLoading } = useScreen<SafetyData>('safety');
 
     const getBackgroundSource = () => {
-        const backgroundPath = safetyData?.background;
-        return backgroundPath ? { uri: backgroundPath } : require("../assets/dev/fallback.jpeg");
+        const backgroundId = safetyData?.background;
+
+        if (backgroundId) {
+        
+        const localUri = getImagePath(backgroundId);
+        if (localUri) {
+            return { uri: localUri };
+        }
+        }
+
+        return require('@/assets/dev/fallback.jpeg');
     };
     
     const getSafetyImageSource = () => {
-        const imagePath = safetyData?.safety_image;
-        return imagePath ? { uri: imagePath } : require("../assets/dev/fallback.jpeg");
+        const backgroundId = safetyData?.safety_image;
+
+        if (backgroundId) {
+        
+        const localUri = getImagePath(backgroundId);
+        if (localUri) {
+            return { uri: localUri };
+        }
+        }
+
+        return require('@/assets/dev/fallback.jpeg');
     };
 
-    // Function to parse the safety text and create bullet points
     const parseSafetyText = (text: string) => {
         if (!text) return [];
         

@@ -1,7 +1,7 @@
+import { ApiProvider } from "@/contexts/api";
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar"
-import { Image, View } from "react-native"
-import { ApiProvider } from "@/contexts/ApiContext";
+import { StatusBar } from "expo-status-bar";
+import { Image, View } from "react-native";
 
 export default function RootLayout() {
   return (
