@@ -1,71 +1,56 @@
-import { useEffect, useState } from 'react';
-import { View, Image, StyleSheet, Text } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { View, Image, StyleSheet, Animated } from 'react-native';
 import { router } from 'expo-router';
-import { useApi } from '../contexts/ApiContext';
+import { useApi, SCREEN_CONFIGS } from '@/contexts/ApiContext';
 
 export default function SplashScreen() {
-  const { fetchScreenData } = useApi();
-  const [loadingText, setLoadingText] = useState('Loading...');
+  const { checkAllScreensForUpdates } = useApi();
+  const progress = useRef(new Animated.Value(0)).current;
+  const totalScreens = Object.keys(SCREEN_CONFIGS).length;
 
   useEffect(() => {
-    const loadDataAndNavigate = async () => {
+    const initializeApp = async () => {
       try {
-        setLoadingText('Loading app data...');
-        
-        const screens = [
-          'home', 
-          'about', 
-          'donate', 
-          'guide', 
-          'emergency', 
-          'rules', 
-          'safety',
-          'report',
-          'guide_wildflower',
-          'guide_tree_shrub',
-          'guide_bird',
-          'guide_mammal',
-          'guide_invertebrate',
-          'guide_track',
-          'guide_herp',
-          'nature_trail_marker',
-          'mile_marker',
+        let processedCount = 0;
 
-        ];
-        
-        // Load data with progress updates
-        let completed = 0;
-        await Promise.all(
-          screens.map(async (screenName) => {
-            try {
-              await fetchScreenData(screenName);
-              completed++;
-              setLoadingText(`Loading data... ${completed}/${screens.length}`);
-            } catch (error) {
-              console.log(`Failed to fetch ${screenName} data:`, error);
-              completed++;
-              setLoadingText(`Loading data... ${completed}/${screens.length}`);
-              // Continue with other screens even if one fails
-            }
-          })
-        );
+        await checkAllScreensForUpdates((message) => {
+          console.log(message);
+          processedCount++;
+          const newProgress = processedCount / totalScreens;
+          
+          Animated.timing(progress, {
+            toValue: newProgress,
+            duration: 250,
+            useNativeDriver: false,
+          }).start();
+        });
 
-        setLoadingText('Ready!');
-        
-        // Small delay to show completion
-        setTimeout(() => {
-          router.replace('/(tabs)/home');
-        }, 500);
+        Animated.timing(progress, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: false,
+        }).start(() => {
+          // Wait a moment before navigating
+          setTimeout(() => {
+            router.replace('/(tabs)/home');
+          }, 300);
+        });
         
       } catch (error) {
-        console.log('Error during data loading:', error);
-        // Navigate anyway - screens will use cached data or show fallbacks
-        router.replace('/(tabs)/home');
+        console.log('A critical error occurred during app initialization:', error);
+        setTimeout(() => {
+          router.replace('/(tabs)/home');
+        }, 1000);
       }
     };
 
-    loadDataAndNavigate();
+    initializeApp();
   }, []);
+
+  const widthInterpolation = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%'],
+  });
 
   return (
     <View style={styles.container}>
@@ -74,7 +59,11 @@ export default function SplashScreen() {
         style={styles.image}
         resizeMode="contain"
       />
-      <Text style={styles.loadingText}>{loadingText}</Text>
+      <View style={styles.progressBarContainer}>
+        <Animated.View 
+          style={[styles.progressBarFill, { width: widthInterpolation }]} 
+        />
+      </View>
     </View>
   );
 }
@@ -90,9 +79,17 @@ const styles = StyleSheet.create({
     height: 200,
     width: 200,
   },
-  loadingText: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 20,
+  progressBarContainer: {
+    height: 8,
+    width: '50%',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 4,
+    marginTop: 30,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#1D4776',
+    borderRadius: 4,
   },
 });

@@ -80,7 +80,7 @@ export default function EmergencyScreen() {
                         <Text style={styles.headerTitle}>Emergency Contacts</Text>
                     </View>
                     <Text style={styles.headerSubtitle}>
-                        Keep these numbers accessible while on the trail
+                        Contacts for trail emergencies
                     </Text>
                 </View>
 
@@ -96,7 +96,7 @@ export default function EmergencyScreen() {
                         <Text style={styles.noticeTitle}>Safety Reminder</Text>
                     </View>
                     <Text style={styles.noticeText}>
-                        Cell service may be limited in remote areas. Consider informing others of your hiking plans.
+                        Cell service is limited in the reserve. Inform others of your hiking plans.
                     </Text>
                 </View>
 

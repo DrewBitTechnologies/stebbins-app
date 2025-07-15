@@ -8,10 +8,6 @@ import { router } from 'expo-router';
 export default function SafetyScreen() {
     const { data: safetyData, getImagePath, isLoading, fetch } = useScreen<SafetyData>('safety');
 
-    useEffect(() => {
-        fetch();
-    }, []);
-
     const getBackgroundSource = () => {
         const backgroundPath = getImagePath('background');
         

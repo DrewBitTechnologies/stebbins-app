@@ -123,7 +123,6 @@ export interface MileMarkerTrailData {
 
 export type MileMarkers = MileMarkerTrailData[];
 
-// Union type for all screen data
 type ScreenData = HomeData
                   | AboutData
                   | DonateData
@@ -138,36 +137,37 @@ type ScreenData = HomeData
                   | MileMarkerTrailData
                   | MileMarkers;
 
-// Screen configuration
 interface ScreenConfig {
   endpoint: string;
   cacheKey: string;
 }
 
-// Context state for cached data - simplified with unified image handling
 interface CachedScreenData {
   data: ScreenData;
-  imagePaths?: Record<string, string>; // All images including background
+  imagePaths?: Record<string, string>;
   timestamp: number;
 }
 
 interface ApiContextType {
   getScreenData: <T extends ScreenData>(screenName: string) => T | null;
   fetchScreenData: <T extends ScreenData>(screenName: string) => Promise<T | null>;
-  getImagePath: (screenName: string, imageName: string) => string | undefined; // Unified image getter
+  getImagePath: (screenName: string, imageName: string) => string | undefined;
   isLoading: (screenName: string) => boolean;
+  checkAllScreensForUpdates: (onProgress?: (message: string) => void) => Promise<void>;
 }
 
-// Create context
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
 
-// Constants
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
 const CACHE_DIR = FileSystem.documentDirectory + 'cache/';
+const COLLECTION_SCREENS = [
+  'guide_wildflower', 'guide_tree_shrub', 'guide_bird', 'guide_mammal',
+  'guide_invertebrate', 'guide_track', 'guide_herp', 'nature_trail_marker',
+  'mile_marker'
+];
 
-// Screen configurations
-const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
+export const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
   home: {
     endpoint: '/items/home/',
     cacheKey: 'home_data'
@@ -229,11 +229,11 @@ const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
     cacheKey: 'guide_herp'
   },
   nature_trail_marker: {
-    endpoint: '/items/nature_trail_marker',
+    endpoint: '/items/nature_trail_marker/',
     cacheKey: 'nature_trail_marker'
   },
   mile_marker: {
-    endpoint: '/items/mile_marker',
+    endpoint: '/items/mile_marker/',
     cacheKey: 'mile_marker'
   }
 
@@ -243,7 +243,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const [screenDataCache, setScreenDataCache] = useState<Record<string, CachedScreenData>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
 
-  // Ensure cache directory exists
   const ensureCacheDir = async () => {
     const dirInfo = await FileSystem.getInfoAsync(CACHE_DIR);
     if (!dirInfo.exists) {
@@ -251,11 +250,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // File paths
   const getDataFilePath = (cacheKey: string) => `${CACHE_DIR}${cacheKey}.json`;
   const getImageFilePath = (screenName: string, imageName: string) => `${CACHE_DIR}${screenName}_${imageName}`;
 
-  // Load cached data for a screen
   const loadCachedData = async (screenName: string): Promise<CachedScreenData | null> => {
     try {
       const config = SCREEN_CONFIGS[screenName];
@@ -274,7 +271,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     return null;
   };
 
-  // Save data to cache
   const saveToCache = async (screenName: string, data: CachedScreenData) => {
     try {
       await ensureCacheDir();
@@ -288,20 +284,15 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Download and cache image
   const downloadImage = async (screenName: string, imageName: string): Promise<string | undefined> => {
     try {
       await ensureCacheDir();
 
       const localPath = getImageFilePath(screenName, imageName);
-
-      // Check if image already exists
       const imageInfo = await FileSystem.getInfoAsync(localPath);
       if (imageInfo.exists) {
         return localPath;
       }
-
-      // Download image
       const downloadResult = await FileSystem.downloadAsync(
         `${API_BASE_URL}/assets/${imageName}`,
         localPath,
@@ -321,12 +312,10 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     return undefined;
   };
 
-  // Set loading state
   const setLoading = (screenName: string, loading: boolean) => {
     setLoadingStates(prev => ({ ...prev, [screenName]: loading }));
   };
 
-  // Main fetch function
   const fetchScreenData = async <T extends ScreenData>(screenName: string): Promise<T | null> => {
     const config = SCREEN_CONFIGS[screenName];
 
@@ -338,13 +327,10 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     setLoading(screenName, true);
 
     try {
-      // First, try to load cached data
       const cachedData = await loadCachedData(screenName);
       if (cachedData) {
         setScreenDataCache(prev => ({ ...prev, [screenName]: cachedData }));
       }
-
-      // Fetch fresh data from API
       const response = await fetch(`${API_BASE_URL}${config.endpoint}`, {
         method: 'GET',
         headers: {
@@ -352,14 +338,11 @@ export function ApiProvider({ children }: { children: ReactNode }) {
           'Content-Type': 'application/json',
         },
       });
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const res = await response.json();
       const screenData = res.data as T;
-
       let parsedData = screenData;
       let imagePaths: Record<string, string> = {};
 
@@ -378,19 +361,17 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         ) as T;
       }
 
-      if ('background' in screenData && screenData.background) {
+      if ('background' in screenData && typeof screenData.background === 'string') {
         const backgroundPath = await downloadImage(screenName, screenData.background);
         if (backgroundPath) {
           imagePaths['background'] = backgroundPath;
         }
       }
 
-      if (screenName === 'rules') {
-        if ('rules_image' in screenData && screenData.rules_image) {
-          const rulesImagePath = await downloadImage(screenName, screenData.rules_image);
-          if (rulesImagePath) {
-            imagePaths['rules_image'] = rulesImagePath;
-          }
+      if (screenName === 'rules' && 'rules_image' in screenData && typeof screenData.rules_image === 'string') {
+        const rulesImagePath = await downloadImage(screenName, screenData.rules_image);
+        if (rulesImagePath) {
+          imagePaths['rules_image'] = rulesImagePath;
         }
 
         if ('rules' in screenData && Array.isArray((screenData as RulesData).rules)) {
@@ -406,13 +387,10 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      if (screenName === 'safety') {
-        // Handle safety image
-        if ('safety_image' in screenData && screenData.safety_image) {
-          const safetyImagePath = await downloadImage(screenName, screenData.safety_image);
-          if (safetyImagePath) {
-            imagePaths['safety_image'] = safetyImagePath;
-          }
+      if (screenName === 'safety' && 'safety_image' in screenData && typeof screenData.safety_image === 'string') {
+        const safetyImagePath = await downloadImage(screenName, screenData.safety_image);
+        if (safetyImagePath) {
+          imagePaths['safety_image'] = safetyImagePath;
         }
       }
 
@@ -422,16 +400,12 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         timestamp: Date.now(),
       };
 
-      // Save to cache and update state
       await saveToCache(screenName, cacheData);
       setScreenDataCache(prev => ({ ...prev, [screenName]: cacheData }));
 
       return screenData;
-
     } catch (error) {
       console.log(`Error fetching data for ${screenName}:`, error);
-
-      // If fetch fails and we don't have cached data yet, try to load it
       if (!screenDataCache[screenName]) {
         const cachedData = await loadCachedData(screenName);
         if (cachedData) {
@@ -439,25 +413,76 @@ export function ApiProvider({ children }: { children: ReactNode }) {
           return cachedData.data as T;
         }
       }
-
       return screenDataCache[screenName]?.data as T || null;
     } finally {
       setLoading(screenName, false);
     }
   };
 
-  // Get screen data
+  const checkAllScreensForUpdates = async (onProgress?: (message: string) => void) => {
+    const screens = Object.keys(SCREEN_CONFIGS);
+
+    for (const screenName of screens) {
+      try {
+        onProgress?.(`[${screenName}] Checking for updates...`);
+        const config = SCREEN_CONFIGS[screenName];
+        const localCache = await loadCachedData(screenName);
+
+        if (!localCache) {
+          onProgress?.(`[${screenName}] No local cache found. Fetching...`);
+          await fetchScreenData(screenName);
+          continue;
+        }
+
+        let metaQuery = 'fields=date_updated';
+        if (COLLECTION_SCREENS.includes(screenName)) {
+          metaQuery = 'sort=-date_updated&limit=1&fields=date_updated';
+        }
+
+        const response = await fetch(`${API_BASE_URL}${config.endpoint}?${metaQuery}`, {
+          headers: { 'Authorization': `Bearer ${BEARER_TOKEN}` },
+        });
+        if (!response.ok) throw new Error(`API timestamp check failed with status ${response.status}`);
+        const remoteMetadata = await response.json();
+
+        let latestRemoteTimestamp: string | null = null;
+
+        if (Array.isArray(remoteMetadata.data) && remoteMetadata.data.length > 0) {
+          latestRemoteTimestamp = remoteMetadata.data[0].date_updated;
+        } else if (remoteMetadata.data?.date_updated) {
+          latestRemoteTimestamp = remoteMetadata.data.date_updated;
+        }
+
+        if (latestRemoteTimestamp && new Date(latestRemoteTimestamp) > new Date(localCache.timestamp)) {
+          onProgress?.(`[${screenName}] ✨ New data found! Fetching updates...`);
+          await fetchScreenData(screenName);
+        } else {
+          onProgress?.(`[${screenName}] ✅ Cache is up to date. Loading from disk...`);
+          setScreenDataCache(prev => ({ ...prev, [screenName]: localCache }));
+        }
+
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        onProgress?.(`[${screenName}] ❌ Error checking for updates. Using cached data. Error: ${errorMessage}`);
+        if (!screenDataCache[screenName]) {
+          const cachedData = await loadCachedData(screenName);
+          if (cachedData) {
+            setScreenDataCache(prev => ({ ...prev, [screenName]: cachedData }));
+          }
+        }
+      }
+    }
+  };
+
   const getScreenData = <T extends ScreenData>(screenName: string): T | null => {
     const cached = screenDataCache[screenName];
     return cached ? (cached.data as T) : null;
   };
 
-  // Unified function to get any image path by name
   const getImagePath = (screenName: string, imageName: string): string | undefined => {
     return screenDataCache[screenName]?.imagePaths?.[imageName];
   };
 
-  // Check if screen is loading
   const isLoading = (screenName: string): boolean => {
     return loadingStates[screenName] || false;
   };
@@ -467,6 +492,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     fetchScreenData,
     getImagePath,
     isLoading,
+    checkAllScreensForUpdates,
   };
 
   return (
@@ -476,7 +502,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Hook to use the context
 export function useApi() {
   const context = useContext(ApiContext);
   if (context === undefined) {
@@ -485,13 +510,11 @@ export function useApi() {
   return context;
 }
 
-// Convenience hook for any screen
 export function useScreen<T extends ScreenData>(screenName: string) {
   const api = useApi();
-
   return {
     data: api.getScreenData<T>(screenName),
-    getImagePath: (imageName: string) => api.getImagePath(screenName, imageName), // Get any image by name
+    getImagePath: (imageName: string) => api.getImagePath(screenName, imageName),
     isLoading: api.isLoading(screenName),
     fetch: () => api.fetchScreenData<T>(screenName),
   };

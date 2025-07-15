@@ -1,8 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, ImageBackground, ScrollView, LayoutAnimation, UIManager, Platform, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet, ImageBackground, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useScreen, HomeData } from '../../contexts/ApiContext';
+import { useScreen, HomeData, useApi } from '../../contexts/ApiContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 interface ButtonItem {
@@ -14,7 +14,8 @@ interface ButtonItem {
 }
 
 export default function HomeScreen() {
-  const { data: homeData, getImagePath, fetch, isLoading } = useScreen<HomeData>('home');
+  const { data: homeData, getImagePath, isLoading } = useScreen<HomeData>('home');
+  const { checkAllScreensForUpdates } = useApi(); // Get the global update function
 
   const mainButtons: ButtonItem[] = [
     {
@@ -70,12 +71,23 @@ export default function HomeScreen() {
       color: '#c70000'
     },
   ];
+  
+  // The handler for the refresh button, which now syncs the entire app.
+  const handleManualRefresh = async () => {
+    console.log("Starting full app sync from home screen...");
+    await checkAllScreensForUpdates((message) => {
+        console.log(message); // For debugging purposes
+    });
+    console.log("Full app sync complete.");
+  };
 
   const status = homeData?.reserve_status || "Loading status...";
 
   const getBackgroundSource = () => {
+    // The getImagePath function is already provided by the useScreen hook.
     const backgroundPath = getImagePath('background');
-    return backgroundPath ? { uri: backgroundPath } : require('../../assets/dev/fallback.jpeg');
+    // The fallback image is a local asset required by the app.
+    return backgroundPath ? { uri: backgroundPath } : require('@/assets/dev/fallback.jpeg');
   };
 
   const handleNavigation = (route: string) => {
@@ -87,7 +99,11 @@ export default function HomeScreen() {
       <View style={styles.statusHeader}>
         <Ionicons name="megaphone" size={24} color="#1a1a1a" />
         <Text style={styles.statusTitle}>Reserve Status</Text>
-        <TouchableOpacity onPress={() => fetch()} style={styles.reloadButton} disabled={isLoading}>
+        <TouchableOpacity 
+          onPress={handleManualRefresh} 
+          style={styles.reloadButton} 
+          disabled={isLoading}
+        >
           {isLoading ? (
             <ActivityIndicator size="small" color="#1a1a1a" />
           ) : (
@@ -95,7 +111,7 @@ export default function HomeScreen() {
           )}
         </TouchableOpacity>
       </View>
-      <Text style={styles.statusText}>{isLoading ? 'Loading status...' : status}</Text>
+      <Text style={styles.statusText}>{isLoading ? 'Checking for updates...' : status}</Text>
     </View>
   );
 
@@ -190,35 +206,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
   },
-  headerSection: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  headerTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerIcon: {
-    marginRight: 12,
-  },
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: 'white',
-    textShadowColor: 'rgba(0,0,0,0.6)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-  },
-  headerSubtitle: {
-    fontSize: 18,
-    color: 'rgba(255,255,255,0.9)',
-    textShadowColor: 'rgba(0,0,0,0.6)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-    marginTop: 4,
-    textAlign: "center",
-  },
   statusCard: {
     backgroundColor: 'rgba(255, 191, 0, 0.85)',
     borderRadius: 16,
@@ -293,7 +280,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginHorizontal: -6, // Counteract card margin
+    marginHorizontal: -6,
   },
   secondaryCard: {
     width: '48%',

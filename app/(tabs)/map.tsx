@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { StyleSheet, View, Dimensions, Pressable, Modal, Text, ScrollView, Alert, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Dimensions, Pressable, Modal, Text, ScrollView, Alert, Image, TouchableOpacity, Animated } from 'react-native';
 import MapboxGL from "@rnmapbox/maps";
 import { useIsConnected } from 'react-native-offline';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -26,7 +26,6 @@ const BLUE = '#1D4776';
 type InfoModalProps = { visible: boolean; onClose: () => void; };
 type MarkerDetailModalProps = { marker: NatureTrailMarkerData | null; onClose: () => void; };
 
-// A unified interface for markers to simplify rendering
 interface DisplayMarker {
   id: number;
   coordinate: [number, number];
@@ -39,8 +38,11 @@ const InfoModal = ({ visible, onClose }: InfoModalProps) => {
         <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
             <View style={styles.modalContainer}>
                 <View style={styles.modalView}>
-                    <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                        <Text style={[styles.infoText, { fontWeight: 'bold' }]}>Icon Descriptions</Text>
+                    <TouchableOpacity style={styles.infoModalCloseButton} onPress={onClose}>
+                        <Ionicons name="close" size={28} color={BLUE} />
+                    </TouchableOpacity>
+                    <Text style={styles.infoModalTitle}>Icon Descriptions</Text>
+                    <ScrollView>
                         <View style={styles.iconRow}>
                             <FontAwesomeIcon name="download" size={24} color={BLUE} style={styles.icon} />
                             <Text style={styles.buttonText}>Deletes and redownloads the offline map to ensure all trail data is up to date.</Text>
@@ -54,9 +56,6 @@ const InfoModal = ({ visible, onClose }: InfoModalProps) => {
                             <Text style={styles.buttonText}>Opens this help screen.</Text>
                         </View>
                     </ScrollView>
-                    <Pressable style={styles.modalCloseButton} onPress={onClose}>
-                        <Text style={styles.modalCloseButtonText}>Close</Text>
-                    </Pressable>
                 </View>
             </View>
         </Modal>
@@ -84,7 +83,7 @@ const MarkerDetailModal = ({ marker, onClose }: MarkerDetailModalProps) => {
             </View>
           </ScrollView>
           <TouchableOpacity style={styles.markerModalCloseButton} onPress={onClose}>
-            <Ionicons name="close" size={24} color="#fff" />
+            <Ionicons name="close" size={28} color={BLUE} />
           </TouchableOpacity>
         </View>
       </View>
@@ -105,9 +104,31 @@ export default function MapScreen() {
 
   const [activeMarkerType, setActiveMarkerType] = useState<'nature' | 'mile'>('nature');
   const [displayedMarkers, setDisplayedMarkers] = useState<DisplayMarker[]>([]);
+  
+  const slideAnimation = useRef(new Animated.Value(0)).current;
+  const [natureButtonWidth, setNatureButtonWidth] = useState(0);
+  const [mileButtonWidth, setMileButtonWidth] = useState(0);
 
   const { data: natureTrailMarkers } = useScreen<NatureTrailMarkerData[]>('nature_trail_marker');
   const { data: mileMarkers } = useScreen<MileMarkerTrailData[]>('mile_marker');
+  
+  useEffect(() => {
+    Animated.spring(slideAnimation, {
+      toValue: activeMarkerType === 'nature' ? 0 : 1,
+      useNativeDriver: false, // Required for animating width/translateX
+      bounciness: 8,
+    }).start();
+  }, [activeMarkerType]);
+
+  const translateX = slideAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, natureButtonWidth],
+  });
+
+  const animatedWidth = slideAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [natureButtonWidth, mileButtonWidth],
+  });
 
   useEffect(() => {
     let markersToDisplay: DisplayMarker[] = [];
@@ -245,9 +266,7 @@ export default function MapScreen() {
             {displayedMarkers.map((marker) => (
               <MapboxGL.MarkerView key={`${activeMarkerType}-${marker.id}`} id={marker.id.toString()} coordinate={marker.coordinate} anchor={{ x: 0.5, y: 1 }}>
                 <TouchableOpacity onPress={marker.onPress} disabled={!marker.onPress} style={styles.markerWrapper}>
-                  {/* CORRECTED: Unified style for all markers */}
                   <View style={styles.markerContainer}>
-                    {/* CORRECTED: Added adjustsFontSizeToFit to prevent text overflow */}
                     <Text style={styles.markerText} adjustsFontSizeToFit numberOfLines={1}>
                       {marker.label}
                     </Text>
@@ -258,20 +277,29 @@ export default function MapScreen() {
             ))}
           </MapboxGL.MapView>
           <View style={styles.buttonContainer}>
-            <Pressable style={styles.mapButton} onPress={checkMapForUpdate}><FontAwesomeIcon name="download" size={22} color={BLUE} /></Pressable>
-            <Pressable style={styles.mapButton} onPress={resetZoom}><FontAwesomeIcon name="compress" size={20} color={BLUE} /></Pressable>
-            <Pressable style={styles.mapButton} onPress={toggleInfoModal}><Ionicons name="help-circle-sharp" size={28} color={BLUE} /></Pressable>
+            <Pressable style={[styles.mapActionButton, styles.mapButtonTop]} onPress={checkMapForUpdate}>
+              <FontAwesomeIcon name="download" size={22} color={BLUE} />
+            </Pressable>
+            <Pressable style={[styles.mapActionButton, styles.mapButtonMiddle]} onPress={resetZoom}>
+              <FontAwesomeIcon name="compress" size={20} color={BLUE} />
+            </Pressable>
+            <Pressable style={[styles.mapActionButton, styles.mapButtonBottom]} onPress={toggleInfoModal}>
+              <Ionicons name="help-circle-sharp" size={28} color={BLUE} />
+            </Pressable>
           </View>
           <View style={styles.toggleContainer}>
+            <Animated.View style={[styles.slidingToggle, { width: animatedWidth, transform: [{ translateX: translateX }] }]} />
             <Pressable
-              style={[styles.toggleButton, activeMarkerType === 'nature' && styles.toggleButtonActive]}
+              style={styles.toggleButton}
               onPress={() => setActiveMarkerType('nature')}
+              onLayout={(e) => setNatureButtonWidth(e.nativeEvent.layout.width)}
             >
               <Text style={[styles.toggleButtonText, activeMarkerType === 'nature' && styles.toggleButtonTextActive]}>Nature Trail</Text>
             </Pressable>
             <Pressable
-              style={[styles.toggleButton, activeMarkerType === 'mile' && styles.toggleButtonActive]}
+              style={styles.toggleButton}
               onPress={() => setActiveMarkerType('mile')}
+              onLayout={(e) => setMileButtonWidth(e.nativeEvent.layout.width)}
             >
               <Text style={[styles.toggleButtonText, activeMarkerType === 'mile' && styles.toggleButtonTextActive]}>Mile Markers</Text>
             </Pressable>
@@ -301,22 +329,51 @@ const styles = StyleSheet.create({
   container: { flex: 1, overflow: 'hidden' },
   map: { flex: 1 },
   offlineMapImage: { width: DEVICE_WIDTH, height: DEVICE_HEIGHT },
-  buttonContainer: { position: 'absolute', top: 60, right: 15, flexDirection: 'column', alignItems: 'center', gap: 12 },
-  mapButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84 },
-  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  modalView: { margin: 20, backgroundColor: 'white', borderRadius: 20, padding: 25, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5, maxHeight: '80%', width: '90%' },
-  scrollViewContent: { paddingRight: 5 },
-  modalCloseButton: { backgroundColor: BLUE, borderRadius: 10, paddingVertical: 12, paddingHorizontal: 30, elevation: 2, marginTop: 20 },
-  modalCloseButtonText: { color: 'white', fontWeight: 'bold', textAlign: 'center', fontSize: 16 },
-  infoText: { fontSize: 18, marginVertical: 10, lineHeight: 25, textAlign: 'center' },
-  iconRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 15 },
+  buttonContainer: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    flexDirection: 'column',
+    borderRadius: 12,
+    backgroundColor: 'white',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  mapActionButton: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  mapButtonTop: {
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  mapButtonMiddle: {
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
+  mapButtonBottom: {
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.0)' },
+  modalView: { margin: 20, backgroundColor: 'white', borderRadius: 16, padding: 25, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5, maxHeight: '80%', width: '90%' },
+  infoModalTitle: { fontSize: 22, fontWeight: 'bold', color: '#333', marginBottom: 20, textAlign: 'center' },
+  infoModalCloseButton: { position: 'absolute', top: 15, right: 15, width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(104, 132, 163, 0.5)', zIndex: 1 },
+  iconRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 20 },
   icon: { marginRight: 20, width: 25, textAlign: 'center' },
   buttonText: { lineHeight: 25, fontSize: 16, flex: 1 },
   markerWrapper: { alignItems: 'center' },
   markerContainer: { backgroundColor: '#fff', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', borderColor: BLUE, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3, elevation: 5, padding: 2 },
   markerText: { color: BLUE, fontWeight: 'bold', fontSize: 14, textAlign: 'center' },
   markerPin: { width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 10, borderStyle: 'solid', backgroundColor: 'transparent', borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: BLUE },
-  markerModalView: { width: '90%', maxHeight: '80%', backgroundColor: 'white', borderRadius: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5, overflow: 'hidden' },
+  markerModalView: { width: '90%', maxHeight: '80%', backgroundColor: 'white', borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5, overflow: 'hidden' },
   markerModalScrollView: { paddingBottom: 20 },
   markerModalTitleSection: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 15 },
   markerModalCommonName: { fontSize: 22, fontWeight: 'bold', color: '#333', marginBottom: 4 },
@@ -325,9 +382,9 @@ const styles = StyleSheet.create({
   markerModalContent: { paddingHorizontal: 20 },
   markerModalDescription: { fontSize: 16, lineHeight: 24, color: '#444' },
   markerModalCloseButton: { position: 'absolute', top: 15, right: 15, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(104, 132, 163, 0.5)', justifyContent: 'center', alignItems: 'center' },
-  toggleContainer: { position: 'absolute', bottom: 30, alignSelf: 'center', flexDirection: 'row', backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 20, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 2 },
-  toggleButton: { paddingVertical: 10, paddingHorizontal: 20 },
-  toggleButtonActive: { backgroundColor: BLUE },
+  toggleContainer: { position: 'absolute', bottom: 30, alignSelf: 'center', flexDirection: 'row', backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 2 },
+  slidingToggle: { position: 'absolute', height: '100%', backgroundColor: BLUE, borderRadius: 12 },
+  toggleButton: { paddingVertical: 10, paddingHorizontal: 20, justifyContent: 'center', alignItems: 'center', zIndex: 1 },
   toggleButtonText: { color: BLUE, fontWeight: '600', fontSize: 14 },
   toggleButtonTextActive: { color: '#fff' },
 });

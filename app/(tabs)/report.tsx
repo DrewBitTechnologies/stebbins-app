@@ -13,7 +13,7 @@ const REPORT_FILES_FOLDER_ID = process.env.EXPO_PUBLIC_REPORT_FILES_FOLDER_ID;
 
 
 export default function ReportScreen() {
-  const { data, getImagePath, fetch: fetchScreenData } = useScreen<ReportData>('report');
+  const { data, getImagePath } = useScreen<ReportData>('report');
   const [description, setDescription] = useState('');
   const [files, setFiles] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [contact, setContact] = useState({
@@ -23,11 +23,6 @@ export default function ReportScreen() {
     phone: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Fetch screen data on mount
-  useEffect(() => {
-    fetchScreenData();
-  }, []);
 
   const getBackgroundSource = () => {
     const backgroundPath = getImagePath('background');
