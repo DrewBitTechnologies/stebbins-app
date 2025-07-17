@@ -112,8 +112,33 @@ export interface MileMarkerTrailData {
   longitude: number;
   value: number;
 }
+export interface SafetyMarkerData {
+  id: number;
+  date_created: string;
+  date_updated: string | null;
+  description: string;
+  map_icon: string | null;
+  latitude: number;
+  longitude: number;
+  map_label: string;
+  image: string | null;
+}
+export interface POIMarkerData {
+  id: number;
+  date_created: string;
+  date_updated: string | null;
+  description: string | null;
+  map_icon: string | null;
+  latitude: number;
+  longitude: number;
+  map_label: string;
+  image: string | null;
+}
 export type MileMarkers = MileMarkerTrailData[];
-export type ScreenData = HomeData | AboutData | DonateData | GuideData | EmergencyData | RulesData | SafetyData | ReportData | GuideDataItem | GuideDataItems | NatureTrailMarkerData | MileMarkerTrailData | MileMarkers;
+export type POIMarkers = POIMarkerData[];
+export type SafetyMarkers = SafetyMarkerData[];
+
+export type ScreenData = HomeData | AboutData | DonateData | GuideData | EmergencyData | RulesData | SafetyData | ReportData | GuideDataItem | GuideDataItems | NatureTrailMarkerData | MileMarkerTrailData | MileMarkers | SafetyMarkers | POIMarkers;
 
 export interface CachedScreenData {
   data: ScreenData;

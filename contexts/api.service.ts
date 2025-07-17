@@ -120,8 +120,26 @@ export const determineSyncActions = (localData: any[], remoteItems: any[]) => {
 
     const itemsToFetchIds = remoteItems
         .filter(remoteItem => {
+            // If the item isn't in our local cache at all, fetch it.
+            if (!localItemMap.has(remoteItem.id)) {
+                return true;
+            }
+            
             const localTimestamp = localItemMap.get(remoteItem.id);
-            return !localTimestamp || new Date(remoteItem.date_updated) > new Date(localTimestamp);
+            const remoteTimestamp = remoteItem.date_updated;
+
+            // If the remote timestamp is null, we can't be "more updated". Don't fetch.
+            if (remoteTimestamp === null) {
+                return false;
+            }
+            
+            // If local is null but remote has a new timestamp, fetch it.
+            if (localTimestamp === null) {
+                return true;
+            }
+            
+            // Both have timestamps, so compare them directly.
+            return new Date(remoteTimestamp) > new Date(localTimestamp);
         })
         .map(item => item.id);
 
