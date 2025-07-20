@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         width: '100%',
         aspectRatio: 1,
         borderRadius: 12,
-        resizeMode: 'cover',
+        resizeMode: 'contain',
     },
     emergencyCard: {
         backgroundColor: '#dc2626',

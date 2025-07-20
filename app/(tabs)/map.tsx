@@ -77,7 +77,7 @@ const MarkerDetailModal = ({ marker, imageUri, iconUri, onClose }: MarkerDetailM
     <Modal animationType="slide" transparent={true} visible={!!marker} onRequestClose={onClose}>
       <View style={styles.modalContainer}>
         <View style={styles.markerModalView}>
-          <ScrollView contentContainerStyle={styles.markerModalScrollView}>
+          <ScrollView>
             <View style={styles.markerModalTitleSection}>
               {iconUri && <Image source={{ uri: iconUri }} style={styles.markerModalIcon} />}
               <View style={styles.markerModalTextContainer}>
@@ -85,9 +85,18 @@ const MarkerDetailModal = ({ marker, imageUri, iconUri, onClose }: MarkerDetailM
                 {subtitle && <Text style={styles.markerModalLatinName}>{subtitle}</Text>}
               </View>
             </View>
+
             {imageUri && (
-              <Image source={{ uri: imageUri }} style={styles.markerModalImage} />
+              <GestureHandlerRootView style={styles.imageContainer}>
+                <ImageZoom
+                  uri={imageUri}
+                  style={styles.markerModalImage}
+                  isDoubleTapEnabled={true}
+                  isPanEnabled={true}
+                />
+              </GestureHandlerRootView>
             )}
+
             <View style={styles.markerModalContent}>
               {marker.description && <Text style={styles.markerModalDescription}>{marker.description}</Text>}
             </View>
@@ -100,6 +109,7 @@ const MarkerDetailModal = ({ marker, imageUri, iconUri, onClose }: MarkerDetailM
     </Modal>
   );
 };
+
 
 export default function MapScreen() {
   const mapview = useRef<MapboxGL.MapView | null>(null);
@@ -468,7 +478,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
   },
-  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.0)' },
+  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   modalView: { margin: 20, backgroundColor: 'white', borderRadius: 16, padding: 25, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5, maxHeight: '80%', width: '90%' },
   infoModalTitle: { fontSize: 22, fontWeight: 'bold', color: '#333', marginBottom: 20, textAlign: 'center' },
   infoModalCloseButton: { position: 'absolute', top: 15, right: 15, width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(104, 132, 163, 0.5)', zIndex: 1 },
@@ -480,17 +490,51 @@ const styles = StyleSheet.create({
   markerText: { color: BLUE, fontWeight: 'bold', fontSize: 14, textAlign: 'center' },
   markerPin: { width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 10, borderStyle: 'solid', backgroundColor: 'transparent', borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: BLUE },
   customMarkerIcon: { width: 36, height: 36, resizeMode: 'contain' },
-  markerModalView: { width: '90%', maxHeight: '80%', backgroundColor: 'white', borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5, overflow: 'hidden' },
-  markerModalScrollView: { paddingBottom: 20 },
-  markerModalTitleSection: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 15, flexDirection: 'row', alignItems: 'center' },
+  markerModalView: {
+    width: '90%',
+    maxHeight: '80%',
+    backgroundColor: 'white',
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    padding: 20,
+  },
+  markerModalTitleSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 15,
+  },
   markerModalIcon: { width: 40, height: 40, marginRight: 15, resizeMode: 'contain' },
   markerModalTextContainer: { flex: 1 },
   markerModalCommonName: { fontSize: 22, fontWeight: 'bold', color: '#333' },
   markerModalLatinName: { fontSize: 16, fontStyle: 'italic', color: '#666' },
-  markerModalImage: { width: '100%', height: 220, backgroundColor: '#e0e0e0', marginBottom: 15 },
-  markerModalContent: { paddingHorizontal: 20 },
+  imageContainer: {
+    height: 220,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  markerModalImage: {
+    width: '100%',
+    height: '100%',
+  },
+  markerModalContent: {
+    paddingTop: 15,
+  },
   markerModalDescription: { fontSize: 16, lineHeight: 24, color: '#444' },
-  markerModalCloseButton: { position: 'absolute', top: 15, right: 15, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(104, 132, 163, 0.5)', justifyContent: 'center', alignItems: 'center' },
+  markerModalCloseButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   toggleContainer: { position: 'absolute', bottom: 30, alignSelf: 'center', flexDirection: 'row', backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 2, padding: 4 },
   toggleButton: { width: 50, height: 40, borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginHorizontal: 2 },
   toggleButtonActive: { backgroundColor: BLUE },
