@@ -1,9 +1,10 @@
-import { MileMarkerTrailData, NatureTrailMarkerData, POIMarkerData, POIMarkers, SafetyMarkerData, SafetyMarkers, useScreen } from '@/contexts/api';
+import { MileMarkerTrailData, NatureTrailMarkerData, POIMarkerData, SafetyMarkerData, useScreen } from '@/contexts/api';
 import { FontAwesome, FontAwesome6 as FontAwesomeIcon, Ionicons } from '@expo/vector-icons';
 import { ImageZoom } from '@likashefqet/react-native-image-zoom';
 import MapboxGL from "@rnmapbox/maps";
+import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useIsConnected } from 'react-native-offline';
 
@@ -12,29 +13,25 @@ MapboxGL.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN);
 const CENTER_LATITUDE = 38.493;
 const CENTER_LONGITUDE = -122.104;
 const BOUNDS = { ne: [-122.084, 38.525], sw: [-122.124, 38.4623] };
-const MAP_PACK = 'stebbins-test';
+const MAP_PACK = 'stebbins';
 const DEFAULT_ZOOM = 13.3;
 const MIN_ZOOM = 13;
 const MAX_ZOOM = 22;
 const STYLE_URL = process.env.EXPO_PUBLIC_MAPBOX_STYLE_URL;
 const DEVICE_WIDTH = Dimensions.get('window').width;
 const DEVICE_HEIGHT = Dimensions.get('window').height;
-const BLUE = '#1D4776';
+const BLUE = '#022851';
 
 type InfoModalProps = { visible: boolean; onClose: () => void; };
-
-// A generic marker type that can hold data from any of our marker collections
 type AnyMarker = NatureTrailMarkerData | SafetyMarkerData | POIMarkerData;
-
 type MarkerDetailModalProps = {
   marker: AnyMarker | null;
   imageUri: string | null | undefined;
   iconUri: string | null | undefined;
   onClose: () => void;
 };
-
 interface DisplayMarker {
-  id: string; // Use a unique string ID for keys
+  id: string;
   coordinate: [number, number];
   label: string;
   onPress?: () => void;
@@ -73,7 +70,6 @@ const InfoModal = ({ visible, onClose }: InfoModalProps) => {
 const MarkerDetailModal = ({ marker, imageUri, iconUri, onClose }: MarkerDetailModalProps) => {
   if (!marker) return null;
 
-  // Determine the title based on the marker type
   const title = 'common_name' in marker ? marker.common_name : marker.map_label;
   const subtitle = 'latin_name' in marker ? marker.latin_name : null;
 
@@ -105,10 +101,10 @@ const MarkerDetailModal = ({ marker, imageUri, iconUri, onClose }: MarkerDetailM
   );
 };
 
-
 export default function MapScreen() {
   const mapview = useRef<MapboxGL.MapView | null>(null);
   const camera = useRef<MapboxGL.Camera | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isMapCached, setIsMapCached] = useState<boolean | null>(null);
   const isConnected = useIsConnected();
   const [isInfoModalVisible, setInfoModalVisible] = useState(false);
@@ -117,6 +113,7 @@ export default function MapScreen() {
   const [zoomLevel, setZoomLevel] = useState(DEFAULT_ZOOM);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimer = useRef<NodeJS.Timeout | null>(null);
+  const [locationPermission, setLocationPermission] = useState(false);
 
   const [activeMarkerTypes, setActiveMarkerTypes] = useState({
     nature: true,
@@ -128,8 +125,29 @@ export default function MapScreen() {
 
   const { data: natureTrailMarkers, getImagePath: getNatureImagePath } = useScreen<NatureTrailMarkerData[]>('nature_trail_marker');
   const { data: mileMarkers } = useScreen<MileMarkerTrailData[]>('mile_marker');
-  const { data: safetyMarkers, getImagePath: getSafetyImagePath } = useScreen<SafetyMarkers>('safety_marker');
-  const { data: poiMarkers, getImagePath: getPoiImagePath } = useScreen<POIMarkers>('poi_marker');
+  const { data: safetyMarkers, getImagePath: getSafetyImagePath } = useScreen<SafetyMarkerData[]>('safety_marker');
+  const { data: poiMarkers, getImagePath: getPoiImagePath } = useScreen<POIMarkerData[]>('poi_marker');
+
+  useEffect(() => {
+    const initializeApp = async () => {
+      // 1. Check for location permission
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Location permission is required to show your position on the map.');
+        setLocationPermission(false);
+      } else {
+        setLocationPermission(true);
+      }
+
+      // 2. Check for offline map state
+      await checkMapState();
+
+      // 3. All checks are done, stop loading
+      setIsLoading(false);
+    };
+
+    initializeApp();
+  }, [isConnected]); // Re-check if connection status changes
 
   const selectedMarkerImageUri = selectedMarker?.image ? getImagePathForMarker(selectedMarker) : null;
   const selectedMarkerIconUri = selectedMarker && 'map_icon' in selectedMarker && selectedMarker.map_icon
@@ -141,9 +159,7 @@ export default function MapScreen() {
     if (!field) return null;
 
     if ('common_name' in marker) return getNatureImagePath(field);
-    if ('map_label' in marker) { // Broad check for POI and Safety markers
-        // This logic assumes safety_marker and poi_marker are the correct screen names.
-        // A more robust way might be to add a 'type' field to AnyMarker if collections grow.
+    if ('map_label' in marker) {
         if (safetyMarkers?.some(m => m.id === marker.id)) return getSafetyImagePath(field);
         if (poiMarkers?.some(m => m.id === marker.id)) return getPoiImagePath(field);
     }
@@ -151,9 +167,10 @@ export default function MapScreen() {
   }
 
   useEffect(() => {
+    if (isLoading) return; // Don't compute markers while loading
+
     let markersToDisplay: DisplayMarker[] = [];
 
-    // Nature Trail Markers
     if (activeMarkerTypes.nature && natureTrailMarkers) {
       let filteredNatureMarkers = natureTrailMarkers;
       if (zoomLevel < 14.5) {
@@ -169,17 +186,15 @@ export default function MapScreen() {
       })));
     }
 
-    // Mile Markers
     if (activeMarkerTypes.mile && mileMarkers) {
       markersToDisplay.push(...mileMarkers.map(marker => ({
         id: `mile-${marker.id}`,
         coordinate: [marker.longitude, marker.latitude] as [number, number],
         label: marker.value.toString(),
-        onPress: undefined, // Mile markers not clickable
+        onPress: undefined,
       })));
     }
 
-    // Safety Markers
     if (activeMarkerTypes.safety && safetyMarkers) {
         markersToDisplay.push(...safetyMarkers.map(marker => ({
             id: `safety-${marker.id}`,
@@ -190,7 +205,6 @@ export default function MapScreen() {
         })));
     }
 
-    // POI Markers
     if (activeMarkerTypes.poi && poiMarkers) {
         markersToDisplay.push(...poiMarkers.map(marker => ({
             id: `poi-${marker.id}`,
@@ -202,7 +216,7 @@ export default function MapScreen() {
     }
 
     setDisplayedMarkers(markersToDisplay);
-  }, [activeMarkerTypes, zoomLevel, natureTrailMarkers, mileMarkers, safetyMarkers, poiMarkers]);
+  }, [isLoading, activeMarkerTypes, zoomLevel, natureTrailMarkers, mileMarkers, safetyMarkers, poiMarkers]);
 
   const deleteMap = async () => {
     try {
@@ -215,7 +229,11 @@ export default function MapScreen() {
   const downloadOfflineMap = async () => {
     try {
       await MapboxGL.offlineManager.createPack({
-        name: MAP_PACK, styleURL: STYLE_URL, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, bounds: [[-122.124, 38.4623], [-122.084, 38.525]]
+        name: MAP_PACK, 
+        styleURL: STYLE_URL, 
+        minZoom: MIN_ZOOM, 
+        maxZoom: MAX_ZOOM, 
+        bounds: [BOUNDS.sw, BOUNDS.ne]
       },
       (offlineRegion, status) => console.log(offlineRegion.name, status.percentage),
       (offlineRegion, err) => console.error('Offline pack download error:', offlineRegion.name, err)
@@ -275,12 +293,6 @@ export default function MapScreen() {
     });
   };
 
-  useEffect(() => {
-    if (isMapCached === null) {
-      checkMapState();
-    }
-  }, [isMapCached]);
-
   const onCameraChanged = (event: any) => {
     setZoomLevel(event.properties.zoom);
   };
@@ -288,7 +300,6 @@ export default function MapScreen() {
   const toggleInfoModal = () => setInfoModalVisible(!isInfoModalVisible);
 
   const toggleMarkerType = (type: keyof typeof activeMarkerTypes) => {
-    // Clear any existing timer
     if (toastTimer.current) {
         clearTimeout(toastTimer.current);
     }
@@ -303,7 +314,6 @@ export default function MapScreen() {
     
     setToastMessage(`${willBeActive ? 'Showing' : 'Hiding'} ${typeNameMap[type]} Markers`);
     
-    // Set a new timer to clear the message
     toastTimer.current = setTimeout(() => {
         setToastMessage(null);
         toastTimer.current = null;
@@ -311,6 +321,14 @@ export default function MapScreen() {
 
     setActiveMarkerTypes(prev => ({ ...prev, [type]: !prev[type] }));
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={BLUE} />
+      </View>
+    );
+  }
 
   if (isMapCached || isConnected) {
     return (
@@ -337,6 +355,9 @@ export default function MapScreen() {
               maxBounds={BOUNDS}
               minZoomLevel={MIN_ZOOM}
             />
+            
+            {locationPermission && <MapboxGL.UserLocation visible={true} />}
+
             {displayedMarkers.map((marker) => (
               <MapboxGL.MarkerView key={marker.id} id={marker.id} coordinate={marker.coordinate} anchor={{ x: 0.5, y: 1 }}>
                 <TouchableOpacity onPress={marker.onPress} disabled={!marker.onPress} style={styles.markerWrapper}>
@@ -383,7 +404,6 @@ export default function MapScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Toast Notification View */}
           {toastMessage && (
             <View style={styles.toastContainer}>
               <Text style={styles.toastText}>{toastMessage}</Text>
@@ -412,6 +432,7 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: '#f0f0f0' },
   container: { flex: 1, overflow: 'hidden' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f0f0' },
   map: { flex: 1 },
   offlineMapImage: { width: DEVICE_WIDTH, height: DEVICE_HEIGHT },
   buttonContainer: {
@@ -475,7 +496,7 @@ const styles = StyleSheet.create({
   toggleButtonActive: { backgroundColor: BLUE },
   toastContainer: {
     position: 'absolute',
-    bottom: 90, // Position it above the toggle buttons
+    bottom: 90,
     alignSelf: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     borderRadius: 20,

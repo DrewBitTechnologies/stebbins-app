@@ -37,6 +37,10 @@ export default (): ExpoConfig => {
         foregroundImage: "./assets/images/splash-icon.png",
         backgroundColor: "#ffffff",
       },
+      permissions: [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
       edgeToEdgeEnabled: true
     },
     web: {
