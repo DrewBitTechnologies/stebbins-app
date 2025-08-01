@@ -5,20 +5,10 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
+import { getBackgroundSource } from '@/utility/background-source';
 
 export default function RulesScreen() {
     const { data: rulesData, getImagePath } = useScreen<RulesData>('rules');
-
-    const getBackgroundSource = () => {
-        const backgroundId = rulesData?.background;
-        if (backgroundId) {
-            const localUri = getImagePath(backgroundId);
-            if (localUri) {
-                return { uri: localUri };
-            }
-        }
-        return require('@/assets/dev/fallback.jpeg');
-    };
 
     const getRulesImageSource = () => {
         const imageId = rulesData?.rules_image;
@@ -32,7 +22,7 @@ export default function RulesScreen() {
     };
 
     return (
-        <ScreenBackground backgroundSource={getBackgroundSource()}>
+        <ScreenBackground backgroundSource={getBackgroundSource(rulesData, getImagePath)}>
             <ScreenHeader 
                 icon="document-text"
                 title="Trail Rules"

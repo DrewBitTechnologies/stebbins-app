@@ -17,7 +17,6 @@ export default function Card({
     const getCardStyle = () => {
         const baseStyle: ViewStyle[] = [styles.baseCard];
         
-        // Variant styles
         switch (variant) {
             case 'compact':
                 baseStyle.push(styles.compactCard);

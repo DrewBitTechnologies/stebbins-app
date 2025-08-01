@@ -6,23 +6,10 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
+import { getBackgroundSource } from '@/utility/background-source';
 
 export default function SafetyScreen() {
     const { data: safetyData, getImagePath, isLoading } = useScreen<SafetyData>('safety');
-
-    const getBackgroundSource = () => {
-        const backgroundId = safetyData?.background;
-
-        if (backgroundId) {
-        
-        const localUri = getImagePath(backgroundId);
-        if (localUri) {
-            return { uri: localUri };
-        }
-        }
-
-        return require('@/assets/dev/fallback.jpeg');
-    };
     
     const getSafetyImageSource = () => {
         const backgroundId = safetyData?.safety_image;
@@ -70,7 +57,7 @@ export default function SafetyScreen() {
     const safetyBulletpoints = safetyData ? parseSafetyText(safetyData.safety_bulletpoints) : [];
 
     return (
-        <ScreenBackground backgroundSource={getBackgroundSource()}>
+        <ScreenBackground backgroundSource={getBackgroundSource(safetyData, getImagePath)}>
                 <ScreenHeader 
                     icon="shield-checkmark"
                     title="Safety Information"

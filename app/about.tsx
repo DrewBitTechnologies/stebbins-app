@@ -7,6 +7,7 @@ import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import Button from '@/components/button';
+import { getBackgroundSource } from '@/utility/background-source';
 
 export default function AboutScreen() {
     const { data: aboutData, getImagePath } = useScreen<AboutData>('about');
@@ -20,20 +21,6 @@ export default function AboutScreen() {
         }
     };
 
-    const getBackgroundSource = () => {
-    const backgroundId = aboutData?.background;
-
-    if (backgroundId) {
-      
-      const localUri = getImagePath(backgroundId);
-      if (localUri) {
-        return { uri: localUri };
-      }
-    }
-
-    return require('@/assets/dev/fallback.jpeg');
-  };
-
     const aboutText = aboutData?.text || "Stebbins Cold Canyon Reserve is part of the University of California Natural Reserve System's protected wildlands network which is dedicated to research, teaching, and public service. This App serves as a guide and information tool to the site. The Map shows your location on the trail and features distances and nature trail markers and descriptions. The Field Guide provides images and information on some of the common species that occur in the reserve. For more detailed information about the history of the site, volunteer opportunities, and species lists, please visit the";
     
     const linkText = aboutData?.link_text || "Reserve Website.";
@@ -43,7 +30,7 @@ export default function AboutScreen() {
 
 
     return (
-        <ScreenBackground backgroundSource={getBackgroundSource()}>
+        <ScreenBackground backgroundSource={getBackgroundSource(aboutData, getImagePath)}>
             <ScreenHeader 
                 icon="information-circle"
                 title="About Stebbins Reserve"

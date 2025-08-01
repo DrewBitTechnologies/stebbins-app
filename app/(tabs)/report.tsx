@@ -15,6 +15,7 @@ import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import Button from '@/components/button';
+import { getBackgroundSource } from '@/utility/background-source';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
@@ -32,20 +33,6 @@ export default function ReportScreen() {
     phone: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const getBackgroundSource = () => {
-    const backgroundId = reportData?.background;
-
-    if (backgroundId) {
-      
-      const localUri = getImagePath(backgroundId);
-      if (localUri) {
-        return { uri: localUri };
-      }
-    }
-
-    return require('@/assets/dev/fallback.jpeg');
-  };
 
   const pickFile = async () => {
     try {
@@ -227,7 +214,6 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
   const handleSubmit = async () => {
     if (isSubmitting) return;
     
-    // Validate that at least something is provided
     const hasFiles = files.length > 0;
     const hasDescription = description.trim().length > 0;
     
@@ -350,7 +336,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
   };
 
   return (
-    <ScreenBackground backgroundSource={getBackgroundSource()}>
+    <ScreenBackground backgroundSource={getBackgroundSource(reportData, getImagePath)}>
       <ScreenHeader 
         icon="flag"
         title="Report an Issue"

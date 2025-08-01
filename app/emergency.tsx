@@ -7,6 +7,7 @@ import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import Button from '@/components/button';
+import { getBackgroundSource } from '@/utility/background-source';
 
 const openPhoneNumber = (phoneNumber: string) => {
     Linking.openURL(`tel:${phoneNumber}`).catch((err) => console.error('An error occurred', err));
@@ -18,20 +19,6 @@ export default function EmergencyScreen() {
     const phone1 = emergencyData?.contact_1_number || '7074217090';
     const text2 = emergencyData?.contact_2_message || 'IF YOU HAVE NO SERVICE TRY CALLING 911';
     const phone2 = emergencyData?.contact_2_number || '911';
-
-    const getBackgroundSource = () => {
-    const backgroundId = emergencyData?.background;
-
-    if (backgroundId) {
-      
-      const localUri = getImagePath(backgroundId);
-      if (localUri) {
-        return { uri: localUri };
-      }
-    }
-
-    return require('@/assets/dev/fallback.jpeg');
-  };
 
     const formatPhoneNumber = (phone: string) => {
         if (phone === '911') return phone;
@@ -59,7 +46,7 @@ export default function EmergencyScreen() {
     ];
 
     return (
-        <ScreenBackground backgroundSource={getBackgroundSource()}>
+        <ScreenBackground backgroundSource={getBackgroundSource(emergencyData, getImagePath)}>
             <ScreenHeader 
                 icon="alert-circle"
                 title="Emergency Contacts"

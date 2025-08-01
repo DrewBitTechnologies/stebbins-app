@@ -7,6 +7,7 @@ import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import Button from '@/components/button';
+import { getBackgroundSource } from '@/utility/background-source';
 
 export default function DonateScreen() {
     const { data: donateData, getImagePath} = useScreen<DonateData>('donate');
@@ -20,25 +21,10 @@ export default function DonateScreen() {
         }
     };
 
-    const getBackgroundSource = () => {
-    const backgroundId = donateData?.background;
-
-    if (backgroundId) {
-      
-      const localUri = getImagePath(backgroundId);
-      if (localUri) {
-        return { uri: localUri };
-      }
-    }
-
-    return require('@/assets/dev/fallback.jpeg');
-  };
-
     const donateText = donateData?.text || 'Donations to Stebbins Cold Canyon go towards trail maintenance and improvements, enhancing the visitor experience and safety with interpretative signage and messaging, and supporting educational programming.';
 
-
     return (
-        <ScreenBackground backgroundSource={getBackgroundSource()}>
+        <ScreenBackground backgroundSource={getBackgroundSource(donateData, getImagePath)}>
             <ScreenHeader 
                 icon="heart"
                 title="Support Our Mission"

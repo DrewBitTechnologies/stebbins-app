@@ -5,6 +5,7 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { HomeData, useApi, useScreen } from '../../contexts/api';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
+import { getBackgroundSource } from '@/utility/background-source';
 
 interface ButtonItem {
   title: string;
@@ -83,20 +84,6 @@ export default function HomeScreen() {
 
   const status = homeData?.reserve_status || "Loading status...";
 
-  const getBackgroundSource = () => {
-    const backgroundId = homeData?.background;
-
-    if (backgroundId) {
-      
-      const localUri = getImagePath(backgroundId);
-      if (localUri) {
-        return { uri: localUri };
-      }
-    }
-
-    return require('@/assets/dev/fallback.jpeg');
-  };
-
   const handleNavigation = (route: string) => {
     router.push(route as any);
   };
@@ -123,7 +110,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScreenBackground backgroundSource={getBackgroundSource()} paddingTop={20}>
+    <ScreenBackground backgroundSource={getBackgroundSource(homeData, getImagePath)} paddingTop={20}>
 
         <ReserveStatusCard />
 
@@ -161,7 +148,7 @@ export default function HomeScreen() {
                margin="none"
                style={{
                  ...styles.secondaryCardStyle,
-                 marginBottom: index < 2 ? 15 : 0 // Add spacing between rows
+                 marginBottom: index < 2 ? 15 : 0
                }}
              >
                <TouchableOpacity

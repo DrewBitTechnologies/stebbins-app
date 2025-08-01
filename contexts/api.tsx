@@ -278,7 +278,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     if (cachedPath) {
       return cachedPath;
     }
-    // **FIX**: Restore the fallback for robustness
+
+    // Restore the fallback for robustness
     if (imageName) {
       return getImageFilePath(screenName, imageName.split('/').pop() || imageName);
     }
