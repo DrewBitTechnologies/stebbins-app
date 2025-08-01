@@ -7,7 +7,7 @@ interface ButtonProps {
     title: string;
     onPress: () => void;
     icon?: keyof typeof Ionicons.glyphMap;
-    backgroundColor?: string[];
+    backgroundColor?: readonly [string, string, ...string[]];
     textColor?: string;
     iconColor?: string;
     disabled?: boolean;
@@ -22,7 +22,7 @@ export default function Button({
     title,
     onPress,
     icon,
-    backgroundColor = ['#f3c436', '#e6b429'],
+    backgroundColor = ['#f3c436', '#e6b429'] as const,
     textColor = '#1a1a1a',
     iconColor,
     disabled = false,
@@ -37,7 +37,7 @@ export default function Button({
     const displayIcon = loading ? loadingIcon : icon;
     const finalIconColor = iconColor || textColor;
     
-    const disabledColors = ['#cccccc', '#999999'];
+    const disabledColors = ['#cccccc', '#999999'] as const;
     const gradientColors = isDisabled ? disabledColors : backgroundColor;
     
     const sizeStyles = {

@@ -58,7 +58,7 @@ export default function AboutScreen() {
                     title={linkText}
                     onPress={handleWebsitePress}
                     icon="globe-outline"
-                    backgroundColor={['rgba(45, 80, 22, 0.1)', 'rgba(45, 80, 22, 0.05)']}
+                    backgroundColor={['rgba(45, 80, 22, 0.1)', 'rgba(45, 80, 22, 0.05)'] as const}
                     textColor="#2d5016"
                     iconColor="#2d5016"
                     size="small"

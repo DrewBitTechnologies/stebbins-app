@@ -227,6 +227,19 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
   const handleSubmit = async () => {
     if (isSubmitting) return;
     
+    // Validate that at least something is provided
+    const hasFiles = files.length > 0;
+    const hasDescription = description.trim().length > 0;
+    
+    if (!hasFiles && !hasDescription) {
+      Alert.alert(
+        'Cannot Submit Empty Form',
+        'Please provide at least one of the following:\n• Upload a photo or video\n• Add a description',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
@@ -365,7 +378,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
           title={files.length === 0 ? 'Select Files' : 'Add More Files'}
           onPress={pickFile}
           icon={files.length === 0 ? "add-circle" : "add"}
-          backgroundColor={['#f8f9fa', '#f0f0f0']}
+          backgroundColor={['#f8f9fa', '#f0f0f0'] as const}
           textColor="#2d5016"
           iconColor="#2d5016"
           disabled={isSubmitting}

@@ -121,7 +121,7 @@ export default function EmergencyScreen() {
                         title={formatPhoneNumber(contact.phone)}
                         onPress={() => openPhoneNumber(contact.phone)}
                         icon="call"
-                        backgroundColor={contact.priority === 'critical' ? ['#ff4444', '#cc0000'] : ['#2d5016', '#1a3b0f']}
+                        backgroundColor={contact.priority === 'critical' ? ['#ff4444', '#cc0000'] as const : ['#2d5016', '#1a3b0f'] as const}
                         textColor="white"
                         iconColor="white"
                     />
