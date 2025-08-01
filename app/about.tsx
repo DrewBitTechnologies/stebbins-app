@@ -1,11 +1,11 @@
 import { AboutData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
-import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
+import ScreenBackground from '@/components/screen-background';
 
 export default function AboutScreen() {
     const { data: aboutData, getImagePath } = useScreen<AboutData>('about');
@@ -42,95 +42,59 @@ export default function AboutScreen() {
 
 
     return (
-        <ImageBackground 
-            source={getBackgroundSource()}
-            resizeMode="cover"
-            style={styles.backgroundImage}
-        >
-            {/* Gradient overlay for better text readability */}
-            <LinearGradient
-                colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
-                style={styles.gradientOverlay}
+        <ScreenBackground backgroundSource={getBackgroundSource()}>
+            <ScreenHeader 
+                icon="information-circle"
+                title="About Stebbins Reserve"
+                subtitle="UC Natural Reserve System"
             />
-            
-            <ScrollView 
-                style={styles.scrollView}
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
-                <ScreenHeader 
-                    icon="information-circle"
-                    title="About Stebbins Reserve"
-                    subtitle="UC Natural Reserve System"
-                />
 
-                <Card variant="default" margin="horizontal">
-                    <Text style={styles.mainText}>{mainText}</Text>
-                    
-                    {/* Website Link Button */}
-                    <TouchableOpacity 
-                        style={styles.websiteButton}
-                        onPress={handleWebsitePress}
-                        activeOpacity={0.8}
-                    >
-                        <View style={styles.buttonContent}>
-                            <Ionicons 
-                                name="globe-outline" 
-                                size={20} 
-                                color="#2d5016" 
-                                style={styles.buttonIcon}
-                            />
-                            <Text style={styles.buttonText}>{linkText}</Text>
-                            <Ionicons 
-                                name="open-outline" 
-                                size={16} 
-                                color="#2d5016" 
-                            />
-                        </View>
-                    </TouchableOpacity>
-                </Card>
-
-                <Card variant="default" margin="horizontal">
-                    <View style={styles.missionHeader}>
+            <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
+                <Text style={styles.mainText}>{mainText}</Text>
+                
+                {/* Website Link Button */}
+                <TouchableOpacity 
+                    style={styles.websiteButton}
+                    onPress={handleWebsitePress}
+                    activeOpacity={0.8}
+                >
+                    <View style={styles.buttonContent}>
                         <Ionicons 
-                            name="heart-outline" 
-                            size={24} 
+                            name="globe-outline" 
+                            size={20} 
                             color="#2d5016" 
-                            style={styles.missionIcon}
+                            style={styles.buttonIcon}
                         />
-                        <Text style={styles.missionTitle}>Our Mission</Text>
+                        <Text style={styles.buttonText}>{linkText}</Text>
+                        <Ionicons 
+                            name="open-outline" 
+                            size={16} 
+                            color="#2d5016" 
+                        />
                     </View>
-                    <Text style={styles.missionText}>
-                        Dedicated to research, teaching, and public service through the protection 
-                        and stewardship of California's natural heritage.
-                    </Text>
-                </Card>
-            </ScrollView>
-        </ImageBackground>
+                </TouchableOpacity>
+            </Card>
+
+            <Card variant="default" margin="none">
+                <View style={styles.missionHeader}>
+                    <Ionicons 
+                        name="heart-outline" 
+                        size={24} 
+                        color="#2d5016" 
+                        style={styles.missionIcon}
+                    />
+                    <Text style={styles.missionTitle}>Our Mission</Text>
+                </View>
+                <Text style={styles.missionText}>
+                    Dedicated to research, teaching, and public service through the protection 
+                    and stewardship of California's natural heritage.
+                </Text>
+            </Card>
+        </ScreenBackground>
     );
 }
 
 const styles = StyleSheet.create({
-    backgroundImage: {
-        flex: 1,
-    },
-    gradientOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 1,
-    },
-    scrollView: {
-        flex: 1,
-        zIndex: 2,
-    },
-    scrollContent: {
-        flexGrow: 1,
-        paddingTop: 80,
-        paddingBottom: 40,
-    },
     mainText: {
         fontSize: 16,
         lineHeight: 24,

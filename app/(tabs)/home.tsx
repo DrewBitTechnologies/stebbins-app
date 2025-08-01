@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { HomeData, useApi, useScreen } from '../../contexts/api';
 import Card from '@/components/card';
+import ScreenBackground from '@/components/screen-background';
 
 interface ButtonItem {
   title: string;
@@ -102,7 +102,7 @@ export default function HomeScreen() {
   };
 
   const ReserveStatusCard = () => (
-    <Card variant="warning" margin="standard">
+    <Card variant="warning" margin="none" style={{ marginBottom: 20 }}>
       <View style={styles.statusHeader}>
         <Ionicons name="megaphone" size={24} color="#1a1a1a" />
         <Text style={styles.statusTitle}>Reserve Status</Text>
@@ -123,21 +123,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <ImageBackground
-      source={getBackgroundSource()}
-      style={styles.backgroundImage}
-      resizeMode="cover"
-    >
-      <LinearGradient
-        colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
-        style={styles.gradientOverlay}
-      />
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+    <ScreenBackground backgroundSource={getBackgroundSource()} paddingTop={20}>
 
         <ReserveStatusCard />
 
@@ -146,8 +132,8 @@ export default function HomeScreen() {
             <Card 
               key={item.title}
               variant="navigation"
-              margin="standard"
-              style={{ flexDirection: 'row', alignItems: 'center' }}
+              margin="none"
+              style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}
             >
               <TouchableOpacity
                 onPress={() => handleNavigation(item.navigateTo)}
@@ -175,7 +161,7 @@ export default function HomeScreen() {
                margin="none"
                style={{
                  ...styles.secondaryCardStyle,
-                 marginBottom: index < 2 ? 12 : 0 // Add spacing between rows
+                 marginBottom: index < 2 ? 15 : 0 // Add spacing between rows
                }}
              >
                <TouchableOpacity
@@ -202,29 +188,11 @@ export default function HomeScreen() {
           ))}
         </View>
 
-      </ScrollView>
-    </ImageBackground>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-  },
-  gradientOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-  },
   statusHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -246,7 +214,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   cardsContainer: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   iconContainer: {
     width: 56,
@@ -273,7 +241,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    paddingHorizontal: 6,
   },
   secondaryCardStyle: {
     width: '48%',

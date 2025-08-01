@@ -6,8 +6,6 @@ import React, { useState } from 'react';
 import {
   Alert,
   Image,
-  ImageBackground,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -16,6 +14,7 @@ import {
 } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
+import ScreenBackground from '@/components/screen-background';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
@@ -338,201 +337,169 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
   };
 
   return (
-    <ImageBackground source={getBackgroundSource()} style={styles.backgroundImage} resizeMode="cover">
-      {/* Gradient overlay */}
-      <LinearGradient
-        colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
-        style={styles.gradientOverlay}
+    <ScreenBackground backgroundSource={getBackgroundSource()}>
+      <ScreenHeader 
+        icon="flag"
+        title="Report an Issue"
+        subtitle={reportData?.instruction_text || 'Help us keep the trails safe and maintained'}
       />
-      
-      <ScrollView 
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <ScreenHeader 
-          icon="flag"
-          title="Report an Issue"
-          subtitle={reportData?.instruction_text || 'Help us keep the trails safe and maintained'}
+
+      <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionIconContainer}>
+            <Ionicons name="camera" size={24} color="#2d5016" />
+          </View>
+          <View style={styles.sectionHeaderText}>
+            <Text style={styles.sectionTitle}>
+              {reportData?.file_upload_text || 'Add Photos or Videos'}
+            </Text>
+            <Text style={styles.sectionSubtitle}>
+              Visual evidence helps us understand the issue better
+            </Text>
+          </View>
+        </View>
+
+        {renderFilesList()}
+
+        <TouchableOpacity 
+          onPress={pickFile} 
+          style={[styles.uploadButton, isSubmitting && styles.buttonDisabled]} 
+          disabled={isSubmitting}
+        >
+          <View style={styles.buttonContent}>
+            <Ionicons 
+              name={files.length === 0 ? "add-circle" : "add"} 
+              size={20} 
+              color="#1a1a1a" 
+              style={styles.buttonIcon}
+            />
+            <Text style={styles.uploadButtonText}>
+              {files.length === 0 ? 'Select Files' : 'Add More Files'}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </Card>
+
+      <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionIconContainer}>
+            <Ionicons name="document-text" size={24} color="#2d5016" />
+          </View>
+          <View style={styles.sectionHeaderText}>
+            <Text style={styles.sectionTitle}>
+              {reportData?.description_text || 'Description'}
+            </Text>
+            <Text style={styles.sectionSubtitle}>
+              Provide details about what you observed
+            </Text>
+          </View>
+        </View>
+
+        <TextInput
+          style={styles.textArea}
+          multiline
+          numberOfLines={4}
+          value={description}
+          onChangeText={setDescription}
+          placeholder="Describe the issue you'd like to report (optional)..."
+          placeholderTextColor="#999"
+          editable={!isSubmitting}
+        />
+      </Card>
+
+      <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionIconContainer}>
+            <Ionicons name="person" size={24} color="#2d5016" />
+          </View>
+          <View style={styles.sectionHeaderText}>
+            <Text style={styles.sectionTitle}>
+              {reportData?.contact_info_text || 'Contact Information'}
+            </Text>
+            <Text style={styles.sectionSubtitle}>
+              Optional - in case we need to follow up
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.inputRow}>
+          <TextInput
+            style={[styles.input, styles.halfInput]}
+            placeholder="First Name"
+            placeholderTextColor="#999"
+            value={contact.firstName}
+            onChangeText={(text) => setContact({ ...contact, firstName: text })}
+            editable={!isSubmitting}
+          />
+          <TextInput
+            style={[styles.input, styles.halfInput]}
+            placeholder="Last Name"
+            placeholderTextColor="#999"
+            value={contact.lastName}
+            onChangeText={(text) => setContact({ ...contact, lastName: text })}
+            editable={!isSubmitting}
+          />
+        </View>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Email Address"
+          placeholderTextColor="#999"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={contact.email}
+          onChangeText={(text) => setContact({ ...contact, email: text })}
+          editable={!isSubmitting}
         />
 
-        <Card variant="default" margin="horizontal">
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionIconContainer}>
-              <Ionicons name="camera" size={24} color="#2d5016" />
-            </View>
-            <View style={styles.sectionHeaderText}>
-              <Text style={styles.sectionTitle}>
-                {reportData?.file_upload_text || 'Add Photos or Videos'}
-              </Text>
-              <Text style={styles.sectionSubtitle}>
-                Visual evidence helps us understand the issue better
-              </Text>
-            </View>
-          </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Phone Number"
+          placeholderTextColor="#999"
+          keyboardType="phone-pad"
+          value={contact.phone}
+          onChangeText={(text) => setContact({ ...contact, phone: text })}
+          editable={!isSubmitting}
+        />
+      </Card>
 
-          {renderFilesList()}
-
-          <TouchableOpacity 
-            onPress={pickFile} 
-            style={[styles.uploadButton, isSubmitting && styles.buttonDisabled]} 
-            disabled={isSubmitting}
-          >
-            <View style={styles.buttonContent}>
-              <Ionicons 
-                name={files.length === 0 ? "add-circle" : "add"} 
-                size={20} 
-                color="#1a1a1a" 
-                style={styles.buttonIcon}
-              />
-              <Text style={styles.uploadButtonText}>
-                {files.length === 0 ? 'Select Files' : 'Add More Files'}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </Card>
-
-        <Card variant="default" margin="horizontal">
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionIconContainer}>
-              <Ionicons name="document-text" size={24} color="#2d5016" />
-            </View>
-            <View style={styles.sectionHeaderText}>
-              <Text style={styles.sectionTitle}>
-                {reportData?.description_text || 'Description'}
-              </Text>
-              <Text style={styles.sectionSubtitle}>
-                Provide details about what you observed
-              </Text>
-            </View>
-          </View>
-
-          <TextInput
-            style={styles.textArea}
-            multiline
-            numberOfLines={4}
-            value={description}
-            onChangeText={setDescription}
-            placeholder="Describe the issue you'd like to report (optional)..."
-            placeholderTextColor="#999"
-            editable={!isSubmitting}
-          />
-        </Card>
-
-        <Card variant="default" margin="horizontal">
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionIconContainer}>
-              <Ionicons name="person" size={24} color="#2d5016" />
-            </View>
-            <View style={styles.sectionHeaderText}>
-              <Text style={styles.sectionTitle}>
-                {reportData?.contact_info_text || 'Contact Information'}
-              </Text>
-              <Text style={styles.sectionSubtitle}>
-                Optional - in case we need to follow up
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.inputRow}>
-            <TextInput
-              style={[styles.input, styles.halfInput]}
-              placeholder="First Name"
-              placeholderTextColor="#999"
-              value={contact.firstName}
-              onChangeText={(text) => setContact({ ...contact, firstName: text })}
-              editable={!isSubmitting}
-            />
-            <TextInput
-              style={[styles.input, styles.halfInput]}
-              placeholder="Last Name"
-              placeholderTextColor="#999"
-              value={contact.lastName}
-              onChangeText={(text) => setContact({ ...contact, lastName: text })}
-              editable={!isSubmitting}
-            />
-          </View>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Email Address"
-            placeholderTextColor="#999"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={contact.email}
-            onChangeText={(text) => setContact({ ...contact, email: text })}
-            editable={!isSubmitting}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Phone Number"
-            placeholderTextColor="#999"
-            keyboardType="phone-pad"
-            value={contact.phone}
-            onChangeText={(text) => setContact({ ...contact, phone: text })}
-            editable={!isSubmitting}
-          />
-        </Card>
-
-        {/* Submit Button */}
-        <TouchableOpacity 
-          onPress={handleSubmit} 
-          style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
-          disabled={isSubmitting}
-          activeOpacity={0.8}
+      {/* Submit Button */}
+      <TouchableOpacity 
+        onPress={handleSubmit} 
+        style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+        disabled={isSubmitting}
+        activeOpacity={0.8}
+      >
+        <LinearGradient
+          colors={isSubmitting ? ['#cccccc', '#999999'] : ['#f3c436', '#e6b429']}
+          style={styles.submitButtonGradient}
         >
-          <LinearGradient
-            colors={isSubmitting ? ['#cccccc', '#999999'] : ['#f3c436', '#e6b429']}
-            style={styles.submitButtonGradient}
-          >
-            <View style={styles.submitButtonContent}>
-              <Ionicons 
-                name={isSubmitting ? "hourglass" : "send"} 
-                size={20} 
-                color="#1a1a1a" 
-                style={styles.buttonIcon}
-              />
-              <Text style={styles.submitButtonText}>
-                {isSubmitting ? 'Submitting...' : 'Submit Report'}
-              </Text>
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
+          <View style={styles.submitButtonContent}>
+            <Ionicons 
+              name={isSubmitting ? "hourglass" : "send"} 
+              size={20} 
+              color="#1a1a1a" 
+              style={styles.buttonIcon}
+            />
+            <Text style={styles.submitButtonText}>
+              {isSubmitting ? 'Submitting...' : 'Submit Report'}
+            </Text>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
 
-        {/* Privacy Notice */}
-        <View style={styles.privacyNotice}>
-          <Ionicons name="shield-checkmark" size={16} color="rgba(255,255,255,0.8)" style={{ marginRight: 8 }} />
-          <Text style={styles.privacyText}>
-            Your information is kept private and used only to address reported issues.
-          </Text>
-        </View>
-      </ScrollView>
-    </ImageBackground>
+      {/* Privacy Notice */}
+      <View style={styles.privacyNotice}>
+        <Ionicons name="shield-checkmark" size={16} color="rgba(255,255,255,0.8)" style={{ marginRight: 8 }} />
+        <Text style={styles.privacyText}>
+          Your information is kept private and used only to address reported issues.
+        </Text>
+      </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-  },
-  gradientOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 1,
-  },
-  scrollView: {
-    flex: 1,
-    zIndex: 2,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingTop: 80,
-    paddingBottom: 40,
-  },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -701,7 +668,6 @@ const styles = StyleSheet.create({
   },
   // Submit button styles
   submitButton: {
-    marginHorizontal: 20,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: {

@@ -3,9 +3,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
-import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
+import ScreenBackground from '@/components/screen-background';
 
 export default function DonateScreen() {
     const { data: donateData, getImagePath} = useScreen<DonateData>('donate');
@@ -37,115 +38,77 @@ export default function DonateScreen() {
 
 
     return (
-        <ImageBackground 
-            source={getBackgroundSource()}
-            resizeMode="cover"
-            style={styles.backgroundImage}
-        >
-            {/* Gradient overlay */}
-            <LinearGradient
-                colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
-                style={styles.gradientOverlay}
+        <ScreenBackground backgroundSource={getBackgroundSource()}>
+            <ScreenHeader 
+                icon="heart"
+                title="Support Our Mission"
+                subtitle="Help preserve and enhance Stebbins for future generations"
             />
-            
-            <ScrollView 
-                style={styles.scrollView}
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
 
-                <ScreenHeader 
-                    icon="heart"
-                    title="Support Our Mission"
-                    subtitle="Help preserve and enhance Stebbins for future generations"
-                />
+            <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
+                <View style={styles.donationHeader}>
+                    <View style={styles.donationIconContainer}>
+                        <Ionicons 
+                            name="leaf" 
+                            size={28} 
+                            color="#2d5016" 
+                        />
+                    </View>
+                    <Text style={styles.donationTitle}>Make a Difference</Text>
+                </View>
 
-                <Card variant="default" margin="horizontal">
-                    <View style={styles.donationHeader}>
-                        <View style={styles.donationIconContainer}>
+                <Text style={styles.donationText}>
+                    {donateText}
+                </Text>
+
+                <TouchableOpacity 
+                    onPress={handleDonatePress}
+                    style={styles.donateButton}
+                    activeOpacity={0.8}
+                >
+                    <LinearGradient
+                        colors={['#f3c436', '#e6b429']}
+                        style={styles.buttonGradient}
+                    >
+                        <View style={styles.buttonContent}>
                             <Ionicons 
-                                name="leaf" 
-                                size={28} 
-                                color="#2d5016" 
+                                name="card" 
+                                size={20} 
+                                color="#1a1a1a" 
+                                style={styles.buttonIcon}
+                            />
+                            <Text style={styles.buttonText}>Donate Now</Text>
+                            <Ionicons 
+                                name="arrow-forward" 
+                                size={20} 
+                                color="#1a1a1a" 
                             />
                         </View>
-                        <Text style={styles.donationTitle}>Make a Difference</Text>
-                    </View>
+                    </LinearGradient>
+                </TouchableOpacity>
+            </Card>
 
-                    <Text style={styles.donationText}>
-                        {donateText}
-                    </Text>
-
-                    <TouchableOpacity 
-                        onPress={handleDonatePress}
-                        style={styles.donateButton}
-                        activeOpacity={0.8}
-                    >
-                        <LinearGradient
-                            colors={['#f3c436', '#e6b429']}
-                            style={styles.buttonGradient}
-                        >
-                            <View style={styles.buttonContent}>
-                                <Ionicons 
-                                    name="card" 
-                                    size={20} 
-                                    color="#1a1a1a" 
-                                    style={styles.buttonIcon}
-                                />
-                                <Text style={styles.buttonText}>Donate Now</Text>
-                                <Ionicons 
-                                    name="arrow-forward" 
-                                    size={20} 
-                                    color="#1a1a1a" 
-                                />
-                            </View>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                </Card>
-
-
-                <Card variant="default" margin="horizontal">
-                    <View style={styles.thankYouHeader}>
-                        <Ionicons 
-                            name="people" 
-                            size={24} 
-                            color="#2d5016" 
-                            style={styles.thankYouIcon}
-                        />
-                        <Text style={styles.thankYouTitle}>Thank You</Text>
-                    </View>
-                    <Text style={styles.thankYouText}>
-                        Every donation, no matter the size, helps us maintain and improve this special place. 
-                        Your support ensures that Stebbins Cold Canyon remains a treasured destination for education, 
-                        recreation, and conservation.
-                    </Text>
-                </Card>
-            </ScrollView>
-        </ImageBackground>
+            <Card variant="default" margin="none">
+                <View style={styles.thankYouHeader}>
+                    <Ionicons 
+                        name="people" 
+                        size={24} 
+                        color="#2d5016" 
+                        style={styles.thankYouIcon}
+                    />
+                    <Text style={styles.thankYouTitle}>Thank You</Text>
+                </View>
+                <Text style={styles.thankYouText}>
+                    Every donation, no matter the size, helps us maintain and improve this special place. 
+                    Your support ensures that Stebbins Cold Canyon remains a treasured destination for education, 
+                    recreation, and conservation.
+                </Text>
+            </Card>
+        </ScreenBackground>
     );
 }
 
 const styles = StyleSheet.create({
-    backgroundImage: {
-        flex: 1,
-    },
-    gradientOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 1,
-    },
-    scrollView: {
-        flex: 1,
-        zIndex: 2,
-    },
-    scrollContent: {
-        flexGrow: 1,
-        paddingTop: 80,
-        paddingBottom: 40,
-    },
     donationHeader: {
         flexDirection: 'row',
         alignItems: 'center',

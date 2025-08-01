@@ -1,11 +1,11 @@
 import { EmergencyData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Linking from 'expo-linking';
 import React from 'react';
-import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
+import ScreenBackground from '@/components/screen-background';
 
 const openPhoneNumber = (phoneNumber: string) => {
     Linking.openURL(`tel:${phoneNumber}`).catch((err) => console.error('An error occurred', err));
@@ -58,129 +58,93 @@ export default function EmergencyScreen() {
     ];
 
     return (
-        <ImageBackground 
-            source={getBackgroundSource()}
-            resizeMode="cover"
-            style={styles.backgroundImage}
-        >
-            {/* Gradient overlay */}
-            <LinearGradient
-                colors={['rgba(139, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.7)']}
-                style={styles.gradientOverlay}
+        <ScreenBackground backgroundSource={getBackgroundSource()}>
+            <ScreenHeader 
+                icon="alert-circle"
+                title="Emergency Contacts"
+                subtitle="Contacts for trail emergencies"
             />
-            
-            <ScrollView 
-                style={styles.scrollView}
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
-                <ScreenHeader 
-                    icon="alert-circle"
-                    title="Emergency Contacts"
-                    subtitle="Contacts for trail emergencies"
-                />
 
-                {/* Safety Notice */}
-                <View style={styles.safetyNotice}>
-                    <View style={styles.noticeHeader}>
-                        <Ionicons 
-                            name="information-circle" 
-                            size={20} 
-                            color="white" 
-                            style={styles.noticeIcon}
-                        />
-                        <Text style={styles.noticeTitle}>Safety Reminder</Text>
+            {/* Safety Notice */}
+            <View style={styles.safetyNotice}>
+                <View style={styles.noticeHeader}>
+                    <Ionicons 
+                        name="information-circle" 
+                        size={20} 
+                        color="white" 
+                        style={styles.noticeIcon}
+                    />
+                    <Text style={styles.noticeTitle}>Safety Reminder</Text>
+                </View>
+                <Text style={styles.noticeText}>
+                    Cell service is limited in the reserve. Inform others of your hiking plans.
+                </Text>
+            </View>
+
+            {/* Emergency Contacts */}
+            {emergencyContacts.map((contact, index) => (
+                <Card 
+                    key={index} 
+                    variant="default"
+                    margin="none"
+                    style={{
+                        marginBottom: 20,
+                        ...(contact.priority === 'critical' ? styles.criticalCard : {})
+                    }}
+                >
+                    <View style={styles.contactHeader}>
+                        <View style={[
+                            styles.contactIconContainer,
+                            contact.priority === 'critical' && styles.criticalIconContainer
+                        ]}>
+                            <Ionicons 
+                                name={contact.icon} 
+                                size={24} 
+                                color={contact.priority === 'critical' ? '#ff4444' : '#2d5016'} 
+                            />
+                        </View>
+                        <View style={styles.contactInfo}>
+                            <Text style={[
+                                styles.contactMessage,
+                                contact.priority === 'critical' && styles.criticalMessage
+                            ]}>
+                                {contact.message}
+                            </Text>
+                            <Text style={styles.contactDescription}>
+                                {contact.description}
+                            </Text>
+                        </View>
                     </View>
-                    <Text style={styles.noticeText}>
-                        Cell service is limited in the reserve. Inform others of your hiking plans.
-                    </Text>
-                </View>
 
-                {/* Emergency Contacts */}
-                <View style={styles.contactsContainer}>
-                    {emergencyContacts.map((contact, index) => (
-                        <Card 
-                            key={index} 
-                            variant="default"
-                            margin="standard"
-                            style={contact.priority === 'critical' ? styles.criticalCard : undefined}
-                        >
-                            <View style={styles.contactHeader}>
-                                <View style={[
-                                    styles.contactIconContainer,
-                                    contact.priority === 'critical' && styles.criticalIconContainer
-                                ]}>
-                                    <Ionicons 
-                                        name={contact.icon} 
-                                        size={24} 
-                                        color={contact.priority === 'critical' ? '#ff4444' : '#2d5016'} 
-                                    />
-                                </View>
-                                <View style={styles.contactInfo}>
-                                    <Text style={[
-                                        styles.contactMessage,
-                                        contact.priority === 'critical' && styles.criticalMessage
-                                    ]}>
-                                        {contact.message}
-                                    </Text>
-                                    <Text style={styles.contactDescription}>
-                                        {contact.description}
-                                    </Text>
-                                </View>
-                            </View>
-
-                            <TouchableOpacity 
-                                onPress={() => openPhoneNumber(contact.phone)}
-                                style={[
-                                    styles.callButton,
-                                    contact.priority === 'critical' && styles.criticalButton
-                                ]}
-                                activeOpacity={0.8}
-                            >
-                                <View style={styles.buttonContent}>
-                                    <Ionicons 
-                                        name="call" 
-                                        size={20} 
-                                        color="white" 
-                                        style={styles.buttonIcon}
-                                    />
-                                    <Text style={styles.buttonText}>
-                                        {formatPhoneNumber(contact.phone)}
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-                        </Card>
-                    ))}
-                </View>
-            </ScrollView>
-        </ImageBackground>
+                    <TouchableOpacity 
+                        onPress={() => openPhoneNumber(contact.phone)}
+                        style={[
+                            styles.callButton,
+                            contact.priority === 'critical' && styles.criticalButton
+                        ]}
+                        activeOpacity={0.8}
+                    >
+                        <View style={styles.buttonContent}>
+                            <Ionicons 
+                                name="call" 
+                                size={20} 
+                                color="white" 
+                                style={styles.buttonIcon}
+                            />
+                            <Text style={styles.buttonText}>
+                                {formatPhoneNumber(contact.phone)}
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
+                </Card>
+            ))}
+        </ScreenBackground>
     );
 }
 
 const styles = StyleSheet.create({
-    backgroundImage: {
-        flex: 1,
-    },
-    gradientOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 1,
-    },
-    scrollView: {
-        flex: 1,
-        zIndex: 2,
-    },
-    scrollContent: {
-        flexGrow: 1,
-        paddingTop: 80,
-        paddingBottom: 40,
-    },
     safetyNotice: {
         backgroundColor: 'rgba(255, 107, 53, 0.75)',
-        marginHorizontal: 20,
         marginBottom: 20,
         borderRadius: 12,
         borderWidth: 1,
@@ -204,10 +168,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: 'rgba(255,255,255,0.9)',
         lineHeight: 20,
-    },
-    contactsContainer: {
-        paddingHorizontal: 20,
-        marginBottom: 20,
     },
     criticalCard: {
         borderLeftWidth: 4,

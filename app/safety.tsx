@@ -1,11 +1,11 @@
 import { SafetyData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
+import ScreenBackground from '@/components/screen-background';
 
 export default function SafetyScreen() {
     const { data: safetyData, getImagePath, isLoading } = useScreen<SafetyData>('safety');
@@ -70,22 +70,7 @@ export default function SafetyScreen() {
     const safetyBulletpoints = safetyData ? parseSafetyText(safetyData.safety_bulletpoints) : [];
 
     return (
-        <ImageBackground 
-            source={getBackgroundSource()}
-            resizeMode="cover"
-            style={styles.container}>
-            
-            {/* Gradient overlay */}
-            <LinearGradient
-                colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
-                style={styles.gradientOverlay}
-            />
-
-            <ScrollView 
-                style={styles.scrollView}
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
+        <ScreenBackground backgroundSource={getBackgroundSource()}>
                 <ScreenHeader 
                     icon="shield-checkmark"
                     title="Safety Information"
@@ -128,32 +113,11 @@ export default function SafetyScreen() {
                         ))}
                     </View>
                 </Card>
-            </ScrollView>
-        </ImageBackground>
+        </ScreenBackground>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    gradientOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 1,
-    },
-    scrollView: {
-        flex: 1,
-        zIndex: 2,
-    },
-    scrollContent: {
-        paddingTop: 60,
-        paddingBottom: 40,
-        paddingHorizontal: 20,
-    },
     safetyImage: {
         width: '100%',
         aspectRatio: 1,
