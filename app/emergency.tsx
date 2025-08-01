@@ -5,6 +5,7 @@ import * as Linking from 'expo-linking';
 import React from 'react';
 import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
+import Card from '@/components/card';
 
 const openPhoneNumber = (phoneNumber: string) => {
     Linking.openURL(`tel:${phoneNumber}`).catch((err) => console.error('An error occurred', err));
@@ -98,12 +99,11 @@ export default function EmergencyScreen() {
                 {/* Emergency Contacts */}
                 <View style={styles.contactsContainer}>
                     {emergencyContacts.map((contact, index) => (
-                        <View 
+                        <Card 
                             key={index} 
-                            style={[
-                                styles.contactCard,
-                                contact.priority === 'critical' && styles.criticalCard
-                            ]}
+                            variant="default"
+                            margin="standard"
+                            style={contact.priority === 'critical' ? styles.criticalCard : undefined}
                         >
                             <View style={styles.contactHeader}>
                                 <View style={[
@@ -149,7 +149,7 @@ export default function EmergencyScreen() {
                                     </Text>
                                 </View>
                             </TouchableOpacity>
-                        </View>
+                        </Card>
                     ))}
                 </View>
             </ScrollView>
@@ -208,22 +208,6 @@ const styles = StyleSheet.create({
     contactsContainer: {
         paddingHorizontal: 20,
         marginBottom: 20,
-    },
-    contactCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderRadius: 16,
-        padding: 20,
-        marginBottom: 16,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 8,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.2)',
     },
     criticalCard: {
         borderLeftWidth: 4,

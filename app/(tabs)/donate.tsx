@@ -5,6 +5,7 @@ import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
+import Card from '@/components/card';
 
 export default function DonateScreen() {
     const { data: donateData, getImagePath} = useScreen<DonateData>('donate');
@@ -34,28 +35,6 @@ export default function DonateScreen() {
 
     const donateText = donateData?.text || 'Donations to Stebbins Cold Canyon go towards trail maintenance and improvements, enhancing the visitor experience and safety with interpretative signage and messaging, and supporting educational programming.';
 
-    const donationImpacts = [
-        {
-            icon: 'trail-sign-outline' as keyof typeof Ionicons.glyphMap,
-            title: 'Trail Maintenance',
-            description: 'Keep trails safe and accessible for all visitors'
-        },
-        {
-            icon: 'information-circle-outline' as keyof typeof Ionicons.glyphMap,
-            title: 'Educational Signage',
-            description: 'Interpretive signs that enhance the visitor experience'
-        },
-        {
-            icon: 'school-outline' as keyof typeof Ionicons.glyphMap,
-            title: 'Educational Programs',
-            description: 'Support learning opportunities for all ages'
-        },
-        {
-            icon: 'shield-checkmark-outline' as keyof typeof Ionicons.glyphMap,
-            title: 'Safety Improvements',
-            description: 'Enhanced safety measures and emergency preparedness'
-        }
-    ];
 
     return (
         <ImageBackground 
@@ -81,8 +60,7 @@ export default function DonateScreen() {
                     subtitle="Help preserve and enhance Stebbins for future generations"
                 />
 
-                {/* Main Donation Card */}
-                <View style={styles.donationCard}>
+                <Card variant="default" margin="horizontal">
                     <View style={styles.donationHeader}>
                         <View style={styles.donationIconContainer}>
                             <Ionicons 
@@ -123,47 +101,10 @@ export default function DonateScreen() {
                             </View>
                         </LinearGradient>
                     </TouchableOpacity>
-                </View>
+                </Card>
 
-                {/* Impact Section */}
-                <View style={styles.impactSection}>
-                    <View style={styles.impactHeader}>
-                        <Ionicons 
-                            name="trending-up" 
-                            size={24} 
-                            color="white" 
-                            style={styles.impactIcon}
-                        />
-                        <Text style={styles.impactTitle}>Your Impact</Text>
-                    </View>
-                    <Text style={styles.impactSubtitle}>
-                        See how your donation helps preserve this natural treasure
-                    </Text>
-                </View>
 
-                {/* Impact Cards */}
-                <View style={styles.impactCardsContainer}>
-                    {donationImpacts.map((impact, index) => (
-                        <View key={index} style={styles.impactCard}>
-                            <View style={styles.impactCardHeader}>
-                                <View style={styles.impactCardIconContainer}>
-                                    <Ionicons 
-                                        name={impact.icon} 
-                                        size={24} 
-                                        color="#2d5016" 
-                                    />
-                                </View>
-                                <Text style={styles.impactCardTitle}>{impact.title}</Text>
-                            </View>
-                            <Text style={styles.impactCardDescription}>
-                                {impact.description}
-                            </Text>
-                        </View>
-                    ))}
-                </View>
-
-                {/* Thank You Note */}
-                <View style={styles.thankYouCard}>
+                <Card variant="default" margin="horizontal">
                     <View style={styles.thankYouHeader}>
                         <Ionicons 
                             name="people" 
@@ -178,7 +119,7 @@ export default function DonateScreen() {
                         Your support ensures that Stebbins Cold Canyon remains a treasured destination for education, 
                         recreation, and conservation.
                     </Text>
-                </View>
+                </Card>
             </ScrollView>
         </ImageBackground>
     );
@@ -204,23 +145,6 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         paddingTop: 80,
         paddingBottom: 40,
-    },
-    donationCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        marginHorizontal: 20,
-        borderRadius: 16,
-        padding: 24,
-        marginBottom: 30,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 8,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.2)',
     },
     donationHeader: {
         flexDirection: 'row',
@@ -276,96 +200,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#1a1a1a',
         marginRight: 8,
-    },
-    impactSection: {
-        alignItems: 'center',
-        marginBottom: 20,
-        paddingHorizontal: 20,
-    },
-    impactHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    impactIcon: {
-        marginRight: 8,
-    },
-    impactTitle: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: 'white',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 3,
-    },
-    impactSubtitle: {
-        fontSize: 14,
-        color: 'rgba(255,255,255,0.8)',
-        textAlign: 'center',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 2,
-    },
-    impactCardsContainer: {
-        paddingHorizontal: 20,
-        marginBottom: 30,
-    },
-    impactCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.92)',
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 4,
-        borderLeftWidth: 3,
-        borderLeftColor: '#2d5016',
-    },
-    impactCardHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    impactCardIconContainer: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: 'rgba(45, 80, 22, 0.1)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 12,
-    },
-    impactCardTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#1a1a1a',
-    },
-    impactCardDescription: {
-        fontSize: 14,
-        color: '#666',
-        lineHeight: 18,
-        marginLeft: 48,
-    },
-    thankYouCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        marginHorizontal: 20,
-        borderRadius: 16,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 8,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.2)',
     },
     thankYouHeader: {
         flexDirection: 'row',

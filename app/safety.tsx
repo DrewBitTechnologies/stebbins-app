@@ -92,7 +92,7 @@ export default function SafetyScreen() {
                     subtitle="Stay safe during your outdoor adventure"
                 />
 
-                <Card variant="default" margin="horizontal" style={{ alignItems: 'center' }}>
+                <Card variant="default" margin="standard" style={{ alignItems: 'center' }}>
                     <Image style={styles.safetyImage} source={getSafetyImageSource()} />
                 </Card>
 
@@ -111,7 +111,7 @@ export default function SafetyScreen() {
                     </View>
                 </TouchableOpacity>
 
-                <Card variant="default" margin="horizontal">
+                <Card variant="default" margin="standard">
                     <View style={styles.guidelinesHeader}>
                         <Ionicons name="list-outline" size={24} color="#374151" />
                         <Text style={styles.guidelinesTitle}>Safety Guidelines</Text>

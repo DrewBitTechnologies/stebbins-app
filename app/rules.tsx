@@ -53,11 +53,11 @@ export default function RulesScreen() {
                     subtitle="Please follow these guidelines to help preserve the reserve"
                 />
 
-                <Card variant="default" margin="horizontal" style={{ alignItems: 'center' }}>
+                <Card variant="default" margin="standard" style={{ alignItems: 'center' }}>
                     <Image style={styles.rulesImage} source={getRulesImageSource()} />
                 </Card>
 
-                <Card variant="default" margin="horizontal">
+                <Card variant="default" margin="standard">
                     <View style={styles.rulesHeader}>
                         <Ionicons name="checkmark-circle-outline" size={24} color="#374151" />
                         <Text style={styles.rulesHeaderTitle}>Guidelines to Follow</Text>
@@ -81,7 +81,7 @@ export default function RulesScreen() {
                     </View>
                 </Card>
 
-                <Card variant="default" margin="horizontal">
+                <Card variant="default" margin="standard">
                     <View style={styles.footerContent}>
                         <Ionicons name="heart" size={24} color="#dc2626" />
                         <Text style={styles.footerText}>

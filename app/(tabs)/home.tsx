@@ -168,16 +168,21 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.secondaryGrid}>
-          {secondaryButtons.map((item) => (
-             <TouchableOpacity
-             key={item.title}
-             style={[
-               styles.secondaryCard,
-               item.title === 'Emergency' && styles.emergencyCard
-             ]}
-             onPress={() => handleNavigation(item.navigateTo)}
-             activeOpacity={0.8}
-           >
+          {secondaryButtons.map((item, index) => (
+             <Card
+               key={item.title}
+               variant={item.title === 'Emergency' ? 'emergency' : 'compact'}
+               margin="none"
+               style={{
+                 ...styles.secondaryCardStyle,
+                 marginBottom: index < 2 ? 12 : 0 // Add spacing between rows
+               }}
+             >
+               <TouchableOpacity
+                 onPress={() => handleNavigation(item.navigateTo)}
+                 activeOpacity={0.8}
+                 style={styles.secondaryCardContent}
+               >
              <Ionicons
                name={item.icon}
                size={24}
@@ -192,7 +197,8 @@ export default function HomeScreen() {
              >
                {item.title}
              </Text>
-           </TouchableOpacity>
+               </TouchableOpacity>
+             </Card>
           ))}
         </View>
 
@@ -267,23 +273,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginHorizontal: -6,
+    paddingHorizontal: 6,
   },
-  secondaryCard: {
+  secondaryCardStyle: {
     width: '48%',
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    minHeight: 100,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
+    justifyContent: 'center',
   },
-  emergencyCard: {
-    backgroundColor: '#e63946',
+  secondaryCardContent: {
+    alignItems: 'center', 
+    justifyContent: 'center',
+    width: '100%',
+    paddingVertical: 8,
   },
   secondaryIcon: {
     marginBottom: 10,
