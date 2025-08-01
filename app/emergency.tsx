@@ -2,10 +2,11 @@ import { EmergencyData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
+import Button from '@/components/button';
 
 const openPhoneNumber = (phoneNumber: string) => {
     Linking.openURL(`tel:${phoneNumber}`).catch((err) => console.error('An error occurred', err));
@@ -116,26 +117,14 @@ export default function EmergencyScreen() {
                         </View>
                     </View>
 
-                    <TouchableOpacity 
+                    <Button
+                        title={formatPhoneNumber(contact.phone)}
                         onPress={() => openPhoneNumber(contact.phone)}
-                        style={[
-                            styles.callButton,
-                            contact.priority === 'critical' && styles.criticalButton
-                        ]}
-                        activeOpacity={0.8}
-                    >
-                        <View style={styles.buttonContent}>
-                            <Ionicons 
-                                name="call" 
-                                size={20} 
-                                color="white" 
-                                style={styles.buttonIcon}
-                            />
-                            <Text style={styles.buttonText}>
-                                {formatPhoneNumber(contact.phone)}
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
+                        icon="call"
+                        backgroundColor={contact.priority === 'critical' ? ['#ff4444', '#cc0000'] : ['#2d5016', '#1a3b0f']}
+                        textColor="white"
+                        iconColor="white"
+                    />
                 </Card>
             ))}
         </ScreenBackground>
@@ -207,36 +196,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#666',
         lineHeight: 18,
-    },
-    callButton: {
-        backgroundColor: '#2d5016',
-        borderRadius: 12,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 4,
-    },
-    criticalButton: {
-        backgroundColor: '#ff4444',
-    },
-    buttonContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 14,
-        paddingHorizontal: 20,
-    },
-    buttonIcon: {
-        marginRight: 8,
-    },
-    buttonText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: 'white',
     },
     tipsCard: {
         backgroundColor: 'rgba(255, 255, 255, 0.95)',

@@ -1,12 +1,12 @@
 import { DonateData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
+import Button from '@/components/button';
 
 export default function DonateScreen() {
     const { data: donateData, getImagePath} = useScreen<DonateData>('donate');
@@ -61,31 +61,11 @@ export default function DonateScreen() {
                     {donateText}
                 </Text>
 
-                <TouchableOpacity 
+                <Button
+                    title="Donate Now"
                     onPress={handleDonatePress}
-                    style={styles.donateButton}
-                    activeOpacity={0.8}
-                >
-                    <LinearGradient
-                        colors={['#f3c436', '#e6b429']}
-                        style={styles.buttonGradient}
-                    >
-                        <View style={styles.buttonContent}>
-                            <Ionicons 
-                                name="card" 
-                                size={20} 
-                                color="#1a1a1a" 
-                                style={styles.buttonIcon}
-                            />
-                            <Text style={styles.buttonText}>Donate Now</Text>
-                            <Ionicons 
-                                name="arrow-forward" 
-                                size={20} 
-                                color="#1a1a1a" 
-                            />
-                        </View>
-                    </LinearGradient>
-                </TouchableOpacity>
+                    icon="card"
+                />
             </Card>
 
             <Card variant="default" margin="none">
@@ -133,36 +113,6 @@ const styles = StyleSheet.create({
         color: '#444',
         lineHeight: 24,
         marginBottom: 24,
-    },
-    donateButton: {
-        borderRadius: 12,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
-        elevation: 6,
-    },
-    buttonGradient: {
-        borderRadius: 12,
-    },
-    buttonContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 16,
-        paddingHorizontal: 24,
-    },
-    buttonIcon: {
-        marginRight: 8,
-    },
-    buttonText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#1a1a1a',
-        marginRight: 8,
     },
     thankYouHeader: {
         flexDirection: 'row',

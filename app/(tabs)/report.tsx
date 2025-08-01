@@ -1,7 +1,6 @@
 import { ReportData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -15,6 +14,7 @@ import {
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
+import Button from '@/components/button';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
@@ -361,23 +361,21 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
 
         {renderFilesList()}
 
-        <TouchableOpacity 
-          onPress={pickFile} 
-          style={[styles.uploadButton, isSubmitting && styles.buttonDisabled]} 
+        <Button
+          title={files.length === 0 ? 'Select Files' : 'Add More Files'}
+          onPress={pickFile}
+          icon={files.length === 0 ? "add-circle" : "add"}
+          backgroundColor={['#f8f9fa', '#f0f0f0']}
+          textColor="#2d5016"
+          iconColor="#2d5016"
           disabled={isSubmitting}
-        >
-          <View style={styles.buttonContent}>
-            <Ionicons 
-              name={files.length === 0 ? "add-circle" : "add"} 
-              size={20} 
-              color="#1a1a1a" 
-              style={styles.buttonIcon}
-            />
-            <Text style={styles.uploadButtonText}>
-              {files.length === 0 ? 'Select Files' : 'Add More Files'}
-            </Text>
-          </View>
-        </TouchableOpacity>
+          style={{ 
+            borderWidth: 2,
+            borderColor: '#2d5016',
+            borderStyle: 'dashed',
+            shadowOpacity: 0
+          }}
+        />
       </Card>
 
       <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
@@ -463,30 +461,15 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
         />
       </Card>
 
-      {/* Submit Button */}
-      <TouchableOpacity 
-        onPress={handleSubmit} 
-        style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+      <Button
+        title="Submit Report"
+        onPress={handleSubmit}
+        icon="send"
+        loading={isSubmitting}
+        loadingText="Submitting..."
         disabled={isSubmitting}
-        activeOpacity={0.8}
-      >
-        <LinearGradient
-          colors={isSubmitting ? ['#cccccc', '#999999'] : ['#f3c436', '#e6b429']}
-          style={styles.submitButtonGradient}
-        >
-          <View style={styles.submitButtonContent}>
-            <Ionicons 
-              name={isSubmitting ? "hourglass" : "send"} 
-              size={20} 
-              color="#1a1a1a" 
-              style={styles.buttonIcon}
-            />
-            <Text style={styles.submitButtonText}>
-              {isSubmitting ? 'Submitting...' : 'Submit Report'}
-            </Text>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
+        style={{ marginBottom: 20 }}
+      />
 
       {/* Privacy Notice */}
       <View style={styles.privacyNotice}>
@@ -610,31 +593,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  uploadButton: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#2d5016',
-    borderStyle: 'dashed',
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-  },
-  buttonIcon: {
-    marginRight: 8,
-  },
-  uploadButtonText: {
-    fontSize: 16,
-    color: '#2d5016',
-    fontWeight: '600',
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
   // Form input styles
   textArea: {
     backgroundColor: '#f8f9fa',
@@ -665,37 +623,6 @@ const styles = StyleSheet.create({
   halfInput: {
     flex: 1,
     marginBottom: 0,
-  },
-  // Submit button styles
-  submitButton: {
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 6,
-    marginBottom: 20,
-  },
-  submitButtonDisabled: {
-    shadowOpacity: 0.1,
-  },
-  submitButtonGradient: {
-    borderRadius: 12,
-  },
-  submitButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-  },
-  submitButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
   },
   privacyNotice: {
     flexDirection: 'row',

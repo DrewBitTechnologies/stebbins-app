@@ -2,10 +2,11 @@ import { AboutData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
+import Button from '@/components/button';
 
 export default function AboutScreen() {
     const { data: aboutData, getImagePath } = useScreen<AboutData>('about');
@@ -53,26 +54,20 @@ export default function AboutScreen() {
                 <Text style={styles.mainText}>{mainText}</Text>
                 
                 {/* Website Link Button */}
-                <TouchableOpacity 
-                    style={styles.websiteButton}
+                <Button
+                    title={linkText}
                     onPress={handleWebsitePress}
-                    activeOpacity={0.8}
-                >
-                    <View style={styles.buttonContent}>
-                        <Ionicons 
-                            name="globe-outline" 
-                            size={20} 
-                            color="#2d5016" 
-                            style={styles.buttonIcon}
-                        />
-                        <Text style={styles.buttonText}>{linkText}</Text>
-                        <Ionicons 
-                            name="open-outline" 
-                            size={16} 
-                            color="#2d5016" 
-                        />
-                    </View>
-                </TouchableOpacity>
+                    icon="globe-outline"
+                    backgroundColor={['rgba(45, 80, 22, 0.1)', 'rgba(45, 80, 22, 0.05)']}
+                    textColor="#2d5016"
+                    iconColor="#2d5016"
+                    size="small"
+                    style={{
+                        borderWidth: 1,
+                        borderColor: 'rgba(45, 80, 22, 0.2)',
+                        shadowOpacity: 0
+                    }}
+                />
             </Card>
 
             <Card variant="default" margin="none">
@@ -100,29 +95,6 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         color: '#333',
         marginBottom: 20,
-    },
-    websiteButton: {
-        backgroundColor: 'rgba(45, 80, 22, 0.1)',
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: 'rgba(45, 80, 22, 0.2)',
-    },
-    buttonContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-    },
-    buttonIcon: {
-        marginRight: 8,
-    },
-    buttonText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#2d5016',
-        flex: 1,
-        textAlign: 'center',
     },
     missionHeader: {
         flexDirection: 'row',
