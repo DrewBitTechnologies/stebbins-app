@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { HomeData, useApi, useScreen } from '../../contexts/api';
+import Card from '@/components/card';
 
 interface ButtonItem {
   title: string;
@@ -101,7 +102,7 @@ export default function HomeScreen() {
   };
 
   const ReserveStatusCard = () => (
-    <View style={styles.statusCard}>
+    <Card variant="warning" margin="standard">
       <View style={styles.statusHeader}>
         <Ionicons name="megaphone" size={24} color="#1a1a1a" />
         <Text style={styles.statusTitle}>Reserve Status</Text>
@@ -118,7 +119,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
       <Text style={styles.statusText}>{isLoading ? 'Checking for updates...' : status}</Text>
-    </View>
+    </Card>
   );
 
   return (
@@ -142,12 +143,17 @@ export default function HomeScreen() {
 
         <View style={styles.cardsContainer}>
           {mainButtons.map((item) => (
-            <TouchableOpacity
+            <Card 
               key={item.title}
-              style={styles.mainCard}
-              onPress={() => handleNavigation(item.navigateTo)}
-              activeOpacity={0.8}
+              variant="navigation"
+              margin="standard"
+              style={{ flexDirection: 'row', alignItems: 'center' }}
             >
+              <TouchableOpacity
+                onPress={() => handleNavigation(item.navigateTo)}
+                activeOpacity={0.8}
+                style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
+              >
               <View style={[styles.iconContainer, { backgroundColor: 'rgba(45, 80, 22, 0.1)' }]}>
                 <Ionicons name={item.icon} size={28} color={item.color} />
               </View>
@@ -156,7 +162,8 @@ export default function HomeScreen() {
                 <Text style={styles.cardDescription}>{item.description}</Text>
               </View>
               <Ionicons name="chevron-forward" size={24} color="#666" />
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </Card>
           ))}
         </View>
 
@@ -212,19 +219,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
   },
-  statusCard: {
-    backgroundColor: 'rgba(255, 191, 0, 0.85)',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.5)',
-  },
   statusHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -247,19 +241,6 @@ const styles = StyleSheet.create({
   },
   cardsContainer: {
     marginBottom: 20,
-  },
-  mainCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
   },
   iconContainer: {
     width: 56,

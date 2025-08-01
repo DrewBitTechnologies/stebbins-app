@@ -4,6 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
 import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import ScreenHeader from '@/components/screen-header';
+import Card from '@/components/card';
 
 interface ButtonItem {
   title: string;
@@ -77,32 +79,25 @@ export default function GuideScreen() {
         showsVerticalScrollIndicator={false}
       >
         
-        {/* Header Section */}
-        <View style={styles.headerSection}>
-            <View style={styles.titleContainer}>
-                <Ionicons 
-                    name="book"
-                    size={36} 
-                    color="white" 
-                    style={styles.headerIcon}
-                />
-                <Text style={styles.headerTitle}>Stebbins Field Guide</Text>
-            </View>
-            <Text style={styles.headerSubtitle}>Explore the natural world around you</Text>
-        </View>
+        <ScreenHeader 
+            icon="book"
+            title="Stebbins Field Guide"
+            subtitle="Explore the natural world around you"
+        />
 
         {/* Guide Cards */}
         <View style={styles.cardsContainer}>
           {guideItems.map((item, index) => (
-            <TouchableOpacity
+            <Card 
               key={item.title}
-              style={[
-                styles.guideCard,
-                { marginBottom: index === guideItems.length - 1 ? 0 : 16 }
-              ]}
-              onPress={() => handleNavigation(item.navigateTo)}
-              activeOpacity={0.8}
+              variant="navigation"
+              margin={index === guideItems.length - 1 ? "none" : "standard"}
             >
+              <TouchableOpacity
+                onPress={() => handleNavigation(item.navigateTo)}
+                activeOpacity={0.8}
+                style={{ flex: 1 }}
+              >
               <View style={styles.cardContent}>
                 <View style={styles.iconContainer}>
                   <Ionicons 
@@ -125,7 +120,8 @@ export default function GuideScreen() {
                   />
                 </View>
               </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </Card>
           ))}
         </View>
       </ScrollView>
@@ -154,51 +150,8 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     paddingBottom: 40,
   },
-  headerSection: {
-    alignItems: 'center',
-    marginBottom: 40,
-    paddingHorizontal: 20,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  headerIcon: {
-    marginRight: 12,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: 'white',
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
-    textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
   cardsContainer: {
     paddingHorizontal: 20,
-  },
-  guideCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   cardContent: {
     flexDirection: 'row',

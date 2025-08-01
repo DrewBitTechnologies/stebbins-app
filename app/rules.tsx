@@ -3,6 +3,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native';
+import ScreenHeader from '@/components/screen-header';
+import Card from '@/components/card';
 
 export default function RulesScreen() {
     const { data: rulesData, getImagePath } = useScreen<RulesData>('rules');
@@ -45,24 +47,17 @@ export default function RulesScreen() {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                <View style={styles.headerSection}>
-                    <View style={styles.titleContainer}>
-                        <Ionicons
-                            name="document-text"
-                            size={36}
-                            color="white"
-                            style={styles.headerIcon}
-                        />
-                        <Text style={styles.headerTitle}>Trail Rules</Text>
-                    </View>
-                    <Text style={styles.headerSubtitle}>Please follow these guidelines to help preserve the reserve</Text>
-                </View>
+                <ScreenHeader 
+                    icon="document-text"
+                    title="Trail Rules"
+                    subtitle="Please follow these guidelines to help preserve the reserve"
+                />
 
-                <View style={styles.imageCard}>
+                <Card variant="default" margin="horizontal" style={{ alignItems: 'center' }}>
                     <Image style={styles.rulesImage} source={getRulesImageSource()} />
-                </View>
+                </Card>
 
-                <View style={styles.rulesListCard}>
+                <Card variant="default" margin="horizontal">
                     <View style={styles.rulesHeader}>
                         <Ionicons name="checkmark-circle-outline" size={24} color="#374151" />
                         <Text style={styles.rulesHeaderTitle}>Guidelines to Follow</Text>
@@ -84,16 +79,16 @@ export default function RulesScreen() {
                             );
                         }) || []}
                     </View>
-                </View>
+                </Card>
 
-                <View style={styles.footerCard}>
+                <Card variant="default" margin="horizontal">
                     <View style={styles.footerContent}>
                         <Ionicons name="heart" size={24} color="#dc2626" />
                         <Text style={styles.footerText}>
                             Thank you for helping us protect and preserve this natural space for future generations.
                         </Text>
                     </View>
-                </View>
+                </Card>
             </ScrollView>
         </ImageBackground>
     );
@@ -120,62 +115,11 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
         paddingHorizontal: 20,
     },
-    headerSection: {
-        alignItems: 'center',
-        marginBottom: 24,
-    },
-    titleContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    headerIcon: {
-        marginRight: 12,
-    },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: 'white',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 3,
-    },
-    headerSubtitle: {
-        fontSize: 16,
-        color: 'rgba(255,255,255,0.9)',
-        textAlign: 'center',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 2,
-    },
-    imageCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 8,
-        alignItems: 'center',
-    },
     rulesImage: {
         width: '100%',
         aspectRatio: 1,
         borderRadius: 12,
         resizeMode: 'contain',
-    },
-    rulesListCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderRadius: 16,
-        padding: 20,
-        marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 8,
     },
     rulesHeader: {
         flexDirection: 'row',
@@ -220,16 +164,6 @@ const styles = StyleSheet.create({
         color: '#374151',
         flex: 1,
         marginTop: 2,
-    },
-    footerCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderRadius: 16,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 8,
     },
     footerContent: {
         flexDirection: 'row',

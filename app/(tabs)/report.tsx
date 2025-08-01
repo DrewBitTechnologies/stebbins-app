@@ -14,6 +14,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import ScreenHeader from '@/components/screen-header';
+import Card from '@/components/card';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
@@ -348,25 +350,13 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header Section */}
-        <View style={styles.headerSection}>
-          <View style={styles.titleContainer}>
-            <View style={styles.reportIconContainer}>
-              <Ionicons 
-                name="flag" 
-                size={36} 
-                color="white" 
-              />
-            </View>
-            <Text style={styles.headerTitle}>Report an Issue</Text>
-          </View>
-          <Text style={styles.headerSubtitle}>
-            {reportData?.instruction_text || 'Help us keep the trails safe and maintained'}
-          </Text>
-        </View>
+        <ScreenHeader 
+          icon="flag"
+          title="Report an Issue"
+          subtitle={reportData?.instruction_text || 'Help us keep the trails safe and maintained'}
+        />
 
-        {/* File Upload Section */}
-        <View style={styles.sectionCard}>
+        <Card variant="default" margin="horizontal">
           <View style={styles.sectionHeader}>
             <View style={styles.sectionIconContainer}>
               <Ionicons name="camera" size={24} color="#2d5016" />
@@ -400,10 +390,9 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
               </Text>
             </View>
           </TouchableOpacity>
-        </View>
+        </Card>
 
-        {/* Description Section */}
-        <View style={styles.sectionCard}>
+        <Card variant="default" margin="horizontal">
           <View style={styles.sectionHeader}>
             <View style={styles.sectionIconContainer}>
               <Ionicons name="document-text" size={24} color="#2d5016" />
@@ -428,10 +417,9 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
             placeholderTextColor="#999"
             editable={!isSubmitting}
           />
-        </View>
+        </Card>
 
-        {/* Contact Information Section */}
-        <View style={styles.sectionCard}>
+        <Card variant="default" margin="horizontal">
           <View style={styles.sectionHeader}>
             <View style={styles.sectionIconContainer}>
               <Ionicons name="person" size={24} color="#2d5016" />
@@ -485,7 +473,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
             onChangeText={(text) => setContact({ ...contact, phone: text })}
             editable={!isSubmitting}
           />
-        </View>
+        </Card>
 
         {/* Submit Button */}
         <TouchableOpacity 
@@ -544,58 +532,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingTop: 80,
     paddingBottom: 40,
-  },
-  headerSection: {
-    alignItems: 'center',
-    marginBottom: 30,
-    paddingHorizontal: 20,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  reportIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: 'white',
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
-    textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-    lineHeight: 22,
-  },
-  sectionCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    marginHorizontal: 20,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   sectionHeader: {
     flexDirection: 'row',

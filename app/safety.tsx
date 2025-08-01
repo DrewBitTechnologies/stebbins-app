@@ -4,6 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import ScreenHeader from '@/components/screen-header';
+import Card from '@/components/card';
 
 export default function SafetyScreen() {
     const { data: safetyData, getImagePath, isLoading } = useScreen<SafetyData>('safety');
@@ -84,24 +86,15 @@ export default function SafetyScreen() {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Header Section */}
-                <View style={styles.headerSection}>
-                    <View style={styles.titleContainer}>
-                        <Ionicons 
-                            name="shield-checkmark" 
-                            size={36} 
-                            color="white" 
-                            style={styles.headerIcon}
-                        />
-                        <Text style={styles.headerTitle}>Safety Information</Text>
-                    </View>
-                    <Text style={styles.headerSubtitle}>Stay safe during your outdoor adventure</Text>
-                </View>
+                <ScreenHeader 
+                    icon="shield-checkmark"
+                    title="Safety Information"
+                    subtitle="Stay safe during your outdoor adventure"
+                />
 
-                {/* Safety Image Card */}
-                <View style={styles.imageCard}>
+                <Card variant="default" margin="horizontal" style={{ alignItems: 'center' }}>
                     <Image style={styles.safetyImage} source={getSafetyImageSource()} />
-                </View>
+                </Card>
 
                 {/* Emergency Contact Card */}
                 <TouchableOpacity 
@@ -118,8 +111,7 @@ export default function SafetyScreen() {
                     </View>
                 </TouchableOpacity>
 
-                {/* Safety Guidelines Card */}
-                <View style={styles.guidelinesCard}>
+                <Card variant="default" margin="horizontal">
                     <View style={styles.guidelinesHeader}>
                         <Ionicons name="list-outline" size={24} color="#374151" />
                         <Text style={styles.guidelinesTitle}>Safety Guidelines</Text>
@@ -135,7 +127,7 @@ export default function SafetyScreen() {
                             </View>
                         ))}
                     </View>
-                </View>
+                </Card>
             </ScrollView>
         </ImageBackground>
     );
@@ -161,46 +153,6 @@ const styles = StyleSheet.create({
         paddingTop: 60,
         paddingBottom: 40,
         paddingHorizontal: 20,
-    },
-    headerSection: {
-        alignItems: 'center',
-        marginBottom: 24,
-    },
-    titleContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    headerIcon: {
-        marginRight: 12,
-    },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: 'white',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 3,
-    },
-    headerSubtitle: {
-        fontSize: 16,
-        color: 'rgba(255,255,255,0.9)',
-        textAlign: 'center',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 2,
-    },
-    imageCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 8,
-        alignItems: 'center',
     },
     safetyImage: {
         width: '100%',
@@ -256,16 +208,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'rgba(255, 255, 255, 0.9)',
         textAlign: 'center',
-    },
-    guidelinesCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderRadius: 16,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 8,
     },
     guidelinesHeader: {
         flexDirection: 'row',

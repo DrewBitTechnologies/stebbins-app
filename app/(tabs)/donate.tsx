@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import ScreenHeader from '@/components/screen-header';
 
 export default function DonateScreen() {
     const { data: donateData, getImagePath} = useScreen<DonateData>('donate');
@@ -74,18 +75,11 @@ export default function DonateScreen() {
                 showsVerticalScrollIndicator={false}
             >
 
-                <View style={styles.headerSection}>
-                    <View style={styles.titleContainer}>
-                        <Ionicons 
-                            name="heart" 
-                            size={36} 
-                            color="white" 
-                            style={styles.headerIcon}
-                        />
-                        <Text style={styles.headerTitle}>Support Our Mission</Text>
-                    </View>
-                    <Text style={styles.headerSubtitle}>Help preserve and enhance Stebbins for future generations</Text>
-                </View>
+                <ScreenHeader 
+                    icon="heart"
+                    title="Support Our Mission"
+                    subtitle="Help preserve and enhance Stebbins for future generations"
+                />
 
                 {/* Main Donation Card */}
                 <View style={styles.donationCard}>
@@ -210,34 +204,6 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         paddingTop: 80,
         paddingBottom: 40,
-    },
-    headerSection: {
-        alignItems: 'center',
-        marginBottom: 24,
-    },
-    titleContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    headerIcon: {
-        marginRight: 12,
-    },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: 'white',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 3,
-    },
-    headerSubtitle: {
-        fontSize: 16,
-        color: 'rgba(255,255,255,0.9)',
-        textAlign: 'center',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 2,
     },
     donationCard: {
         backgroundColor: 'rgba(255, 255, 255, 0.95)',

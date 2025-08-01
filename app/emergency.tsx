@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Linking from 'expo-linking';
 import React from 'react';
 import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import ScreenHeader from '@/components/screen-header';
 
 const openPhoneNumber = (phoneNumber: string) => {
     Linking.openURL(`tel:${phoneNumber}`).catch((err) => console.error('An error occurred', err));
@@ -72,22 +73,11 @@ export default function EmergencyScreen() {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Header Section */}
-                <View style={styles.headerSection}>
-                    <View style={styles.titleContainer}>
-                        <View style={styles.alertIconContainer}>
-                            <Ionicons 
-                                name="alert-circle" 
-                                size={36} 
-                                color="white" 
-                            />
-                        </View>
-                        <Text style={styles.headerTitle}>Emergency Contacts</Text>
-                    </View>
-                    <Text style={styles.headerSubtitle}>
-                        Contacts for trail emergencies
-                    </Text>
-                </View>
+                <ScreenHeader 
+                    icon="alert-circle"
+                    title="Emergency Contacts"
+                    subtitle="Contacts for trail emergencies"
+                />
 
                 {/* Safety Notice */}
                 <View style={styles.safetyNotice}>
@@ -187,40 +177,6 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         paddingTop: 80,
         paddingBottom: 40,
-    },
-    headerSection: {
-        alignItems: 'center',
-        marginBottom: 30,
-        paddingHorizontal: 20,
-    },
-    titleContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    alertIconContainer: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 12,
-    },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: 'white',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 3,
-    },
-    headerSubtitle: {
-        fontSize: 16,
-        color: 'rgba(255,255,255,0.9)',
-        textAlign: 'center',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 2,
     },
     safetyNotice: {
         backgroundColor: 'rgba(255, 107, 53, 0.75)',
