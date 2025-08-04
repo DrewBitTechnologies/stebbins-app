@@ -61,6 +61,23 @@ const downloadImage = async (screenName: string, imageName: string): Promise<str
   try {
     await ensureCacheDir();
     const localPath = getImageFilePath(screenName, imageName);
+    
+    // Try CDN with common extensions
+    const extensions = ['.jpg', '.jpeg', '.png', '.JPG', '.JPEG'];
+    
+    for (const ext of extensions) {
+      try {
+        const cdnUrl = `${process.env.EXPO_PUBLIC_CDN_URL}/${imageName}${ext}`;
+        const cdnResult = await FileSystem.downloadAsync(cdnUrl, localPath);
+        if (cdnResult.status === 200) {
+          return localPath;
+        }
+      } catch {
+        // Continue to next extension
+      }
+    }
+    
+    // Fallback to /assets/ endpoint
     const downloadResult = await FileSystem.downloadAsync(
       `${API_BASE_URL}/assets/${imageName}`,
       localPath,

@@ -1,6 +1,7 @@
 import { ReportData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -33,6 +34,23 @@ export default function ReportScreen() {
     phone: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const convertToJpeg = async (uri: string): Promise<string> => {
+    try {
+      const result = await ImageManipulator.manipulateAsync(
+        uri,
+        [], // No resize, just convert
+        {
+          compress: 0.8, // Good quality compression
+          format: ImageManipulator.SaveFormat.JPEG,
+        }
+      );
+      return result.uri;
+    } catch (error) {
+      console.error('Image conversion failed:', error);
+      return uri; // Return original if conversion fails
+    }
+  };
 
   const pickFile = async () => {
     try {
@@ -69,7 +87,24 @@ export default function ReportScreen() {
             continue;
           }
           
-          validFiles.push(selectedFile);
+          // Convert images to JPEG for compatibility
+          if (selectedFile.type === 'image') {
+            try {
+              const convertedUri = await convertToJpeg(selectedFile.uri);
+              const convertedFile: ImagePicker.ImagePickerAsset = {
+                ...selectedFile,
+                uri: convertedUri,
+                mimeType: 'image/jpeg',
+                fileName: selectedFile.fileName?.replace(/\.(heic|heif|png|webp)$/i, '.jpg') || 'image.jpg'
+              };
+              validFiles.push(convertedFile);
+            } catch (error) {
+              console.error('Failed to convert image:', error);
+              validFiles.push(selectedFile); // Add original if conversion fails
+            }
+          } else {
+            validFiles.push(selectedFile);
+          }
         }
 
         if (validFiles.length > 0) {
@@ -119,8 +154,8 @@ export default function ReportScreen() {
 const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
     const formData = new FormData();
     
-    const fileName = file.fileName || `upload_${Date.now()}.${file.type?.split('/')[1] || 'jpg'}`;
-    const mimeType = file.type || 'application/octet-stream';
+    const fileName = file.fileName || `upload_${Date.now()}.${file.mimeType?.split('/')[1] || 'jpg'}`;
+    const mimeType = file.mimeType || 'application/octet-stream';
     
     if (REPORT_FILES_FOLDER_ID) {
       formData.append('folder', REPORT_FILES_FOLDER_ID);
@@ -281,7 +316,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
   };
 
   const renderThumbnail = (file: ImagePicker.ImagePickerAsset, index: number) => {
-    const isVideo = file.type?.includes('video');
+    const isVideo = file.type === 'video';
 
     return (
       <View key={index} style={styles.thumbnailContainer}>
