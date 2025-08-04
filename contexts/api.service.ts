@@ -3,7 +3,6 @@ import { CachedScreenData, ScreenData } from './api';
 import { API_BASE_URL, BEARER_TOKEN, CACHE_DIR, IMAGE_FIELD_KEYS, getDataFilePath, getImageFilePath } from './api.config';
 
 // --- File System Operations ---
-
 export const ensureCacheDir = async () => {
   const dirInfo = await FileSystem.getInfoAsync(CACHE_DIR);
   if (!dirInfo.exists) {
@@ -36,7 +35,6 @@ export const loadFromCache = async (cacheKey: string): Promise<CachedScreenData 
 };
 
 // --- API & Image Processing ---
-
 const fetchFromApi = async (endpoint: string) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         headers: { Authorization: `Bearer ${BEARER_TOKEN}` },

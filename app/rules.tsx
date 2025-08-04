@@ -5,24 +5,13 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
-import { getBackgroundSource } from '@/utility/background-source';
+import { getImageSource } from '@/utility/image-source';
 
 export default function RulesScreen() {
     const { data: rulesData, getImagePath } = useScreen<RulesData>('rules');
 
-    const getRulesImageSource = () => {
-        const imageId = rulesData?.rules_image;
-        if (imageId) {
-            const localUri = getImagePath(imageId);
-            if (localUri) {
-                return { uri: localUri };
-            }
-        }
-        return require('@/assets/dev/fallback.jpeg');
-    };
-
     return (
-        <ScreenBackground backgroundSource={getBackgroundSource(rulesData, getImagePath)}>
+        <ScreenBackground backgroundSource={getImageSource(rulesData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
             <ScreenHeader 
                 icon="document-text"
                 title="Trail Rules"
@@ -30,7 +19,10 @@ export default function RulesScreen() {
             />
 
             <Card variant="default" margin="none" style={{ alignItems: 'center', marginBottom: 20 }}>
-                <Image style={styles.rulesImage} source={getRulesImageSource()} />
+                <Image 
+                    style={styles.rulesImage} 
+                    source={getImageSource(rulesData, 'rules_image', getImagePath, require('@/assets/dev/fallback.jpeg'))} 
+                />
             </Card>
 
             <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
@@ -40,20 +32,22 @@ export default function RulesScreen() {
                 </View>
 
                 <View style={styles.rulesContainer}>
-                    {rulesData?.rules?.map((item, index) => {
-                        const iconUri = item.icon ? getImagePath(item.icon) : null;
-                        return (
-                            <View key={item.id} style={[
-                                styles.ruleItem,
-                                { marginBottom: index === (rulesData?.rules?.length || 0) - 1 ? 0 : 20 }
-                            ]}>
-                                <View style={styles.ruleIconContainer}>
-                                    {iconUri && <Image source={{ uri: iconUri }} style={styles.ruleIcon} />}
-                                </View>
-                                <Text style={styles.ruleText}>{item.text}</Text>
+                    {rulesData?.rules?.map((item, index) => (
+                        <View key={item.id} style={[
+                            styles.ruleItem,
+                            { marginBottom: index === (rulesData?.rules?.length || 0) - 1 ? 0 : 20 }
+                        ]}>
+                            <View style={styles.ruleIconContainer}>
+                                {getImageSource(item, 'icon', getImagePath) && (
+                                    <Image 
+                                        source={getImageSource(item, 'icon', getImagePath)}
+                                        style={styles.ruleIcon} 
+                                    />
+                                )}
                             </View>
-                        );
-                    }) || []}
+                            <Text style={styles.ruleText}>{item.text}</Text>
+                        </View>
+                    )) || []}
                 </View>
             </Card>
 

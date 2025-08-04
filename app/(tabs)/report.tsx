@@ -15,7 +15,7 @@ import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import Button from '@/components/button';
-import { getBackgroundSource } from '@/utility/background-source';
+import { getImageSource } from '@/utility/image-source';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
@@ -336,7 +336,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
   };
 
   return (
-    <ScreenBackground backgroundSource={getBackgroundSource(reportData, getImagePath)}>
+    <ScreenBackground backgroundSource={getImageSource(reportData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
       <ScreenHeader 
         icon="flag"
         title="Report an Issue"

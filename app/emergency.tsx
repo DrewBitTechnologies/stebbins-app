@@ -7,7 +7,7 @@ import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import Button from '@/components/button';
-import { getBackgroundSource } from '@/utility/background-source';
+import { getImageSource } from '@/utility/image-source';
 
 const openPhoneNumber = (phoneNumber: string) => {
     Linking.openURL(`tel:${phoneNumber}`).catch((err) => console.error('An error occurred', err));
@@ -46,7 +46,7 @@ export default function EmergencyScreen() {
     ];
 
     return (
-        <ScreenBackground backgroundSource={getBackgroundSource(emergencyData, getImagePath)}>
+        <ScreenBackground backgroundSource={getImageSource(emergencyData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
             <ScreenHeader 
                 icon="alert-circle"
                 title="Emergency Contacts"

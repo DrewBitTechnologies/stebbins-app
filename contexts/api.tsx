@@ -78,7 +78,7 @@ export interface SafetyData {
   date_updated: string;
   background?: string;
   safety_image?: string;
-  safety_bulletpoints: string;
+  safety_bullet_points: string;
 }
 export interface ReportData {
   id: number;
@@ -134,11 +134,41 @@ export interface POIMarkerData {
   map_label: string;
   image: string | null;
 }
+export interface UpdateData {
+  id: number;
+  date_updated: string;
+  update_signal: string;
+}
+
+export interface BrandingData {
+  id: number;
+  date_created: string;
+  date_updated: string;
+  header_image: string;
+  splash_image: string;
+}
+
 export type MileMarkers = MileMarkerTrailData[];
 export type POIMarkers = POIMarkerData[];
 export type SafetyMarkers = SafetyMarkerData[];
 
-export type ScreenData = HomeData | AboutData | DonateData | GuideData | EmergencyData | RulesData | SafetyData | ReportData | GuideDataItem | GuideDataItems | NatureTrailMarkerData | MileMarkerTrailData | MileMarkers | SafetyMarkers | POIMarkers;
+export type ScreenData = HomeData | 
+                         AboutData | 
+                         DonateData | 
+                         GuideData | 
+                         EmergencyData | 
+                         RulesData | 
+                         SafetyData | 
+                         ReportData | 
+                         GuideDataItem | 
+                         GuideDataItems | 
+                         NatureTrailMarkerData | 
+                         MileMarkerTrailData | 
+                         MileMarkers | 
+                         SafetyMarkers | 
+                         POIMarkers | 
+                         UpdateData |
+                         BrandingData;
 
 export interface CachedScreenData {
   data: ScreenData;
@@ -153,6 +183,7 @@ interface ApiContextType {
   getImagePath: (screenName: string, imageName: string) => string | undefined;
   isLoading: (screenName: string) => boolean;
   checkAllScreensForUpdates: (onProgress?: (message: string) => void) => Promise<void>;
+  checkForUpdates: (onProgress?: (message: string) => void) => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -201,6 +232,97 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const saveLastSyncDate = async (dateString: string) => {
+    try {
+      const cacheData: CachedScreenData = {
+        data: { id: 0, date_updated: dateString, update_signal: 'sync' } as UpdateData,
+        lastItemUpdateTimestamp: dateString
+      };
+      await ApiService.saveToCache('lastSyncDate', cacheData);
+    } catch (error) {
+      console.error('Error saving last sync date:', error);
+    }
+  };
+
+  const getLastSyncDate = async (): Promise<string | null> => {
+    try {
+      const cacheData = await ApiService.loadFromCache('lastSyncDate');
+      return cacheData?.lastItemUpdateTimestamp || null;
+    } catch (error) {
+      console.error('Error loading last sync date:', error);
+      return null;
+    }
+  };
+
+  const loadAllCachedData = async (onProgress?: (message: string) => void) => {
+    for (const screenName of Object.keys(SCREEN_CONFIGS)) {
+      try {
+        const config = SCREEN_CONFIGS[screenName];
+        const cachedData = await ApiService.loadFromCache(config.cacheKey);
+        if (cachedData) {
+          setScreenDataCache(prev => ({ ...prev, [screenName]: cachedData }));
+          onProgress?.(`✅ [${screenName}] Loaded from cache.`);
+        }
+      } catch (error) {
+        console.error(`Error loading cached data for ${screenName}:`, error);
+      }
+    }
+  };
+
+  const checkForUpdates = async (onProgress?: (message: string) => void) => {
+    try {
+      onProgress?.('Checking for updates...');
+      
+      const response = await ApiService.fetchFullData<UpdateData>('/items/update/');
+      if (!response) {
+        onProgress?.('Failed to check for updates. Running full sync...');
+        await checkAllScreensForUpdates(onProgress);
+        return;
+      }
+
+      if (!response.date_updated) {
+        onProgress?.('No update date from server. Running full sync...');
+        await checkAllScreensForUpdates(onProgress);
+        return;
+      }
+
+      const lastSyncDateString = await getLastSyncDate();
+
+      const serverUpdateDate = new Date(response.date_updated);
+      if (isNaN(serverUpdateDate.getTime())) {
+        onProgress?.('Invalid server date format. Running full sync...');
+        await checkAllScreensForUpdates(onProgress);
+        return;
+      }
+
+      const localSyncDate = lastSyncDateString ? new Date(lastSyncDateString) : new Date(0);
+      if (lastSyncDateString && isNaN(localSyncDate.getTime())) {
+        onProgress?.('Invalid local sync date. Running full sync...');
+        await checkAllScreensForUpdates(onProgress);
+        return;
+      }
+
+      onProgress?.(`Server last update: ${serverUpdateDate.toISOString()}`);
+      onProgress?.(`Local last sync: ${localSyncDate.toISOString()}`);
+
+      if (localSyncDate >= serverUpdateDate) {
+        onProgress?.('✅ App is up to date. Loading cached data...');
+        await loadAllCachedData(onProgress);
+        return;
+      }
+
+      onProgress?.('🔄 Updates available. Running full sync...');
+      await checkAllScreensForUpdates(onProgress);
+      
+      await saveLastSyncDate(serverUpdateDate.toISOString());
+      
+    } catch (error) {
+      console.error('Error checking for updates:', error);
+      onProgress?.('❌ Error checking updates. Running full sync...');
+      await checkAllScreensForUpdates(onProgress);
+    }
+  };
+
   const checkAllScreensForUpdates = async (onProgress?: (message: string) => void) => {
     for (const screenName of Object.keys(SCREEN_CONFIGS)) {
       setLoading(screenName, true);
@@ -241,7 +363,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
           const localCache = await ApiService.loadFromCache(config.cacheKey);
           const remoteMetadata = await ApiService.fetchSingletonMetadata(config.endpoint);
           
-          console.log(localCache?.lastItemUpdateTimestamp);
 
           if (localCache?.data && remoteMetadata && 
               new Date(localCache.lastItemUpdateTimestamp) >= new Date(remoteMetadata.date_updated)) {
@@ -294,6 +415,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     getImagePath,
     isLoading,
     checkAllScreensForUpdates,
+    checkForUpdates,
   };
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;

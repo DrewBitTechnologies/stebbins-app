@@ -5,7 +5,7 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { HomeData, useApi, useScreen } from '../../contexts/api';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
-import { getBackgroundSource } from '@/utility/background-source';
+import { getImageSource } from '@/utility/image-source';
 
 interface ButtonItem {
   title: string;
@@ -110,7 +110,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScreenBackground backgroundSource={getBackgroundSource(homeData, getImagePath)} paddingTop={20}>
+    <ScreenBackground backgroundSource={getImageSource(homeData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))} paddingTop={20}>
 
         <ReserveStatusCard />
 

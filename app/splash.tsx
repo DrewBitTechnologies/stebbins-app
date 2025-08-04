@@ -1,25 +1,37 @@
-import { useApi } from '@/contexts/api';
+import { BrandingData, useApi, useScreen } from '@/contexts/api';
 import { SCREEN_CONFIGS } from '@/contexts/api.config';
 import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Animated, Image, StyleSheet, View } from 'react-native';
+import { getImageSource } from '@/utility/image-source';
 
 export default function SplashScreen() {
-  const { checkAllScreensForUpdates } = useApi();
+  const { checkForUpdates } = useApi();
+  const { data: brandingData, getImagePath } = useScreen<BrandingData>('branding');
   const progress = useRef(new Animated.Value(0)).current;
+  const screenShimmerTranslate = useRef(new Animated.Value(-500)).current;
   const totalScreens = Object.keys(SCREEN_CONFIGS).length;
 
   useEffect(() => {
+    const shimmerAnimation = Animated.loop(
+      Animated.timing(screenShimmerTranslate, {
+        toValue: 500,
+        duration: 2000,
+        useNativeDriver: true,
+      })
+    );
+    shimmerAnimation.start();
+
     const initializeApp = async () => {
       try {
         let processedCount = 0;
 
-        await checkAllScreensForUpdates((message) => {
+        await checkForUpdates((message) => {
           console.log(message);
           processedCount++;
-          const newProgress = processedCount / totalScreens;
+          const newProgress = Math.min(processedCount / Math.max(totalScreens, 1), 0.95);
           
-          Animated.timing(progress, {
+        Animated.timing(progress, {
             toValue: newProgress,
             duration: 250,
             useNativeDriver: false,
@@ -32,6 +44,7 @@ export default function SplashScreen() {
           useNativeDriver: false,
         }).start(() => {
           setTimeout(() => {
+            shimmerAnimation.stop();
             router.replace('/(tabs)/home');
           }, 300);
         });
@@ -39,6 +52,7 @@ export default function SplashScreen() {
       } catch (error) {
         console.log('A critical error occurred during app initialization:', error);
         setTimeout(() => {
+          shimmerAnimation.stop();
           router.replace('/(tabs)/home');
         }, 1000);
       }
@@ -54,16 +68,26 @@ export default function SplashScreen() {
 
   return (
     <View style={styles.container}>
-      <Image 
-        source={require('../assets/images/splash-icon.png')}
-        style={styles.image}
-        resizeMode="contain"
-      />
+      <View style={styles.logoContainer}>
+        <Image 
+          source={getImageSource(brandingData, 'splash_image', getImagePath, require('../assets/images/splash-icon.png'))}
+          style={styles.image}
+          resizeMode="contain"
+        />
+      </View>
+
       <View style={styles.progressBarContainer}>
         <Animated.View 
           style={[styles.progressBarFill, { width: widthInterpolation }]} 
         />
       </View>
+
+      <Animated.View 
+        style={[
+          styles.screenShimmer,
+          { transform: [{ translateX: screenShimmerTranslate }] }
+        ]} 
+      />
     </View>
   );
 }
@@ -75,6 +99,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  logoContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 40,
+  },
   image: {
     height: 200,
     width: 200,
@@ -84,12 +113,20 @@ const styles = StyleSheet.create({
     width: '50%',
     backgroundColor: '#e0e0e0',
     borderRadius: 4,
-    marginTop: 30,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
     backgroundColor: '#1D4776',
     borderRadius: 4,
+  },
+  screenShimmer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    width: 100,
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    transform: [{ skewX: '-20deg' }],
   },
 });

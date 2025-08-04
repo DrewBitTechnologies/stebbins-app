@@ -6,7 +6,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
-import { getBackgroundSource } from '@/utility/background-source';
+import { getImageSource } from '@/utility/image-source';
 
 interface ButtonItem {
   title: string;
@@ -50,14 +50,13 @@ export default function GuideScreen() {
   };
 
   return (
-    <ScreenBackground backgroundSource={getBackgroundSource(guideData, getImagePath)}>
+    <ScreenBackground backgroundSource={getImageSource(guideData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
       <ScreenHeader 
           icon="book"
           title="Stebbins Field Guide"
           subtitle="Explore the natural world around you"
       />
-
-      {/* Guide Cards */}
+      
       {guideItems.map((item, index) => (
         <Card 
           key={item.title}

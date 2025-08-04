@@ -4,7 +4,7 @@ import * as FileSystem from 'expo-file-system';
 export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 export const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
 export const CACHE_DIR = FileSystem.documentDirectory + 'cache/';
-export const IMAGE_FIELD_KEYS = ['image', 'background', 'rules_image', 'safety_image', 'icon', 'map_icon'];
+export const IMAGE_FIELD_KEYS = ['image', 'background', 'rules_image', 'safety_image', 'icon', 'map_icon', 'header_image', 'splash_image'];
 
 // --- Screen Configuration ---
 export interface ScreenConfig {
@@ -33,6 +33,7 @@ export const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
   mile_marker: { endpoint: '/items/mile_marker/', cacheKey: 'mile_marker', isCollection: true },
   safety_marker: { endpoint: '/items/safety_marker/', cacheKey: 'safety_marker', isCollection: true },
   poi_marker: { endpoint: '/items/point_of_interest_marker/', cacheKey: 'poi_marker', isCollection: true },
+  branding: { endpoint: '/items/branding/', cacheKey: 'branding_data', isCollection: false },
 };
 
 // --- Helper Functions for Paths ---

@@ -6,25 +6,11 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
-import { getBackgroundSource } from '@/utility/background-source';
+import { getImageSource } from '@/utility/image-source';
 
 export default function SafetyScreen() {
     const { data: safetyData, getImagePath, isLoading } = useScreen<SafetyData>('safety');
     
-    const getSafetyImageSource = () => {
-        const backgroundId = safetyData?.safety_image;
-
-        if (backgroundId) {
-        
-        const localUri = getImagePath(backgroundId);
-        if (localUri) {
-            return { uri: localUri };
-        }
-        }
-
-        return require('@/assets/dev/fallback.jpeg');
-    };
-
     const parseSafetyText = (text: string) => {
         if (!text) return [];
         
@@ -54,10 +40,10 @@ export default function SafetyScreen() {
         );
     }
 
-    const safetyBulletpoints = safetyData ? parseSafetyText(safetyData.safety_bulletpoints) : [];
+    const safetyBulletpoints = safetyData ? parseSafetyText(safetyData.safety_bullet_points) : [];
 
     return (
-        <ScreenBackground backgroundSource={getBackgroundSource(safetyData, getImagePath)}>
+        <ScreenBackground backgroundSource={getImageSource(safetyData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
                 <ScreenHeader 
                     icon="shield-checkmark"
                     title="Safety Information"
@@ -65,7 +51,10 @@ export default function SafetyScreen() {
                 />
 
                 <Card variant="default" margin="standard" style={{ alignItems: 'center' }}>
-                    <Image style={styles.safetyImage} source={getSafetyImageSource()} />
+                    <Image 
+                        style={styles.safetyImage} 
+                        source={getImageSource(safetyData, 'safety_image', getImagePath, require('@/assets/dev/fallback.jpeg'))} 
+                    />
                 </Card>
 
                 {/* Emergency Contact Card */}
@@ -90,7 +79,7 @@ export default function SafetyScreen() {
                     </View>
                     
                     <View style={styles.bulletPointsContainer}>
-                        {safetyBulletpoints.map((item, index) => (
+                        {safetyBulletpoints.map((item) => (
                             <View key={item.id} style={styles.bulletPointItem}>
                                 <View style={styles.bulletIconContainer}>
                                     <View style={styles.bulletDot} />
