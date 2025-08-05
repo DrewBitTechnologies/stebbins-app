@@ -223,7 +223,7 @@ export default function MapScreen() {
             key={mapKey}
             ref={mapview}
             style={styles.map}
-            styleURL={getStyleUrl()}
+            styleURL={getStyleUrl(MAPBOX_STYLE_URL)}
             rotateEnabled={true}
             onCameraChanged={onCameraChanged}
           >
