@@ -6,7 +6,7 @@ import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useIsConnected } from 'react-native-offline';
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 
 MapboxGL.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN);
 
@@ -116,7 +116,7 @@ export default function MapScreen() {
   const camera = useRef<MapboxGL.Camera | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMapCached, setIsMapCached] = useState<boolean | null>(null);
-  const isConnected = useIsConnected();
+  const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isInfoModalVisible, setInfoModalVisible] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState<AnyMarker | null>(null);
   const [mapKey, setMapKey] = useState(0);
@@ -158,6 +158,15 @@ export default function MapScreen() {
 
     initializeApp();
   }, [isConnected]); // Re-check if connection status changes
+
+  // Monitor network connectivity
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
+      setIsConnected(state.isConnected ?? false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const selectedMarkerImageUri = selectedMarker?.image ? getImagePathForMarker(selectedMarker) : null;
   const selectedMarkerIconUri = selectedMarker && 'map_icon' in selectedMarker && selectedMarker.map_icon

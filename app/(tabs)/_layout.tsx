@@ -2,15 +2,13 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Platform } from 'react-native';
-import { NetworkProvider } from 'react-native-offline';
 
 export default function TabsLayout() {
   // Get the safe area insets
   const insets = useSafeAreaInsets();
   
   return (
-    <NetworkProvider>
-      <Tabs
+    <Tabs
         screenOptions={{
           tabBarActiveTintColor: '#022851',
           tabBarInactiveTintColor: '#8e8e93',
@@ -79,6 +77,5 @@ export default function TabsLayout() {
           }}
         />
       </Tabs>
-    </NetworkProvider>
   );
 }
