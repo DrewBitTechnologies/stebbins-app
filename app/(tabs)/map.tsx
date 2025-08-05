@@ -1,4 +1,5 @@
 import { MileMarkerTrailData, NatureTrailMarkerData, POIMarkerData, SafetyMarkerData, useScreen } from '@/contexts/api';
+import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE_URL } from '@/contexts/api.config';
 import { FontAwesome, FontAwesome6 as FontAwesomeIcon, Ionicons } from '@expo/vector-icons';
 import { ImageZoom } from '@likashefqet/react-native-image-zoom';
 import MapboxGL from "@rnmapbox/maps";
@@ -8,7 +9,13 @@ import { ActivityIndicator, Alert, Dimensions, Image, Modal, Pressable, ScrollVi
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useIsConnected } from 'react-native-offline';
 
-MapboxGL.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN);
+// Initialize Mapbox
+if (MAPBOX_ACCESS_TOKEN) {
+  MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
+  console.log('✅ Mapbox access token configured');
+} else {
+  console.error('❌ MAPBOX_ACCESS_TOKEN not found');
+}
 
 const CENTER_LATITUDE = 38.493;
 const CENTER_LONGITUDE = -122.104;
@@ -17,7 +24,14 @@ const MAP_PACK = 'stebbins';
 const DEFAULT_ZOOM = 13.3;
 const MIN_ZOOM = 13;
 const MAX_ZOOM = 22;
-const STYLE_URL = process.env.EXPO_PUBLIC_MAPBOX_STYLE_URL;
+const getStyleUrl = () => {
+  if (MAPBOX_STYLE_URL) {
+    return MAPBOX_STYLE_URL;
+  } else {
+    console.error('❌ MAPBOX_STYLE_URL not found');
+    return 'mapbox://styles/mapbox/outdoors-v12'; // fallback
+  }
+};
 const DEVICE_WIDTH = Dimensions.get('window').width;
 const DEVICE_HEIGHT = Dimensions.get('window').height;
 const BLUE = '#022851';
@@ -240,7 +254,7 @@ export default function MapScreen() {
     try {
       await MapboxGL.offlineManager.createPack({
         name: MAP_PACK, 
-        styleURL: STYLE_URL, 
+        styleURL: getStyleUrl(), 
         minZoom: MIN_ZOOM, 
         maxZoom: MAX_ZOOM, 
         bounds: [BOUNDS.sw, BOUNDS.ne]
@@ -355,7 +369,7 @@ export default function MapScreen() {
             key={mapKey}
             ref={mapview}
             style={styles.map}
-            styleURL={STYLE_URL}
+            styleURL={getStyleUrl()}
             rotateEnabled={true}
             onCameraChanged={onCameraChanged}
           >

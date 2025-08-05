@@ -1,18 +1,19 @@
+import * as React from 'react';
+import { Animated, Image, StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
 import { BrandingData, useApi, useScreen } from '@/contexts/api';
 import { SCREEN_CONFIGS } from '@/contexts/api.config';
-import { router } from 'expo-router';
-import { useEffect, useRef } from 'react';
-import { Animated, Image, StyleSheet, View } from 'react-native';
+
 import { getImageSource } from '@/utility/image-source';
 
 export default function SplashScreen() {
   const { checkForUpdates } = useApi();
   const { data: brandingData, getImagePath } = useScreen<BrandingData>('branding');
-  const progress = useRef(new Animated.Value(0)).current;
-  const screenShimmerTranslate = useRef(new Animated.Value(-500)).current;
+  const progress = React.useRef(new Animated.Value(0)).current;
+  const screenShimmerTranslate = React.useRef(new Animated.Value(-500)).current;
   const totalScreens = Object.keys(SCREEN_CONFIGS).length;
 
-  useEffect(() => {
+  React.useEffect(() => {
     const shimmerAnimation = Animated.loop(
       Animated.timing(screenShimmerTranslate, {
         toValue: 500,
@@ -26,12 +27,11 @@ export default function SplashScreen() {
       try {
         let processedCount = 0;
 
-        await checkForUpdates((message) => {
-          console.log(message);
+        await checkForUpdates(() => {
           processedCount++;
           const newProgress = Math.min(processedCount / Math.max(totalScreens, 1), 0.95);
           
-        Animated.timing(progress, {
+          Animated.timing(progress, {
             toValue: newProgress,
             duration: 250,
             useNativeDriver: false,
@@ -43,18 +43,13 @@ export default function SplashScreen() {
           duration: 200,
           useNativeDriver: false,
         }).start(() => {
-          setTimeout(() => {
-            shimmerAnimation.stop();
-            router.replace('/(tabs)/home');
-          }, 300);
+          shimmerAnimation.stop();
+          router.replace('/(tabs)/home');
         });
         
       } catch (error) {
-        console.log('A critical error occurred during app initialization:', error);
-        setTimeout(() => {
-          shimmerAnimation.stop();
-          router.replace('/(tabs)/home');
-        }, 1000);
+        shimmerAnimation.stop();
+        router.replace('/(tabs)/home');
       }
     };
 
@@ -98,15 +93,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   image: {
-    height: 200,
-    width: 200,
+    height: 150,
+    width: 150,
   },
   progressBarContainer: {
     height: 8,
@@ -114,6 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0e0e0',
     borderRadius: 4,
     overflow: 'hidden',
+    marginBottom: 20,
   },
   progressBarFill: {
     height: '100%',

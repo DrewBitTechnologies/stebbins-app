@@ -197,7 +197,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     setLoadingStates(prev => ({ ...prev, [screenName]: loading }));
   };
 
-  const fetchScreenData = async <T extends ScreenData>(screenName:string): Promise<T | null> => {
+  const fetchScreenData = async <T extends ScreenData>(screenName:string, onProgress?: (message: string) => void): Promise<T | null> => {
     const config = SCREEN_CONFIGS[screenName];
     if (!config) return null;
 
@@ -220,7 +220,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       setScreenDataCache(prev => ({ ...prev, [screenName]: cacheData }));
       return data;
     } catch (error) {
-      console.error(`Error fetching full data for ${screenName}:`, error);
+      // Fetch failed, try cache
       const cachedData = await ApiService.loadFromCache(config.cacheKey);
       if (cachedData) {
         setScreenDataCache(prev => ({ ...prev, [screenName]: cachedData }));
@@ -240,7 +240,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       };
       await ApiService.saveToCache('lastSyncDate', cacheData);
     } catch (error) {
-      console.error('Error saving last sync date:', error);
+      // Failed to save sync date
     }
   };
 
@@ -249,7 +249,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       const cacheData = await ApiService.loadFromCache('lastSyncDate');
       return cacheData?.lastItemUpdateTimestamp || null;
     } catch (error) {
-      console.error('Error loading last sync date:', error);
+      // Failed to load sync date
       return null;
     }
   };
@@ -264,7 +264,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
           onProgress?.(`✅ [${screenName}] Loaded from cache.`);
         }
       } catch (error) {
-        console.error(`Error loading cached data for ${screenName}:`, error);
+        // Failed to load cached data
       }
     }
   };
@@ -317,7 +317,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       await saveLastSyncDate(serverUpdateDate.toISOString());
       
     } catch (error) {
-      console.error('Error checking for updates:', error);
+      // Update check failed
       onProgress?.('❌ Error checking updates. Running full sync...');
       await checkAllScreensForUpdates(onProgress);
     }
@@ -336,7 +336,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
           if (!localCache || !Array.isArray(localCache.data)) {
             onProgress?.(`[${screenName}] 🔄 Stale cache. Fetching updates...`);
-            await fetchScreenData(screenName);
+            await fetchScreenData(screenName, onProgress);
             continue;
           }
 

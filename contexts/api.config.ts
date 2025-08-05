@@ -3,6 +3,10 @@ import * as FileSystem from 'expo-file-system';
 // --- Constants ---
 export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 export const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
+export const CDN_URL = process.env.EXPO_PUBLIC_CDN_URL;
+export const REPORT_FILES_FOLDER_ID = process.env.EXPO_PUBLIC_REPORT_FILES_FOLDER_ID;
+export const MAPBOX_ACCESS_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
+export const MAPBOX_STYLE_URL = process.env.EXPO_PUBLIC_MAPBOX_STYLE_URL;
 export const CACHE_DIR = FileSystem.documentDirectory + 'cache/';
 export const IMAGE_FIELD_KEYS = ['image', 'background', 'rules_image', 'safety_image', 'icon', 'map_icon', 'header_image', 'splash_image'];
 

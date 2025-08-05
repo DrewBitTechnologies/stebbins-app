@@ -1,6 +1,6 @@
 import * as FileSystem from 'expo-file-system';
 import { CachedScreenData, ScreenData } from './api';
-import { API_BASE_URL, BEARER_TOKEN, CACHE_DIR, IMAGE_FIELD_KEYS, getDataFilePath, getImageFilePath } from './api.config';
+import { API_BASE_URL, BEARER_TOKEN, CDN_URL, CACHE_DIR, IMAGE_FIELD_KEYS, getDataFilePath, getImageFilePath } from './api.config';
 
 // --- File System Operations ---
 export const ensureCacheDir = async () => {
@@ -16,7 +16,7 @@ export const saveToCache = async (cacheKey: string, data: CachedScreenData) => {
     const filePath = getDataFilePath(cacheKey);
     await FileSystem.writeAsStringAsync(filePath, JSON.stringify(data));
   } catch (error) {
-    console.error(`Error saving to cache for ${cacheKey}:`, error);
+    // Cache save failed - continue without cache
   }
 };
 
@@ -29,19 +29,30 @@ export const loadFromCache = async (cacheKey: string): Promise<CachedScreenData 
       return JSON.parse(cachedData) as CachedScreenData;
     }
   } catch (error) {
-    console.error(`Error loading cached data for ${cacheKey}:`, error);
+    // Cache load failed - return null
   }
   return null;
 };
 
 // --- API & Image Processing ---
 const fetchFromApi = async (endpoint: string) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        headers: { Authorization: `Bearer ${BEARER_TOKEN}` },
-    });
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    const { data } = await response.json();
-    return data;
+    const url = `${API_BASE_URL}${endpoint}`;
+    
+    try {
+        const response = await fetch(url, {
+            headers: { Authorization: `Bearer ${BEARER_TOKEN}` },
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+        }
+        
+        const result = await response.json();
+        return result.data;
+    } catch (error) {
+        throw error;
+    }
 }
 
 export const fetchFullData = async <T extends ScreenData>(endpoint: string): Promise<T | null> => {
@@ -67,7 +78,7 @@ const downloadImage = async (screenName: string, imageName: string): Promise<str
     
     for (const ext of extensions) {
       try {
-        const cdnUrl = `${process.env.EXPO_PUBLIC_CDN_URL}/${imageName}${ext}`;
+        const cdnUrl = `${CDN_URL}/${imageName}${ext}`;
         const cdnResult = await FileSystem.downloadAsync(cdnUrl, localPath);
         if (cdnResult.status === 200) {
           return localPath;
@@ -85,7 +96,7 @@ const downloadImage = async (screenName: string, imageName: string): Promise<str
     );
     return downloadResult.status === 200 ? localPath : undefined;
   } catch (error) {
-    console.error(`Error downloading image ${imageName}:`, error);
+    // Image download failed
   }
   return undefined;
 };

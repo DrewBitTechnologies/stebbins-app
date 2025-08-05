@@ -1,26 +1,15 @@
 import { ReportData, useScreen } from '@/contexts/api';
+import { API_BASE_URL, BEARER_TOKEN, REPORT_FILES_FOLDER_ID } from '@/contexts/api.config';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import React, { useState } from 'react';
-import {
-  Alert,
-  Image,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import Button from '@/components/button';
 import { getImageSource } from '@/utility/image-source';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
-const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
-const REPORT_FILES_FOLDER_ID = process.env.EXPO_PUBLIC_REPORT_FILES_FOLDER_ID;
 
 
 export default function ReportScreen() {
@@ -157,13 +146,8 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
     const fileName = file.fileName || `upload_${Date.now()}.${file.mimeType?.split('/')[1] || 'jpg'}`;
     const mimeType = file.mimeType || 'application/octet-stream';
     
-    if (REPORT_FILES_FOLDER_ID) {
-      formData.append('folder', REPORT_FILES_FOLDER_ID);
-      console.log(`Uploading file: ${fileName}, type: ${mimeType} to folder: ${REPORT_FILES_FOLDER_ID}`);
-    } else {
-      console.log(`Uploading file: ${fileName}, type: ${mimeType} to root folder`);
-      console.warn('EXPO_PUBLIC_REPORT_FILES_FOLDER_ID not set - files will go to root folder');
-    }
+    formData.append('folder', REPORT_FILES_FOLDER_ID);
+    console.log(`Uploading file: ${fileName}, type: ${mimeType} to folder: ${REPORT_FILES_FOLDER_ID}`);
 
     formData.append('file', {
       uri: file.uri,
@@ -171,9 +155,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
       type: mimeType,
     } as any);
 
-    console.log(`Uploading file: ${fileName}, type: ${mimeType} to folder: ${REPORT_FILES_FOLDER_ID}`);
-
-    const response = await fetch(`${API_URL}/files`, {
+    const response = await fetch(`${API_BASE_URL}/files`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${BEARER_TOKEN}`,
@@ -202,7 +184,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
 
     console.log('Creating report with data:', reportData);
 
-    const response = await fetch(`${API_URL}/items/report`, {
+    const response = await fetch(`${API_BASE_URL}/items/report`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${BEARER_TOKEN}`,
@@ -229,7 +211,7 @@ const uploadFile = async (file: ImagePicker.ImagePickerAsset) => {
 
     console.log('Linking file to report:', linkData);
 
-    const response = await fetch(`${API_URL}/items/report_files`, {
+    const response = await fetch(`${API_BASE_URL}/items/report_files`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${BEARER_TOKEN}`,
