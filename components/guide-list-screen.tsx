@@ -266,35 +266,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       {/* Expanded Content - Animated Show/Hide */}
       <Animated.View style={[styles.navigationDropdownContent, navigationAnimatedStyle]}> 
         <ScrollView style={styles.navigationScrollContent} showsVerticalScrollIndicator={false}>
-          {/* Animal Categories */}
-          <View style={styles.expandedSection}>
-            <Text style={styles.expandedSectionTitle}>Animals</Text>
-            <View style={styles.categoryGrid}>
-              {animalCategories.map(category => (
-                <TouchableOpacity
-                  key={category.title}
-                  style={[
-                    styles.categoryButton,
-                    isCurrentCategory(category.title) && styles.categoryButtonActive
-                  ]}
-                  onPress={() => handleAnimalCategoryChange(category.route)}
-                >
-                  <Ionicons 
-                    name={category.icon} 
-                    size={20} 
-                    color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
-                  />
-                  <Text style={[
-                    styles.categoryButtonText,
-                    isCurrentCategory(category.title) && styles.categoryButtonTextActive
-                  ]}>
-                    {category.title}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-          
+
           {/* Other Categories */}
           <View style={[styles.expandedSection, styles.expandedSectionCompact]}>
             <Text style={styles.expandedSectionTitle}>Plants & Tracks</Text>
@@ -323,6 +295,36 @@ export default function GuideListScreen({ route }: { route: any }) {
               ))}
             </View>
           </View>
+          
+          {/* Animal Categories */}
+          <View style={[styles.expandedSection, styles.expandedSectionCompact]}>
+            <Text style={styles.expandedSectionTitle}>Animals</Text>
+            <View style={styles.categoryGrid}>
+              {animalCategories.map(category => (
+                <TouchableOpacity
+                  key={category.title}
+                  style={[
+                    styles.categoryButton,
+                    isCurrentCategory(category.title) && styles.categoryButtonActive
+                  ]}
+                  onPress={() => handleAnimalCategoryChange(category.route)}
+                >
+                  <Ionicons 
+                    name={category.icon} 
+                    size={20} 
+                    color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
+                  />
+                  <Text style={[
+                    styles.categoryButtonText,
+                    isCurrentCategory(category.title) && styles.categoryButtonTextActive
+                  ]}>
+                    {category.title}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+          
         </ScrollView>
         </Animated.View>
     </View>
