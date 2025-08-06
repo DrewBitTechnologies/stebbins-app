@@ -2,6 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView, ImageBackground } from 'react-native';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withTiming, 
+  interpolate 
+} from 'react-native-reanimated';
 import { GuideDataItem, GuideData, useScreen } from '../contexts/api';
 import FilterChip from './filter-chip';
 import GuideCard from './guide-card';
@@ -25,6 +31,10 @@ export default function GuideListScreen({ route }: { route: any }) {
   const [allSeasons, setAllSeasons] = useState<string[]>([]);
   const [isFilterDropdownVisible, setIsFilterDropdownVisible] = useState(false);
   const [isNavigationDropdownVisible, setIsNavigationDropdownVisible] = useState(false);
+  
+  // Reanimated values
+  const navigationAnimation = useSharedValue(0);
+  const filterAnimation = useSharedValue(0);
 
   const guideCategories = [
     { title: 'Trees & Shrubs', route: '/guides/trees-and-shrubs', icon: 'leaf-outline' as keyof typeof Ionicons.glyphMap },
@@ -38,6 +48,18 @@ export default function GuideListScreen({ route }: { route: any }) {
     { title: 'Herps', route: '/guides/herps', icon: 'bug-outline' as keyof typeof Ionicons.glyphMap },
     { title: 'Invertebrates', route: '/guides/invertebrates', icon: 'rose-outline' as keyof typeof Ionicons.glyphMap },
   ];
+
+  const getFilterCategoryName = () => {
+    const titleLower = title.toLowerCase();
+    if (titleLower.includes('mammal')) return 'Mammals';
+    if (titleLower.includes('bird')) return 'Birds';
+    if (titleLower.includes('herp')) return 'Herps';
+    if (titleLower.includes('invertebrate')) return 'Invertebrates';
+    if (titleLower.includes('tree') || titleLower.includes('shrub')) return 'Trees & Shrubs';
+    if (titleLower.includes('wildflower') || titleLower.includes('flower')) return 'Wildflowers';
+    if (titleLower.includes('track')) return 'Trail Tracks';
+    return title; // fallback
+  };
 
 
   const isCurrentCategory = (categoryTitle: string) => {
@@ -153,12 +175,51 @@ export default function GuideListScreen({ route }: { route: any }) {
     setSelectedSeasons([]);
   };
 
+  // Animated styles
+  const navigationAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(navigationAnimation.value, [0, 1], [0, 1]),
+      maxHeight: interpolate(navigationAnimation.value, [0, 1], [0, 280]),
+    };
+  });
+
+  const navigationChevronStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { rotate: `${interpolate(navigationAnimation.value, [0, 1], [0, 180])}deg` }
+      ],
+    };
+  });
+
+  const filterAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(filterAnimation.value, [0, 1], [0, 1]),
+      maxHeight: interpolate(filterAnimation.value, [0, 1], [0, 280]),
+    };
+  });
+
+  const filterChevronStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { rotate: `${interpolate(filterAnimation.value, [0, 1], [0, -180])}deg` }
+      ],
+    };
+  });
+
   const toggleNavigationDropdown = () => {
     setIsNavigationDropdownVisible(!isNavigationDropdownVisible);
+    navigationAnimation.value = withTiming(
+      isNavigationDropdownVisible ? 0 : 1,
+      { duration: 300 }
+    );
   };
 
   const toggleFilterDropdown = () => {
     setIsFilterDropdownVisible(!isFilterDropdownVisible);
+    filterAnimation.value = withTiming(
+      isFilterDropdownVisible ? 0 : 1,
+      { duration: 300 }
+    );
   };
 
   const renderItem = ({ item }: { item: GuideDataItem }) => (
@@ -185,24 +246,25 @@ export default function GuideListScreen({ route }: { route: any }) {
               <Text style={styles.navigationBarTitle}>Navigate Guides</Text>
               <View style={styles.navigationBarSubtitle}>
                 <Text style={styles.navigationBarSubtitleText}>
-                  Currently viewing {title}
+                  Currently viewing {getFilterCategoryName()}
                 </Text>
               </View>
             </View>
           </View>
           <View style={styles.navigationBarRight}>
-            <Ionicons 
-              name={isNavigationDropdownVisible ? "chevron-up" : "chevron-down"}
-              size={20} 
-              color="#2d5016" 
-            />
+            <Animated.View style={navigationChevronStyle}>
+              <Ionicons 
+                name="chevron-down"
+                size={20} 
+                color="#2d5016" 
+              />
+            </Animated.View>
           </View>
         </View>
       </TouchableOpacity>
       
-      {/* Expanded Content - Simple Show/Hide */}
-      {isNavigationDropdownVisible && (
-        <View style={styles.navigationDropdownContent}> 
+      {/* Expanded Content - Animated Show/Hide */}
+      <Animated.View style={[styles.navigationDropdownContent, navigationAnimatedStyle]}> 
         <ScrollView style={styles.navigationScrollContent} showsVerticalScrollIndicator={false}>
           {/* Animal Categories */}
           <View style={styles.expandedSection}>
@@ -234,7 +296,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           </View>
           
           {/* Other Categories */}
-          <View style={styles.expandedSection}>
+          <View style={[styles.expandedSection, styles.expandedSectionCompact]}>
             <Text style={styles.expandedSectionTitle}>Plants & Tracks</Text>
             <View style={styles.categoryGrid}>
               {guideCategories.map(category => (
@@ -262,8 +324,7 @@ export default function GuideListScreen({ route }: { route: any }) {
             </View>
           </View>
         </ScrollView>
-        </View>
-      )}
+        </Animated.View>
     </View>
   );
 
@@ -280,11 +341,10 @@ export default function GuideListScreen({ route }: { route: any }) {
 
   const renderBottomFilterComponent = () => (
     <View style={styles.bottomFilterComponent}>
-      {/* Expanded Content - Simple Show/Hide */}
-      {isFilterDropdownVisible && (
-        <View style={styles.filterDropdownContent}>
+      {/* Expanded Content - Animated Show/Hide */}
+      <Animated.View style={[styles.filterDropdownContent, filterAnimatedStyle]}>
         <View style={styles.filterExpandedHeader}>
-          <Text style={styles.filterExpandedTitle}>Filter {title}</Text>
+          <Text style={styles.filterExpandedTitle}>Filter {getFilterCategoryName()}</Text>
           {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
             <TouchableOpacity style={styles.clearAllButton} onPress={clearAllFilters}>
               <Ionicons name="close-circle" size={16} color="#666" />
@@ -294,46 +354,51 @@ export default function GuideListScreen({ route }: { route: any }) {
         </View>
         
         <ScrollView style={styles.filterScrollContent} showsVerticalScrollIndicator={false}>
-          {allColors.length > 0 && (
-            <View style={styles.filterSection}>
-              <View style={styles.filterTitleContainer}>
-                <Ionicons name="color-filter" size={18} color="#2d5016" />
-                <Text style={styles.filterTitle}>Filter by Color</Text>
-              </View>
-              <View style={styles.chipContainer}>
-                {allColors.map(color => (
+          {/* Color Filter Section - Always Show */}
+          <View style={styles.filterSection}>
+            <View style={styles.filterTitleContainer}>
+              <Ionicons name="color-filter" size={18} color="#2d5016" />
+              <Text style={styles.filterTitle}>Filter by Color</Text>
+            </View>
+            <View style={styles.chipContainer}>
+              {allColors.length > 0 ? (
+                allColors.map(color => (
                   <FilterChip
                     key={color}
                     label={color}
                     selected={selectedColors.includes(color)}
                     onPress={() => toggleColorFilter(color)}
                   />
-                ))}
-              </View>
+                ))
+              ) : (
+                <Text style={styles.noFiltersText}>No color data available</Text>
+              )}
             </View>
-          )}
+          </View>
           
-          {allSeasons.length > 0 && (
-            <View style={styles.filterSection}>
-              <View style={styles.filterTitleContainer}>
-                <Ionicons name="calendar" size={18} color="#2d5016" />
-                <Text style={styles.filterTitle}>Filter by Season</Text>
-              </View>
-              <View style={styles.chipContainer}>
-                {allSeasons.map(season => (
+          {/* Season Filter Section - Always Show */}
+          <View style={styles.filterSection}>
+            <View style={styles.filterTitleContainer}>
+              <Ionicons name="calendar" size={18} color="#2d5016" />
+              <Text style={styles.filterTitle}>Filter by Season</Text>
+            </View>
+            <View style={styles.chipContainer}>
+              {allSeasons.length > 0 ? (
+                allSeasons.map(season => (
                   <FilterChip
                     key={season}
                     label={season}
                     selected={selectedSeasons.includes(season)}
                     onPress={() => toggleSeasonFilter(season)}
                   />
-                ))}
-              </View>
+                ))
+              ) : (
+                <Text style={styles.noFiltersText}>No seasonal data available</Text>
+              )}
             </View>
-          )}
+          </View>
         </ScrollView>
-        </View>
-      )}
+        </Animated.View>
       
       {/* Footer Section - Always Visible */}
       <TouchableOpacity 
@@ -361,11 +426,13 @@ export default function GuideListScreen({ route }: { route: any }) {
             </View>
           </View>
           <View style={styles.filterBarRight}>
-            <Ionicons 
-              name={isFilterDropdownVisible ? "chevron-down" : "chevron-up"}
-              size={20} 
-              color="#2d5016" 
-            />
+            <Animated.View style={filterChevronStyle}>
+              <Ionicons 
+                name="chevron-up"
+                size={20} 
+                color="#2d5016" 
+              />
+            </Animated.View>
             {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
               <View style={styles.activeFilterBadge}>
                 <Text style={styles.activeFilterText}>
@@ -520,6 +587,9 @@ const styles = StyleSheet.create({
   expandedSection: {
     marginTop: 20,
     marginBottom: 16,
+  },
+  expandedSectionCompact: {
+    marginTop: 8,
   },
   expandedSectionTitle: {
     fontSize: 14,
@@ -779,7 +849,7 @@ const styles = StyleSheet.create({
     color: '#2d5016',
   },
   filterScrollContent: {
-    maxHeight: 180,
+    maxHeight: 240,
   },
   filterSection: {
     marginVertical: 20,
@@ -813,5 +883,12 @@ const styles = StyleSheet.create({
   },
   iconWithMargin: {
     marginRight: 12,
+  },
+  noFiltersText: {
+    fontSize: 14,
+    color: '#999',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingVertical: 8,
   },
 });
