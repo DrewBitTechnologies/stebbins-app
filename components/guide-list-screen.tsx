@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, Modal, ScrollView, ImageBackground } from 'react-native';
+import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView, ImageBackground } from 'react-native';
 import { GuideDataItem, GuideData, useScreen } from '../contexts/api';
 import FilterChip from './filter-chip';
 import GuideCard from './guide-card';
@@ -23,7 +23,7 @@ export default function GuideListScreen({ route }: { route: any }) {
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [allColors, setAllColors] = useState<string[]>([]);
   const [allSeasons, setAllSeasons] = useState<string[]>([]);
-  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [isFilterDropdownVisible, setIsFilterDropdownVisible] = useState(false);
   const [isNavigationDropdownVisible, setIsNavigationDropdownVisible] = useState(false);
 
   const guideCategories = [
@@ -153,20 +153,12 @@ export default function GuideListScreen({ route }: { route: any }) {
     setSelectedSeasons([]);
   };
 
-  const openFilterModal = () => {
-    setIsFilterModalVisible(true);
+  const toggleNavigationDropdown = () => {
+    setIsNavigationDropdownVisible(!isNavigationDropdownVisible);
   };
 
-  const closeFilterModal = () => {
-    setIsFilterModalVisible(false);
-  };
-
-  const openNavigationDropdown = () => {
-    setIsNavigationDropdownVisible(true);
-  };
-
-  const closeNavigationDropdown = () => {
-    setIsNavigationDropdownVisible(false);
+  const toggleFilterDropdown = () => {
+    setIsFilterDropdownVisible(!isFilterDropdownVisible);
   };
 
   const renderItem = ({ item }: { item: GuideDataItem }) => (
@@ -179,17 +171,16 @@ export default function GuideListScreen({ route }: { route: any }) {
   );
   
 
-  const renderTopNavigationButton = () => (
-    <View style={styles.topNavigationButton}>
+  const renderTopNavigationComponent = () => (
+    <View style={styles.topNavigationComponent}>
       {/* Header Section - Always Visible */}
       <TouchableOpacity 
         style={styles.navigationHeader}
-        onPress={isNavigationDropdownVisible ? closeNavigationDropdown : openNavigationDropdown}
-        activeOpacity={0.8}
+        onPress={toggleNavigationDropdown}
       >
         <View style={styles.navigationBarContent}>
           <View style={styles.navigationBarLeft}>
-            <Ionicons name="library" size={20} color="#2d5016" style={{marginRight: 12}} />
+            <Ionicons name="library" size={20} color="#2d5016" style={styles.iconWithMargin} />
             <View style={styles.navigationBarTextContainer}>
               <Text style={styles.navigationBarTitle}>Navigate Guides</Text>
               <View style={styles.navigationBarSubtitle}>
@@ -201,7 +192,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           </View>
           <View style={styles.navigationBarRight}>
             <Ionicons 
-              name={isNavigationDropdownVisible ? "chevron-up" : "chevron-down"} 
+              name={isNavigationDropdownVisible ? "chevron-up" : "chevron-down"}
               size={20} 
               color="#2d5016" 
             />
@@ -209,206 +200,183 @@ export default function GuideListScreen({ route }: { route: any }) {
         </View>
       </TouchableOpacity>
       
-      {/* Expanded Content - Only When Open */}
+      {/* Expanded Content - Simple Show/Hide */}
       {isNavigationDropdownVisible && (
-        <View style={styles.expandedNavigationContent}>       
-         
-            {/* Animal Categories */}
-            <View style={styles.expandedSection}>
-              <Text style={styles.expandedSectionTitle}>Animals</Text>
-              <View style={styles.categoryGrid}>
-                {animalCategories.map(category => (
-                  <TouchableOpacity
-                    key={category.title}
-                    style={[
-                      styles.categoryButton,
-                      isCurrentCategory(category.title) && styles.categoryButtonActive
-                    ]}
-                    onPress={() => handleAnimalCategoryChange(category.route)}
-                  >
-                    <Ionicons 
-                      name={category.icon} 
-                      size={20} 
-                      color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
-                    />
-                    <Text style={[
-                      styles.categoryButtonText,
-                      isCurrentCategory(category.title) && styles.categoryButtonTextActive
-                    ]}>
-                      {category.title}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+        <View style={styles.navigationDropdownContent}> 
+        <ScrollView style={styles.navigationScrollContent} showsVerticalScrollIndicator={false}>
+          {/* Animal Categories */}
+          <View style={styles.expandedSection}>
+            <Text style={styles.expandedSectionTitle}>Animals</Text>
+            <View style={styles.categoryGrid}>
+              {animalCategories.map(category => (
+                <TouchableOpacity
+                  key={category.title}
+                  style={[
+                    styles.categoryButton,
+                    isCurrentCategory(category.title) && styles.categoryButtonActive
+                  ]}
+                  onPress={() => handleAnimalCategoryChange(category.route)}
+                >
+                  <Ionicons 
+                    name={category.icon} 
+                    size={20} 
+                    color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
+                  />
+                  <Text style={[
+                    styles.categoryButtonText,
+                    isCurrentCategory(category.title) && styles.categoryButtonTextActive
+                  ]}>
+                    {category.title}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
-            
-            {/* Other Categories */}
-            <View style={styles.expandedSection}>
-              <Text style={styles.expandedSectionTitle}>Plants & Tracks</Text>
-              <View style={styles.categoryGrid}>
-                {guideCategories.map(category => (
-                  <TouchableOpacity
-                    key={category.title}
-                    style={[
-                      styles.categoryButton,
-                      isCurrentCategory(category.title) && styles.categoryButtonActive
-                    ]}
-                    onPress={() => handleCategoryChange(category.route)}
-                  >
-                    <Ionicons 
-                      name={category.icon} 
-                      size={20} 
-                      color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
-                    />
-                    <Text style={[
-                      styles.categoryButtonText,
-                      isCurrentCategory(category.title) && styles.categoryButtonTextActive
-                    ]}>
-                      {category.title}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
+          </View>
           
+          {/* Other Categories */}
+          <View style={styles.expandedSection}>
+            <Text style={styles.expandedSectionTitle}>Plants & Tracks</Text>
+            <View style={styles.categoryGrid}>
+              {guideCategories.map(category => (
+                <TouchableOpacity
+                  key={category.title}
+                  style={[
+                    styles.categoryButton,
+                    isCurrentCategory(category.title) && styles.categoryButtonActive
+                  ]}
+                  onPress={() => handleCategoryChange(category.route)}
+                >
+                  <Ionicons 
+                    name={category.icon} 
+                    size={20} 
+                    color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
+                  />
+                  <Text style={[
+                    styles.categoryButtonText,
+                    isCurrentCategory(category.title) && styles.categoryButtonTextActive
+                  ]}>
+                    {category.title}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </ScrollView>
         </View>
       )}
     </View>
   );
 
-  const renderBottomFilterBar = () => (
-    <TouchableOpacity 
-      style={styles.bottomFilterButton}
-      onPress={openFilterModal}
-      activeOpacity={0.8}
-    >
-      <View style={styles.filterBarContent}>
-        <View style={styles.filterBarLeft}>
-          <Ionicons name="options" size={20} color="#2d5016" style={{marginRight: 12}} />
-          <View style={styles.filterBarTextContainer}>
-            <Text style={styles.filterBarTitle}>Filters</Text>
-            <View style={styles.filterBarSubtitle}>
-              <Text style={styles.filterBarSubtitleText}>
-                {filteredData.length} {filteredData.length === 1 ? 'result' : 'results'}
-              </Text>
-              {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
-                <>
-                  <Text style={styles.filterBarDivider}> • </Text>
-                  <Text style={styles.activeFiltersText}>
-                    {selectedColors.length + selectedSeasons.length} active filter{selectedColors.length + selectedSeasons.length !== 1 ? 's' : ''}
-                  </Text>
-                </>
-              )}
-            </View>
-          </View>
-        </View>
-        <View style={styles.filterBarRight}>
-          <Ionicons 
-            name={isFilterModalVisible ? "chevron-down" : "chevron-up"} 
-            size={20} 
-            color="#2d5016" 
-          />
-          {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
-            <View style={styles.activeFilterBadge}>
-              <Text style={styles.activeFilterText}>
-                {selectedColors.length + selectedSeasons.length}
-              </Text>
-            </View>
-          )}
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
 
   const handleCategoryChange = (route: string) => {
-    closeNavigationDropdown();
+    setIsNavigationDropdownVisible(false);
     router.replace(route as any);
   };
 
   const handleAnimalCategoryChange = (route: string) => {
-    closeNavigationDropdown();
+    setIsNavigationDropdownVisible(false);
     router.replace(route as any);
   };
 
-
-  const renderFilterModal = () => (
-    <Modal
-      visible={isFilterModalVisible}
-      animationType="none"
-      transparent={true}
-      onRequestClose={closeFilterModal}
-    >
-      <View style={styles.modalOverlay}>
-        <TouchableOpacity 
-          style={styles.modalBackdrop} 
-          activeOpacity={1} 
-          onPress={closeFilterModal}
-        />
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Filter {title}</Text>
-            <TouchableOpacity onPress={closeFilterModal} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color="#666" />
+  const renderBottomFilterComponent = () => (
+    <View style={styles.bottomFilterComponent}>
+      {/* Expanded Content - Simple Show/Hide */}
+      {isFilterDropdownVisible && (
+        <View style={styles.filterDropdownContent}>
+        <View style={styles.filterExpandedHeader}>
+          <Text style={styles.filterExpandedTitle}>Filter {title}</Text>
+          {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
+            <TouchableOpacity style={styles.clearAllButton} onPress={clearAllFilters}>
+              <Ionicons name="close-circle" size={16} color="#666" />
+              <Text style={styles.clearAllButtonText}>Clear All</Text>
             </TouchableOpacity>
-          </View>
-          
-          <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
-            {/* Only Filtering Options */}
-            {allColors.length > 0 && (
-              <View style={styles.modalFilterSection}>
-                <View style={styles.filterTitleContainer}>
-                  <Ionicons name="color-filter" size={18} color="#2d5016" />
-                  <Text style={styles.modalFilterTitle}>Filter by Color</Text>
-                </View>
-                <View style={styles.chipContainer}>
-                  {allColors.map(color => (
-                    <FilterChip
-                      key={color}
-                      label={color}
-                      selected={selectedColors.includes(color)}
-                      onPress={() => toggleColorFilter(color)}
-                    />
-                  ))}
-                </View>
+          )}
+        </View>
+        
+        <ScrollView style={styles.filterScrollContent} showsVerticalScrollIndicator={false}>
+          {allColors.length > 0 && (
+            <View style={styles.filterSection}>
+              <View style={styles.filterTitleContainer}>
+                <Ionicons name="color-filter" size={18} color="#2d5016" />
+                <Text style={styles.filterTitle}>Filter by Color</Text>
               </View>
-            )}
-            
-            {allSeasons.length > 0 && (
-              <View style={styles.modalFilterSection}>
-                <View style={styles.filterTitleContainer}>
-                  <Ionicons name="calendar" size={18} color="#2d5016" />
-                  <Text style={styles.modalFilterTitle}>Filter by Season</Text>
-                </View>
-                <View style={styles.chipContainer}>
-                  {allSeasons.map(season => (
-                    <FilterChip
-                      key={season}
-                      label={season}
-                      selected={selectedSeasons.includes(season)}
-                      onPress={() => toggleSeasonFilter(season)}
-                    />
-                  ))}
-                </View>
+              <View style={styles.chipContainer}>
+                {allColors.map(color => (
+                  <FilterChip
+                    key={color}
+                    label={color}
+                    selected={selectedColors.includes(color)}
+                    onPress={() => toggleColorFilter(color)}
+                  />
+                ))}
               </View>
-            )}
-          </ScrollView>
+            </View>
+          )}
           
-          <View style={styles.modalFooter}>
-            {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
-              <TouchableOpacity style={styles.clearAllButton} onPress={clearAllFilters}>
-                <Ionicons name="close-circle" size={16} color="#666" />
-                <Text style={styles.clearAllButtonText}>Clear All Filters</Text>
-              </TouchableOpacity>
-            )}
-            <View style={styles.modalResultsContainer}>
-              <Text style={styles.modalResultsText}>
-                {filteredData.length} {filteredData.length === 1 ? 'result' : 'results'} found
-              </Text>
+          {allSeasons.length > 0 && (
+            <View style={styles.filterSection}>
+              <View style={styles.filterTitleContainer}>
+                <Ionicons name="calendar" size={18} color="#2d5016" />
+                <Text style={styles.filterTitle}>Filter by Season</Text>
+              </View>
+              <View style={styles.chipContainer}>
+                {allSeasons.map(season => (
+                  <FilterChip
+                    key={season}
+                    label={season}
+                    selected={selectedSeasons.includes(season)}
+                    onPress={() => toggleSeasonFilter(season)}
+                  />
+                ))}
+              </View>
+            </View>
+          )}
+        </ScrollView>
+        </View>
+      )}
+      
+      {/* Footer Section - Always Visible */}
+      <TouchableOpacity 
+        style={styles.bottomFilterButton}
+        onPress={toggleFilterDropdown}
+      >
+        <View style={styles.filterBarContent}>
+          <View style={styles.filterBarLeft}>
+            <Ionicons name="options" size={20} color="#2d5016" style={styles.iconWithMargin} />
+            <View style={styles.filterBarTextContainer}>
+              <Text style={styles.filterBarTitle}>Filters</Text>
+              <View style={styles.filterBarSubtitle}>
+                <Text style={styles.filterBarSubtitleText}>
+                  {filteredData.length} {filteredData.length === 1 ? 'result' : 'results'}
+                </Text>
+                {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
+                  <>
+                    <Text style={styles.filterBarDivider}> • </Text>
+                    <Text style={styles.activeFiltersText}>
+                      {selectedColors.length + selectedSeasons.length} active filter{selectedColors.length + selectedSeasons.length !== 1 ? 's' : ''}
+                    </Text>
+                  </>
+                )}
+              </View>
             </View>
           </View>
+          <View style={styles.filterBarRight}>
+            <Ionicons 
+              name={isFilterDropdownVisible ? "chevron-down" : "chevron-up"}
+              size={20} 
+              color="#2d5016" 
+            />
+            {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
+              <View style={styles.activeFilterBadge}>
+                <Text style={styles.activeFilterText}>
+                  {selectedColors.length + selectedSeasons.length}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
-      </View>
-    </Modal>
+      </TouchableOpacity>
+    </View>
   );
 
   if (isLoading && !data) {
@@ -441,9 +409,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
       {/* Top Navigation Component */}
-      <View style={styles.topNavContainer}>
-        {renderTopNavigationButton()}
-      </View>
+      {renderTopNavigationComponent()}
       
       {/* Scrollable Content Area */}
       <FlatList
@@ -457,12 +423,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       />
       
       {/* Bottom Filter Component */}
-      <View style={styles.bottomFilterContainer}>
-        {renderBottomFilterBar()}
-      </View>
-      
-      {/* Filter Modal */}
-      {renderFilterModal()}
+      {renderBottomFilterComponent()}
       
       {zoomedImage && (
         <ZoomableImageModal
@@ -515,7 +476,7 @@ const styles = StyleSheet.create({
     color: '#2d5016',
     fontWeight: '500',
   },
-  topNavContainer: {
+  topNavigationComponent: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -525,20 +486,36 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  topNavigationButton: {
-    width: '100%',
+  navigationDropdownContent: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(45, 80, 22, 0.1)',
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    overflow: 'hidden',
+  },
+  navigationExpandedHeader: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(45, 80, 22, 0.1)',
+  },
+  navigationExpandedTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2d5016',
+  },
+  navigationExpandedSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
+  },
+  navigationScrollContent: {
+    maxHeight: 280,
   },
   navigationHeader: {
     width: '100%',
-  },
-  expandedNavigationContent: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(45, 80, 22, 0.1)',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
   },
   expandedSection: {
     marginTop: 20,
@@ -558,7 +535,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     paddingTop: 20,
   },
-  bottomFilterContainer: {
+  bottomFilterComponent: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -576,10 +553,10 @@ const styles = StyleSheet.create({
     height: 8,
   },
   topNavigationContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
+    // position: 'absolute',
+    // top: 0,
+    // left: 0,
+    // right: 0,
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(45, 80, 22, 0.1)',
@@ -628,10 +605,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bottomFilterBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    // position: 'absolute',
+    // bottom: 0,
+    // left: 0,
+    // right: 0,
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderTopWidth: 1,
     borderTopColor: 'rgba(45, 80, 22, 0.1)',
@@ -712,79 +689,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    zIndex: 500,
-  },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  modalContainer: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '70%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
-    elevation: 16,
-    overflow: 'hidden',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(45, 80, 22, 0.1)',
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#2d5016',
-  },
-  closeButton: {
-    padding: 4,
-  },
-  modalContent: {
-    maxHeight: 400,
-    paddingHorizontal: 20,
-  },
-  modalFilterSection: {
-    marginVertical: 20,
-  },
   filterTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
   },
-  modalFilterTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#2d5016',
-    marginLeft: 8,
-  },
   chipContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-  },
-  modalFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(45, 80, 22, 0.1)',
-    backgroundColor: '#fff',
   },
   clearAllButton: {
     flexDirection: 'row',
@@ -801,19 +714,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     marginLeft: 6,
-  },
-  modalResultsContainer: {
-    backgroundColor: 'rgba(45, 80, 22, 0.1)',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(45, 80, 22, 0.2)',
-  },
-  modalResultsText: {
-    fontSize: 14,
-    color: '#2d5016',
-    fontWeight: '600',
   },
   categoryGrid: {
     flexDirection: 'row',
@@ -854,5 +754,64 @@ const styles = StyleSheet.create({
     color: '#2d5016',
     marginTop: 8,
     marginBottom: 12,
+  },
+  filterDropdownContent: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(45, 80, 22, 0.1)',
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    overflow: 'hidden',
+  },
+  filterExpandedHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(45, 80, 22, 0.1)',
+  },
+  filterExpandedTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2d5016',
+  },
+  filterScrollContent: {
+    maxHeight: 180,
+  },
+  filterSection: {
+    marginVertical: 20,
+  },
+  filterTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2d5016',
+    marginLeft: 8,
+  },
+  filterFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(45, 80, 22, 0.1)',
+  },
+  filterResultsContainer: {
+    backgroundColor: 'rgba(45, 80, 22, 0.1)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(45, 80, 22, 0.2)',
+  },
+  filterResultsText: {
+    fontSize: 14,
+    color: '#2d5016',
+    fontWeight: '600',
+  },
+  iconWithMargin: {
+    marginRight: 12,
   },
 });
