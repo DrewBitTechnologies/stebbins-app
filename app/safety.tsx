@@ -26,7 +26,7 @@ export default function SafetyScreen() {
     };
 
     const navigateToEmergency = () => {
-       router.push("emergency" as any)
+       router.replace("emergency" as any)
     };
 
     if (isLoading && !safetyData) {

@@ -20,6 +20,7 @@ export default function ScreenBackground({
             source={backgroundSource}
             style={styles.backgroundImage}
             resizeMode="cover"
+            blurRadius={5}
         >
             {/* Gradient overlay */}
             <LinearGradient

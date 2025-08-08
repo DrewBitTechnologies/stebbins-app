@@ -43,6 +43,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="home-outline" size={size} color={color} />
             ),
+            tabBarLabel: 'Home',
           }}
         />
         <Tabs.Screen
@@ -51,6 +52,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="map-outline" size={size} color={color} />
             ),
+            tabBarLabel: 'Map',
           }}
         />
         <Tabs.Screen
@@ -59,6 +61,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="book-outline" size={size} color={color} />
             ),
+            tabBarLabel: 'Guide',
           }}
         />
         <Tabs.Screen
@@ -67,6 +70,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="warning-outline" size={size} color={color} />
             ),
+            tabBarLabel: 'Report',
           }}
         />
         <Tabs.Screen
@@ -75,6 +79,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="wallet-outline" size={size} color={color} />
             ),
+            tabBarLabel: 'Donate',
           }}
         />
       </Tabs>

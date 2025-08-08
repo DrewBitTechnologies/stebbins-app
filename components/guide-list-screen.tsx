@@ -497,6 +497,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       source={getImageSource(guideData, 'background', getGuideImagePath, require('@/assets/dev/fallback.jpeg'))}
       style={styles.backgroundImage}
       resizeMode="cover"
+      blurRadius={5}
     >
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
