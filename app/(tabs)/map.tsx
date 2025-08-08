@@ -7,7 +7,7 @@ import * as Location from 'expo-location';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import NetInfo from '@react-native-community/netinfo';
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { 
   getStyleUrl, 
   checkMapState, 
@@ -41,8 +41,6 @@ const DEVICE_WIDTH = Dimensions.get('window').width;
 const DEVICE_HEIGHT = Dimensions.get('window').height;
 const BLUE = '#022851';
 
-
-
 export default function MapScreen() {
   const mapview = useRef<MapboxGL.MapView | null>(null);
   const camera = useRef<MapboxGL.Camera>(null);
@@ -71,7 +69,7 @@ export default function MapScreen() {
 
   useEffect(() => {
     // Set up network info listener
-    const unsubscribe = NetInfo.addEventListener(state => {
+    const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
       setIsConnected(state.isConnected ?? false);
     });
 
@@ -104,10 +102,8 @@ export default function MapScreen() {
       setIsLoading(false);
     };
 
-    if (isConnected !== null) { // Wait for network state to be determined
-      initializeApp();
-    }
-  }, [isConnected]);
+    initializeApp();
+  }, [isConnected]); // Re-check if connection status changes
 
   const selectedMarkerImageSource = selectedMarker ? 
     getImageSource(selectedMarker, 'image', 
