@@ -5,7 +5,6 @@ export default function GuidesLayout() {
     <Stack screenOptions={{
       headerShown: false,
       animation: 'fade',
-      animationDuration: 200,
     }}>
       <Stack.Screen name="mammals" />
       <Stack.Screen name="birds" />
