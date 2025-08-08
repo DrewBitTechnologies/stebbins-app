@@ -7,6 +7,7 @@ import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+//<<<<<<< guide
 import NetInfo from '@react-native-community/netinfo';
 import { 
   getStyleUrl, 
@@ -37,6 +38,11 @@ if (MAPBOX_ACCESS_TOKEN) {
 } else {
   console.error('❌ MAPBOX_ACCESS_TOKEN not found');
 }
+//=======
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
+
+MapboxGL.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN);
+//>>>>>>> main
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
 const DEVICE_HEIGHT = Dimensions.get('window').height;
@@ -106,8 +112,36 @@ export default function MapScreen() {
       setIsLoading(false);
     };
 
+//<<<<<<< guide
     if (isConnected !== null) { // Wait for network state to be determined
       initializeApp();
+//=======
+    initializeApp();
+  }, [isConnected]); // Re-check if connection status changes
+
+  // Monitor network connectivity
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
+      setIsConnected(state.isConnected ?? false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const selectedMarkerImageUri = selectedMarker?.image ? getImagePathForMarker(selectedMarker) : null;
+  const selectedMarkerIconUri = selectedMarker && 'map_icon' in selectedMarker && selectedMarker.map_icon
+      ? getImagePathForMarker(selectedMarker, true)
+      : null;
+
+  function getImagePathForMarker(marker: AnyMarker, forIcon: boolean = false) {
+    const field = forIcon ? (marker as SafetyMarkerData).map_icon : marker.image;
+    if (!field) return null;
+
+    if ('common_name' in marker) return getNatureImagePath(field);
+    if ('map_label' in marker) {
+        if (safetyMarkers?.some(m => m.id === marker.id)) return getSafetyImagePath(field);
+        if (poiMarkers?.some(m => m.id === marker.id)) return getPoiImagePath(field);
+//>>>>>>> main
     }
   }, [isConnected]);
 
