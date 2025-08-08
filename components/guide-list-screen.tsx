@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView, ImageBackground } from 'react-native';
+import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView, ImageBackground, Pressable } from 'react-native';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -222,6 +222,25 @@ export default function GuideListScreen({ route }: { route: any }) {
     );
   };
 
+  const closeFilterDropdown = () => {
+    if (isFilterDropdownVisible) {
+      setIsFilterDropdownVisible(false);
+      filterAnimation.value = withTiming(0, { duration: 300 });
+    }
+  };
+
+  const closeNavigationDropdown = () => {
+    if (isNavigationDropdownVisible) {
+      setIsNavigationDropdownVisible(false);
+      navigationAnimation.value = withTiming(0, { duration: 300 });
+    }
+  };
+
+  const closeAllDropdowns = () => {
+    closeFilterDropdown();
+    closeNavigationDropdown();
+  };
+
   const renderItem = ({ item }: { item: GuideDataItem }) => (
     <GuideCard
       item={item}
@@ -265,7 +284,8 @@ export default function GuideListScreen({ route }: { route: any }) {
       
       {/* Expanded Content - Animated Show/Hide */}
       <Animated.View style={[styles.navigationDropdownContent, navigationAnimatedStyle]}> 
-        <ScrollView style={styles.navigationScrollContent} showsVerticalScrollIndicator={false}>
+        <Pressable onPress={(e) => e.stopPropagation()}>
+          <ScrollView style={styles.navigationScrollContent} showsVerticalScrollIndicator={false}>
 
           {/* Other Categories */}
           <View style={[styles.expandedSection, styles.expandedSectionCompact]}>
@@ -325,7 +345,8 @@ export default function GuideListScreen({ route }: { route: any }) {
             </View>
           </View>
           
-        </ScrollView>
+          </ScrollView>
+        </Pressable>
         </Animated.View>
     </View>
   );
@@ -345,7 +366,8 @@ export default function GuideListScreen({ route }: { route: any }) {
     <View style={styles.bottomFilterComponent}>
       {/* Expanded Content - Animated Show/Hide */}
       <Animated.View style={[styles.filterDropdownContent, filterAnimatedStyle]}>
-        <View style={styles.filterExpandedHeader}>
+        <Pressable onPress={(e) => e.stopPropagation()}>
+          <View style={styles.filterExpandedHeader}>
           <Text style={styles.filterExpandedTitle}>Filter {getFilterCategoryName()}</Text>
           {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
             <TouchableOpacity style={styles.clearAllButton} onPress={clearAllFilters}>
@@ -399,7 +421,8 @@ export default function GuideListScreen({ route }: { route: any }) {
               )}
             </View>
           </View>
-        </ScrollView>
+          </ScrollView>
+        </Pressable>
         </Animated.View>
       
       {/* Footer Section - Always Visible */}
@@ -481,15 +504,17 @@ export default function GuideListScreen({ route }: { route: any }) {
       {renderTopNavigationComponent()}
       
       {/* Scrollable Content Area */}
-      <FlatList
-        data={filteredData}
-        keyExtractor={item => item.id.toString()}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        style={styles.flatList}
-      />
+      <Pressable style={{ flex: 1 }} onPress={closeAllDropdowns}>
+        <FlatList
+          data={filteredData}
+          keyExtractor={item => item.id.toString()}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          style={styles.flatList}
+        />
+      </Pressable>
       
       {/* Bottom Filter Component */}
       {renderBottomFilterComponent()}

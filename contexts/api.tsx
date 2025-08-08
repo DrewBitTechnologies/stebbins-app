@@ -192,6 +192,7 @@ const ApiContext = createContext<ApiContextType | undefined>(undefined);
 export function ApiProvider({ children }: { children: ReactNode }) {
   const [screenDataCache, setScreenDataCache] = useState<Record<string, CachedScreenData>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+  const [initialLoadCompleted, setInitialLoadCompleted] = useState(false);
 
   const setLoading = (screenName: string, loading: boolean) => {
     setLoadingStates(prev => ({ ...prev, [screenName]: loading }));
@@ -267,6 +268,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         // Failed to load cached data
       }
     }
+    setInitialLoadCompleted(true);
   };
 
   const checkForUpdates = async (onProgress?: (message: string) => void) => {
@@ -306,8 +308,12 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       onProgress?.(`Local last sync: ${localSyncDate.toISOString()}`);
 
       if (localSyncDate >= serverUpdateDate) {
-        onProgress?.('✅ App is up to date. Loading cached data...');
-        await loadAllCachedData(onProgress);
+        if (!initialLoadCompleted) {
+          onProgress?.('✅ App is up to date. Loading cached data...');
+          await loadAllCachedData(onProgress);
+        } else {
+          onProgress?.('✅ App is up to date.');
+        }
         return;
       }
 
@@ -387,6 +393,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         setLoading(screenName, false);
       }
     }
+    setInitialLoadCompleted(true);
   };
   
   const getScreenData = <T extends ScreenData>(screenName: string): T | null => {
