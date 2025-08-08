@@ -1,5 +1,6 @@
 import React from 'react';
-import { Dimensions, Image, Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -25,7 +26,7 @@ export default function ZoomableImageModal({ visible, imageUri, onClose }: Zooma
               <Image
                 source={{ uri: imageUri }}
                 style={styles.zoomedImage}
-                resizeMode="contain"
+                contentFit="contain"
               />
             </ScrollView>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>

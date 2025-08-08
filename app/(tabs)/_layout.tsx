@@ -13,6 +13,7 @@ export default function TabsLayout() {
         tabBarActiveTintColor: '#022851',
         tabBarInactiveTintColor: '#8e8e93',
         headerShown: false,
+        animation: 'fade',
         tabBarStyle: {
           height: 60 + (insets.bottom > 0 ? insets.bottom : 16),
           paddingBottom: insets.bottom > 0 ? insets.bottom : 8,

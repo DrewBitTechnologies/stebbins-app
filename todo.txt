@@ -1,0 +1,88 @@
+Item 1. Cache Invalidation Fix (Offline Caching)
+
+Summary
+We are likely encountering issues with the cache being invalidated across app updates (especially via TestFlight). This results in the app being unable to display cached images, unless the app is deleted and reinstalled.
+
+This is due to how Expo FileSystem behaves on iOS. This fix addresses the issue by:
+- Switching to a more persistent storage directory
+- Adding a simple versioning system
+- Verifying the cache on splash screen startup
+
+Context
+
+iOS + Expo FileSystem Behavior
+- FileSystem.cacheDirectory is volatile — iOS may wipe it during app updates.
+- FileSystem.documentDirectory is more persistent across app versions, but not guaranteed.
+
+We should avoid relying on cacheDirectory for critical image assets.
+
+Implementation Plan
+
+Affected files
+- /contexts/api.config.ts —  where SCREEN_CONFIGS and image paths are defined
+- /app/splash.tsx — for startup checks and logging
+- /context/api.service.ts/ — for all things related to the cache.
+
+Look into expo-image with built-in cache support.
+Step 1: Use documentDirectory instead of cacheDirectory
+
+Location: /contexts/api.config.ts, within SCREEN_CONFIGS or other path definitions.
+
+Replace any FileSystem.cacheDirectory references with:
+const path = \`\${FileSystem.documentDirectory}my-cache/image.png\`;
+
+If using a shared base path, define:
+export const CACHE_BASE_PATH = \`\${FileSystem.documentDirectory}my-cache/\`;
+
+Step 2: Add Cache Versioning
+File to update: /contexts/api.service.ts/
+
+Logic:
+- On app start (during splash), read cache_version.json from documentDirectory.
+- Compare its version and build to Constants.nativeAppVersion and Constants.nativeBuildVersion.
+- If mismatch: wipe cache and re-download.
+
+Example Structure:
+{
+  "version": "1.0.2",
+  "build": "53"
+}
+
+Step 3: Add Cache Integrity Checks
+Location: Splash screen startup logic
+
+Steps:
+- Check if cache folder exists
+- Check if specific image files exist (e.g., background images)
+- Log results for debugging
+
+Step 4: Fallback – Wipe Cache if Inconsistent
+
+If cache is invalid or images are missing:
+- Call FileSystem.deleteAsync(CACHE_BASE_PATH, { idempotent: true })
+- Trigger cache re-download
+- Update cache_version.json
+
+Add a config flag in dev mode to force full redownload.
+
+Final Notes
+
+- Run all checks in splash screen before navigation
+- Optimize for performance (do parallel checks if possible)
+- Clean, labeled logs during development only (disable in prod)
+- Create seperation of concerns between the cache and the api. There will be overlap, but they should be as loosly coupled as possible.
+
+
+Item 2. Use new update logic to check for updates via the /items/update/ endponint and 
+fallback to the standard update checking now on the home screen.
+
+Files: /app/(tabs)/home.tsx
+
+Funciton to update: handleManualRefresh
+
+Reference implemnetation: /contexts/api.tsx checkForUpdates function
+
+Make this a clean interface, Ideally the api.tsx code can just be used for the 
+handleManualRefresh.
+
+Item 3. Close filter and nav components when user clicks away from them. The user should be able to close the nav or filter by clicking the chevron, or clicking away from the component.

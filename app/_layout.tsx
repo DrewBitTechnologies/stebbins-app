@@ -9,6 +9,7 @@ export default function RootLayout() {
       <StatusBar style="auto"/>
         <Stack screenOptions={{
           headerTitle: () => <AppHeader />,
+          animation: 'fade',
         }}>
           <Stack.Screen name="(tabs)"/>
           <Stack.Screen name="splash" options={{ headerShown: false }}/>

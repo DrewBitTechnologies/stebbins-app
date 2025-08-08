@@ -1,7 +1,8 @@
 import { RulesData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
         width: '100%',
         aspectRatio: 1,
         borderRadius: 12,
-        resizeMode: 'contain',
+        contentFit: 'contain',
     },
     rulesHeader: {
         flexDirection: 'row',
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
     ruleIcon: {
         width: 75,
         height: 75,
-        resizeMode: 'cover',
+        contentFit: 'cover',
     },
     ruleText: {
         fontSize: 18,

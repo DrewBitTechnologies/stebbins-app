@@ -1,8 +1,10 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { GuideDataItem } from '../contexts/api';
 import ExpandableText from './expandable-text';
+import { getImageSource } from '@/utility/image-source';
 
 interface GuideCardProps {
   item: GuideDataItem;
@@ -13,16 +15,17 @@ interface GuideCardProps {
 
 export default function GuideCard({ item, getImagePath, onImagePress, monthMap }: GuideCardProps) {
   const imageUri = item.image ? getImagePath(item.image) : null;
+  const imageSource = getImageSource(item, 'image', getImagePath);
 
   return (
     <View style={styles.cardContainer}>
       <View style={styles.card}>
-        {imageUri && (
-          <TouchableOpacity onPress={() => onImagePress(imageUri)} style={styles.imageContainer}>
+        {imageSource && (
+          <TouchableOpacity onPress={() => imageUri && onImagePress(imageUri)} style={styles.imageContainer}>
             <Image
-              source={{ uri: imageUri }}
+              source={imageSource}
               style={styles.cardImage}
-              resizeMode="cover"
+              contentFit="cover"
             />
             <View style={styles.zoomIndicator}>
               <Ionicons name="expand" size={16} color="#2d5016" />

@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView, ImageBackground } from 'react-native';
+import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native';
+import { ImageBackground } from 'expo-image';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -453,7 +454,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       <ImageBackground 
         source={getImageSource(guideData, 'background', getGuideImagePath, require('@/assets/dev/fallback.jpeg'))}
         style={styles.backgroundImage}
-        resizeMode="cover"
+        contentFit="cover"
       >
         <LinearGradient
           colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.1)']}
@@ -473,7 +474,7 @@ export default function GuideListScreen({ route }: { route: any }) {
     <ImageBackground 
       source={getImageSource(guideData, 'background', getGuideImagePath, require('@/assets/dev/fallback.jpeg'))}
       style={styles.backgroundImage}
-      resizeMode="cover"
+      contentFit="cover"
     >
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       

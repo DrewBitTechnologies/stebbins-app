@@ -1,4 +1,5 @@
 import { ImageSourcePropType } from 'react-native';
+import { ImageSource } from 'expo-image';
 
 /**
  * Generic image source utility that retrieves cached images with fallback support
@@ -6,29 +7,33 @@ import { ImageSourcePropType } from 'react-native';
  * @param imageField - The field name in the data object that contains the image ID
  * @param getImagePath - Function to get the cached image path from image ID
  * @param fallbackImage - Optional fallback image to use if cached image not available
- * @returns ImageSourcePropType for React Native Image component
+ * @returns ImageSource for expo-image component
  */
 export function getImageSource(
   data: any,
   imageField: string,
   getImagePath: (imageName: string) => string | undefined,
   fallbackImage?: ImageSourcePropType
-): ImageSourcePropType | undefined {
+): ImageSource | undefined {
   if (!data || typeof data !== 'object') {
-    return fallbackImage;
+    // Convert React Native fallback to expo-image compatible format
+    return fallbackImage as ImageSource;
   }
 
   const imageId = (data as any)[imageField];
   if (!imageId || typeof imageId !== 'string') {
-    return fallbackImage;
+    // Convert React Native fallback to expo-image compatible format
+    return fallbackImage as ImageSource;
   }
 
   const imagePath = getImagePath(imageId);
   if (imagePath) {
+    // For expo-image, return the file URI as an object
     return { uri: imagePath };
   }
 
-  return fallbackImage;
+  // Convert React Native fallback to expo-image compatible format
+  return fallbackImage as ImageSource;
 }
 
 /**
@@ -37,7 +42,7 @@ export function getImageSource(
 export function getBackgroundSource(
   data: any,
   getImagePath: (imageName: string) => string | undefined
-): ImageSourcePropType | undefined {
+): ImageSource | undefined {
   return getImageSource(data, 'background', getImagePath);
 }
 
@@ -72,5 +77,5 @@ export function extractImageFields(obj: any): string[] {
   };
 
   processObject(obj);
-  return [...new Set(imageFields)]; // Remove duplicates
+  return Array.from(new Set(imageFields)); // Remove duplicates
 }

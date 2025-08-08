@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { ImageBackground, ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
+import { ImageBackground } from 'expo-image';
 
 interface ScreenBackgroundProps {
     children: React.ReactNode;
@@ -19,7 +20,7 @@ export default function ScreenBackground({
         <ImageBackground 
             source={backgroundSource}
             style={styles.backgroundImage}
-            resizeMode="cover"
+            contentFit="cover"
         >
             {/* Gradient overlay */}
             <LinearGradient

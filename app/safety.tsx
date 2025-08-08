@@ -2,7 +2,8 @@ import { SafetyData, useScreen } from '@/contexts/api';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image } from 'expo-image';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
         width: '100%',
         aspectRatio: 1,
         borderRadius: 12,
-        resizeMode: 'contain',
+        contentFit: 'contain',
     },
     emergencyCard: {
         backgroundColor: '#dc2626',

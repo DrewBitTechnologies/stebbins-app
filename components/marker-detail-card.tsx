@@ -1,5 +1,6 @@
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import { ImageZoom } from '@likashefqet/react-native-image-zoom';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AnyMarker, getMarkerTitle, getMarkerSubtitle } from '@/utility/marker-utils';
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     marginRight: 15,
-    resizeMode: 'contain',
+    contentFit: 'contain',
   },
   textContainer: {
     flex: 1,

@@ -1,4 +1,5 @@
 import * as FileSystem from 'expo-file-system';
+import Constants from 'expo-constants';
 import { CachedScreenData, ScreenData } from './api';
 import { API_BASE_URL, BEARER_TOKEN, CDN_URL, CACHE_DIR, IMAGE_FIELD_KEYS, getDataFilePath, getImageFilePath } from './api.config';
 
@@ -15,7 +16,7 @@ export const saveToCache = async (cacheKey: string, data: CachedScreenData) => {
     await ensureCacheDir();
     const filePath = getDataFilePath(cacheKey);
     await FileSystem.writeAsStringAsync(filePath, JSON.stringify(data));
-  } catch (error) {
+  } catch {
     // Cache save failed - continue without cache
   }
 };
@@ -28,10 +29,75 @@ export const loadFromCache = async (cacheKey: string): Promise<CachedScreenData 
       const cachedData = await FileSystem.readAsStringAsync(filePath);
       return JSON.parse(cachedData) as CachedScreenData;
     }
-  } catch (error) {
+  } catch {
     // Cache load failed - return null
   }
   return null;
+};
+
+// --- Cache Versioning ---
+interface CacheVersion {
+  version: string;
+  build: string;
+}
+
+const getCacheVersionPath = () => `${CACHE_DIR}cache_version.json`;
+
+export const getCurrentAppVersion = (): CacheVersion => {
+  return {
+    version: Constants.nativeAppVersion || '0.0.0',
+    build: Constants.nativeBuildVersion || '0'
+  };
+};
+
+export const getCacheVersion = async (): Promise<CacheVersion | null> => {
+  try {
+    const versionPath = getCacheVersionPath();
+    const fileInfo = await FileSystem.getInfoAsync(versionPath);
+    if (fileInfo.exists) {
+      const versionData = await FileSystem.readAsStringAsync(versionPath);
+      return JSON.parse(versionData) as CacheVersion;
+    }
+  } catch {
+    // Version file load failed
+  }
+  return null;
+};
+
+export const saveCacheVersion = async (version: CacheVersion) => {
+  try {
+    await ensureCacheDir();
+    const versionPath = getCacheVersionPath();
+    await FileSystem.writeAsStringAsync(versionPath, JSON.stringify(version));
+  } catch {
+    // Version save failed - continue without version tracking
+  }
+};
+
+export const isCacheVersionValid = async (): Promise<boolean> => {
+  const currentVersion = getCurrentAppVersion();
+  const cachedVersion = await getCacheVersion();
+  
+  if (!cachedVersion) {
+    return false;
+  }
+  
+  return (
+    currentVersion.version === cachedVersion.version &&
+    currentVersion.build === cachedVersion.build
+  );
+};
+
+export const wipeCache = async () => {
+  try {
+    // Delete cache directory
+    await FileSystem.deleteAsync(CACHE_DIR, { idempotent: true });
+    
+    // Recreate cache directory
+    await ensureCacheDir();
+  } catch {
+    // Cache wipe failed - continue
+  }
 };
 
 // --- API & Image Processing ---
@@ -68,10 +134,29 @@ export const fetchItemsByIds = async <T>(endpoint: string, ids: (string | number
     return await fetchFromApi(`${endpoint}?filter[id][_in]=${ids.join(',')}`);
 }
 
+// Rate limiting to prevent DOS
+let downloadQueue = 0;
+const MAX_CONCURRENT_DOWNLOADS = 3;
+
 const downloadImage = async (screenName: string, imageName: string): Promise<string | undefined> => {
+  // Rate limiting check
+  if (downloadQueue >= MAX_CONCURRENT_DOWNLOADS) {
+    while (downloadQueue >= MAX_CONCURRENT_DOWNLOADS) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+  
+  downloadQueue++;
+  
   try {
     await ensureCacheDir();
     const localPath = getImageFilePath(screenName, imageName);
+    
+    // Check if file already exists
+    const existingFile = await FileSystem.getInfoAsync(localPath);
+    if (existingFile.exists) {
+      return localPath;
+    }
     
     // Try CDN with common extensions
     const extensions = ['.jpg', '.jpeg', '.png', '.JPG', '.JPEG'];
@@ -80,8 +165,13 @@ const downloadImage = async (screenName: string, imageName: string): Promise<str
       try {
         const cdnUrl = `${CDN_URL}/${imageName}${ext}`;
         const cdnResult = await FileSystem.downloadAsync(cdnUrl, localPath);
+        
         if (cdnResult.status === 200) {
-          return localPath;
+          // Verify the file was actually written
+          const verifyFile = await FileSystem.getInfoAsync(localPath);
+          if (verifyFile.exists && verifyFile.size && verifyFile.size > 0) {
+            return localPath;
+          }
         }
       } catch {
         // Continue to next extension
@@ -89,16 +179,31 @@ const downloadImage = async (screenName: string, imageName: string): Promise<str
     }
     
     // Fallback to /assets/ endpoint
-    const downloadResult = await FileSystem.downloadAsync(
-      `${API_BASE_URL}/assets/${imageName}`,
-      localPath,
-      { headers: { Authorization: `Bearer ${BEARER_TOKEN}` } }
-    );
-    return downloadResult.status === 200 ? localPath : undefined;
-  } catch (error) {
-    // Image download failed
+    try {
+      const assetsUrl = `${API_BASE_URL}/assets/${imageName}`;
+      const downloadResult = await FileSystem.downloadAsync(
+        assetsUrl,
+        localPath,
+        { headers: { Authorization: `Bearer ${BEARER_TOKEN}` } }
+      );
+      
+      if (downloadResult.status === 200) {
+        // Verify the file was actually written
+        const verifyFile = await FileSystem.getInfoAsync(localPath);
+        if (verifyFile.exists && verifyFile.size && verifyFile.size > 0) {
+          return localPath;
+        }
+      }
+    } catch {
+      // Assets download failed
+    }
+    
+    return undefined;
+  } catch {
+    return undefined;
+  } finally {
+    downloadQueue--;
   }
-  return undefined;
 };
 
 export const processAndCacheImages = async (screenName: string, data: any[], existingImagePaths: Record<string, string> = {}) => {
@@ -112,7 +217,6 @@ export const processAndCacheImages = async (screenName: string, data: any[], exi
               const imageId = item[key];
               const localPath = await downloadImage(screenName, imageId);
               if (localPath) {
-                  
                   imagePaths[imageId] = localPath;
               }
           }

@@ -10,6 +10,7 @@ export const MAPBOX_STYLE_URL = process.env.EXPO_PUBLIC_MAPBOX_STYLE_URL;
 export const CACHE_DIR = FileSystem.documentDirectory + 'cache/';
 export const IMAGE_FIELD_KEYS = ['image', 'background', 'rules_image', 'safety_image', 'icon', 'map_icon', 'header_image', 'splash_image'];
 
+
 // --- Screen Configuration ---
 export interface ScreenConfig {
   endpoint: string;

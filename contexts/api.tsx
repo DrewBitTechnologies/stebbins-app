@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { getImageFilePath, SCREEN_CONFIGS } from './api.config';
 import * as ApiService from './api.service';
+import * as FileSystem from 'expo-file-system';
 
 // --- TYPE DEFINITIONS ---
 export interface HomeData {
@@ -260,6 +261,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         const config = SCREEN_CONFIGS[screenName];
         const cachedData = await ApiService.loadFromCache(config.cacheKey);
         if (cachedData) {
+          
           setScreenDataCache(prev => ({ ...prev, [screenName]: cachedData }));
           onProgress?.(`✅ [${screenName}] Loaded from cache.`);
         }
@@ -400,10 +402,12 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       return cachedPath;
     }
 
-    // Restore the fallback for robustness
+    // Fallback for robustness
     if (imageName) {
-      return getImageFilePath(screenName, imageName.split('/').pop() || imageName);
+      const fallbackPath = getImageFilePath(screenName, imageName.split('/').pop() || imageName);
+      return fallbackPath;
     }
+    
     return undefined;
   };
 
