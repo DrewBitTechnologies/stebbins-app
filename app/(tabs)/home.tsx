@@ -17,7 +17,7 @@ interface ButtonItem {
 
 export default function HomeScreen() {
   const { data: homeData, isLoading, getImagePath } = useScreen<HomeData>('home');
-  const { checkAllScreensForUpdates } = useApi();
+  const { checkForUpdates } = useApi();
 
   const mainButtons: ButtonItem[] = [
     {
@@ -75,11 +75,11 @@ export default function HomeScreen() {
   ];
   
   const handleManualRefresh = async () => {
-    console.log("Starting full app sync from home screen...");
-    await checkAllScreensForUpdates((message) => {
+    console.log("Starting app update check from home screen...");
+    await checkForUpdates((message) => {
         console.log(message);
     });
-    console.log("Full app sync complete.");
+    console.log("App update check complete.");
   };
 
   const status = homeData?.reserve_status || "Loading status...";

@@ -19,7 +19,7 @@ export default function GuideScreen() {
   const guideItems: ButtonItem[] = [
     { 
       title: 'Animals', 
-      navigateTo: '/guides/animals',
+      navigateTo: '/guides/mammals',
       icon: 'paw-outline',
       description: 'Discover local wildlife and their habitats'
     },

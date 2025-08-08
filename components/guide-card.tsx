@@ -109,7 +109,6 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
 
 const styles = StyleSheet.create({
   cardContainer: {
-    marginHorizontal: 20,
     borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

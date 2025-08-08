@@ -1,16 +1,27 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { GuideDataItem, useScreen } from '../contexts/api';
+import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView, ImageBackground, Pressable } from 'react-native';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withTiming, 
+  interpolate 
+} from 'react-native-reanimated';
+import { GuideDataItem, GuideData, useScreen } from '../contexts/api';
 import FilterChip from './filter-chip';
 import GuideCard from './guide-card';
 import ZoomableImageModal from './zoomable-image-modal';
+import { getImageSource } from '@/utility/image-source';
+import { router } from 'expo-router';
 
 
 export default function GuideListScreen({ route }: { route: any }) {
   const { screenName, title } = route.params;
   const { data, getImagePath, isLoading } = useScreen<GuideDataItem[]>(screenName);
+  
+  // Get the main guide screen data for background image
+  const { data: guideData, getImagePath: getGuideImagePath } = useScreen<GuideData>('guide');
 
   const [filteredData, setFilteredData] = useState<GuideDataItem[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -18,6 +29,54 @@ export default function GuideListScreen({ route }: { route: any }) {
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [allColors, setAllColors] = useState<string[]>([]);
   const [allSeasons, setAllSeasons] = useState<string[]>([]);
+  const [isFilterDropdownVisible, setIsFilterDropdownVisible] = useState(false);
+  const [isNavigationDropdownVisible, setIsNavigationDropdownVisible] = useState(false);
+  
+  // Reanimated values
+  const navigationAnimation = useSharedValue(0);
+  const filterAnimation = useSharedValue(0);
+
+  const guideCategories = [
+    { title: 'Trees & Shrubs', route: '/guides/trees-and-shrubs', icon: 'leaf-outline' as keyof typeof Ionicons.glyphMap },
+    { title: 'Trail Tracks', route: '/guides/trail-tracks', icon: 'footsteps-outline' as keyof typeof Ionicons.glyphMap },
+    { title: 'Wildflowers', route: '/guides/wildflowers', icon: 'flower-outline' as keyof typeof Ionicons.glyphMap },
+  ];
+
+  const animalCategories = [
+    { title: 'Mammals', route: '/guides/mammals', icon: 'paw-outline' as keyof typeof Ionicons.glyphMap },
+    { title: 'Birds', route: '/guides/birds', icon: 'paw-outline' as keyof typeof Ionicons.glyphMap },
+    { title: 'Herps', route: '/guides/herps', icon: 'bug-outline' as keyof typeof Ionicons.glyphMap },
+    { title: 'Invertebrates', route: '/guides/invertebrates', icon: 'rose-outline' as keyof typeof Ionicons.glyphMap },
+  ];
+
+  const getFilterCategoryName = () => {
+    const titleLower = title.toLowerCase();
+    if (titleLower.includes('mammal')) return 'Mammals';
+    if (titleLower.includes('bird')) return 'Birds';
+    if (titleLower.includes('herp')) return 'Herps';
+    if (titleLower.includes('invertebrate')) return 'Invertebrates';
+    if (titleLower.includes('tree') || titleLower.includes('shrub')) return 'Trees & Shrubs';
+    if (titleLower.includes('wildflower') || titleLower.includes('flower')) return 'Wildflowers';
+    if (titleLower.includes('track')) return 'Trail Tracks';
+    return title; // fallback
+  };
+
+
+  const isCurrentCategory = (categoryTitle: string) => {
+    const titleLower = title.toLowerCase();
+    const categoryLower = categoryTitle.toLowerCase();
+    
+    // Check exact matches for animal subcategories and other categories
+    if (categoryLower.includes('mammal') && titleLower.includes('mammal')) return true;
+    if (categoryLower.includes('bird') && titleLower.includes('bird')) return true;
+    if (categoryLower.includes('herp') && titleLower.includes('herp')) return true;
+    if (categoryLower.includes('invertebrate') && titleLower.includes('invertebrate')) return true;
+    if (categoryLower.includes('tree') && (titleLower.includes('tree') || titleLower.includes('shrub'))) return true;
+    if (categoryLower.includes('wildflower') && (titleLower.includes('wildflower') || titleLower.includes('flower'))) return true;
+    if (categoryLower.includes('track') && titleLower.includes('track')) return true;
+    
+    return false;
+  };
 
   const monthMap: Record<string, string> = {
     '0': 'None', '1': 'January', '2': 'February', '3': 'March',
@@ -116,6 +175,72 @@ export default function GuideListScreen({ route }: { route: any }) {
     setSelectedSeasons([]);
   };
 
+  // Animated styles
+  const navigationAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(navigationAnimation.value, [0, 1], [0, 1]),
+      maxHeight: interpolate(navigationAnimation.value, [0, 1], [0, 280]),
+    };
+  });
+
+  const navigationChevronStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { rotate: `${interpolate(navigationAnimation.value, [0, 1], [0, 180])}deg` }
+      ],
+    };
+  });
+
+  const filterAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(filterAnimation.value, [0, 1], [0, 1]),
+      maxHeight: interpolate(filterAnimation.value, [0, 1], [0, 280]),
+    };
+  });
+
+  const filterChevronStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { rotate: `${interpolate(filterAnimation.value, [0, 1], [0, -180])}deg` }
+      ],
+    };
+  });
+
+  const toggleNavigationDropdown = () => {
+    setIsNavigationDropdownVisible(!isNavigationDropdownVisible);
+    navigationAnimation.value = withTiming(
+      isNavigationDropdownVisible ? 0 : 1,
+      { duration: 300 }
+    );
+  };
+
+  const toggleFilterDropdown = () => {
+    setIsFilterDropdownVisible(!isFilterDropdownVisible);
+    filterAnimation.value = withTiming(
+      isFilterDropdownVisible ? 0 : 1,
+      { duration: 300 }
+    );
+  };
+
+  const closeFilterDropdown = () => {
+    if (isFilterDropdownVisible) {
+      setIsFilterDropdownVisible(false);
+      filterAnimation.value = withTiming(0, { duration: 300 });
+    }
+  };
+
+  const closeNavigationDropdown = () => {
+    if (isNavigationDropdownVisible) {
+      setIsNavigationDropdownVisible(false);
+      navigationAnimation.value = withTiming(0, { duration: 300 });
+    }
+  };
+
+  const closeAllDropdowns = () => {
+    closeFilterDropdown();
+    closeNavigationDropdown();
+  };
+
   const renderItem = ({ item }: { item: GuideDataItem }) => (
     <GuideCard
       item={item}
@@ -125,119 +250,298 @@ export default function GuideListScreen({ route }: { route: any }) {
     />
   );
   
-  const renderHeader = () => (
-    <View style={styles.header}>
-      <View style={styles.headerTitleContainer}>
-        <Text style={styles.headerTitle}>{title} Guide</Text>
-      </View>
-      
-      {allColors.length > 0 && (
-        <View style={styles.filterSection}>
-          <View style={styles.filterTitleContainer}>
-            <Ionicons name="color-filter" size={16} color="#2d5016" />
-            <Text style={styles.filterTitle}>Filter by Color</Text>
+
+  const renderTopNavigationComponent = () => (
+    <View style={styles.topNavigationComponent}>
+      {/* Header Section - Always Visible */}
+      <TouchableOpacity 
+        style={styles.navigationHeader}
+        onPress={toggleNavigationDropdown}
+      >
+        <View style={styles.navigationBarContent}>
+          <View style={styles.navigationBarLeft}>
+            <Ionicons name="library" size={20} color="#2d5016" style={styles.iconWithMargin} />
+            <View style={styles.navigationBarTextContainer}>
+              <Text style={styles.navigationBarTitle}>Navigate Guides</Text>
+              <View style={styles.navigationBarSubtitle}>
+                <Text style={styles.navigationBarSubtitleText}>
+                  Currently viewing {getFilterCategoryName()}
+                </Text>
+              </View>
+            </View>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.filterRow}>
-              {allColors.map(color => (
-                <FilterChip
-                  key={color}
-                  label={color}
-                  selected={selectedColors.includes(color)}
-                  onPress={() => toggleColorFilter(color)}
-                />
+          <View style={styles.navigationBarRight}>
+            <Animated.View style={navigationChevronStyle}>
+              <Ionicons 
+                name="chevron-down"
+                size={20} 
+                color="#2d5016" 
+              />
+            </Animated.View>
+          </View>
+        </View>
+      </TouchableOpacity>
+      
+      {/* Expanded Content - Animated Show/Hide */}
+      <Animated.View style={[styles.navigationDropdownContent, navigationAnimatedStyle]}> 
+        <Pressable onPress={(e) => e.stopPropagation()}>
+          <ScrollView style={styles.navigationScrollContent} showsVerticalScrollIndicator={false}>
+
+          {/* Other Categories */}
+          <View style={[styles.expandedSection, styles.expandedSectionCompact]}>
+            <Text style={styles.expandedSectionTitle}>Plants & Tracks</Text>
+            <View style={styles.categoryGrid}>
+              {guideCategories.map(category => (
+                <TouchableOpacity
+                  key={category.title}
+                  style={[
+                    styles.categoryButton,
+                    isCurrentCategory(category.title) && styles.categoryButtonActive
+                  ]}
+                  onPress={() => handleCategoryChange(category.route)}
+                >
+                  <Ionicons 
+                    name={category.icon} 
+                    size={20} 
+                    color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
+                  />
+                  <Text style={[
+                    styles.categoryButtonText,
+                    isCurrentCategory(category.title) && styles.categoryButtonTextActive
+                  ]}>
+                    {category.title}
+                  </Text>
+                </TouchableOpacity>
               ))}
             </View>
-          </ScrollView>
-        </View>
-      )}
-      
-      {allSeasons.length > 0 && (
-        <View style={styles.filterSection}>
-          <View style={styles.filterTitleContainer}>
-            <Ionicons name="calendar" size={16} color="#2d5016" />
-            <Text style={styles.filterTitle}>Filter by Season</Text>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.filterRow}>
-              {allSeasons.map(season => (
-                <FilterChip
-                  key={season}
-                  label={season}
-                  selected={selectedSeasons.includes(season)}
-                  onPress={() => toggleSeasonFilter(season)}
-                />
+          
+          {/* Animal Categories */}
+          <View style={[styles.expandedSection, styles.expandedSectionCompact]}>
+            <Text style={styles.expandedSectionTitle}>Animals</Text>
+            <View style={styles.categoryGrid}>
+              {animalCategories.map(category => (
+                <TouchableOpacity
+                  key={category.title}
+                  style={[
+                    styles.categoryButton,
+                    isCurrentCategory(category.title) && styles.categoryButtonActive
+                  ]}
+                  onPress={() => handleAnimalCategoryChange(category.route)}
+                >
+                  <Ionicons 
+                    name={category.icon} 
+                    size={20} 
+                    color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
+                  />
+                  <Text style={[
+                    styles.categoryButtonText,
+                    isCurrentCategory(category.title) && styles.categoryButtonTextActive
+                  ]}>
+                    {category.title}
+                  </Text>
+                </TouchableOpacity>
               ))}
             </View>
+          </View>
+          
           </ScrollView>
+        </Pressable>
+        </Animated.View>
+    </View>
+  );
+
+
+  const handleCategoryChange = (route: string) => {
+    setIsNavigationDropdownVisible(false);
+    router.replace(route as any);
+  };
+
+  const handleAnimalCategoryChange = (route: string) => {
+    setIsNavigationDropdownVisible(false);
+    router.replace(route as any);
+  };
+
+  const renderBottomFilterComponent = () => (
+    <View style={styles.bottomFilterComponent}>
+      {/* Expanded Content - Animated Show/Hide */}
+      <Animated.View style={[styles.filterDropdownContent, filterAnimatedStyle]}>
+        <Pressable onPress={(e) => e.stopPropagation()}>
+          <View style={styles.filterExpandedHeader}>
+          <Text style={styles.filterExpandedTitle}>Filter {getFilterCategoryName()}</Text>
+          {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
+            <TouchableOpacity style={styles.clearAllButton} onPress={clearAllFilters}>
+              <Ionicons name="close-circle" size={16} color="#666" />
+              <Text style={styles.clearAllButtonText}>Clear All</Text>
+            </TouchableOpacity>
+          )}
         </View>
-      )}
+        
+        <ScrollView style={styles.filterScrollContent} showsVerticalScrollIndicator={false}>
+          {/* Color Filter Section - Always Show */}
+          <View style={styles.filterSection}>
+            <View style={styles.filterTitleContainer}>
+              <Ionicons name="color-filter" size={18} color="#2d5016" />
+              <Text style={styles.filterTitle}>Filter by Color</Text>
+            </View>
+            <View style={styles.chipContainer}>
+              {allColors.length > 0 ? (
+                allColors.map(color => (
+                  <FilterChip
+                    key={color}
+                    label={color}
+                    selected={selectedColors.includes(color)}
+                    onPress={() => toggleColorFilter(color)}
+                  />
+                ))
+              ) : (
+                <Text style={styles.noFiltersText}>No color data available</Text>
+              )}
+            </View>
+          </View>
+          
+          {/* Season Filter Section - Always Show */}
+          <View style={styles.filterSection}>
+            <View style={styles.filterTitleContainer}>
+              <Ionicons name="calendar" size={18} color="#2d5016" />
+              <Text style={styles.filterTitle}>Filter by Season</Text>
+            </View>
+            <View style={styles.chipContainer}>
+              {allSeasons.length > 0 ? (
+                allSeasons.map(season => (
+                  <FilterChip
+                    key={season}
+                    label={season}
+                    selected={selectedSeasons.includes(season)}
+                    onPress={() => toggleSeasonFilter(season)}
+                  />
+                ))
+              ) : (
+                <Text style={styles.noFiltersText}>No seasonal data available</Text>
+              )}
+            </View>
+          </View>
+          </ScrollView>
+        </Pressable>
+        </Animated.View>
       
-      {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
-        <TouchableOpacity style={styles.clearButton} onPress={clearAllFilters}>
-          <Ionicons name="close-circle" size={14} color="#666" />
-          <Text style={styles.clearButtonText}>Clear All Filters</Text>
-        </TouchableOpacity>
-      )}
-      
-      <View style={styles.resultsContainer}>
-        <Ionicons name="list" size={14} color="#2d5016" />
-        <Text style={styles.resultsCount}>
-          {filteredData.length} {filteredData.length === 1 ? 'result' : 'results'}
-        </Text>
-      </View>
+      {/* Footer Section - Always Visible */}
+      <TouchableOpacity 
+        style={styles.bottomFilterButton}
+        onPress={toggleFilterDropdown}
+      >
+        <View style={styles.filterBarContent}>
+          <View style={styles.filterBarLeft}>
+            <Ionicons name="options" size={20} color="#2d5016" style={styles.iconWithMargin} />
+            <View style={styles.filterBarTextContainer}>
+              <Text style={styles.filterBarTitle}>Filters</Text>
+              <View style={styles.filterBarSubtitle}>
+                <Text style={styles.filterBarSubtitleText}>
+                  {filteredData.length} {filteredData.length === 1 ? 'result' : 'results'}
+                </Text>
+                {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
+                  <>
+                    <Text style={styles.filterBarDivider}> • </Text>
+                    <Text style={styles.activeFiltersText}>
+                      {selectedColors.length + selectedSeasons.length} active filter{selectedColors.length + selectedSeasons.length !== 1 ? 's' : ''}
+                    </Text>
+                  </>
+                )}
+              </View>
+            </View>
+          </View>
+          <View style={styles.filterBarRight}>
+            <Animated.View style={filterChevronStyle}>
+              <Ionicons 
+                name="chevron-up"
+                size={20} 
+                color="#2d5016" 
+              />
+            </Animated.View>
+            {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
+              <View style={styles.activeFilterBadge}>
+                <Text style={styles.activeFilterText}>
+                  {selectedColors.length + selectedSeasons.length}
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 
   if (isLoading && !data) {
     return (
-      <LinearGradient
-        colors={['#f8f9fa', '#e9ecef']}
-        style={styles.backgroundGradient}
+      <ImageBackground 
+        source={getImageSource(guideData, 'background', getGuideImagePath, require('@/assets/dev/fallback.jpeg'))}
+        style={styles.backgroundImage}
+        resizeMode="cover"
       >
+        <LinearGradient
+          colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.1)']}
+          style={styles.gradientOverlay}
+        />
         <View style={styles.loadingContainer}>
           <View style={styles.loadingCard}>
             <ActivityIndicator size="large" color="#2d5016" />
             <Text style={styles.loadingText}>Loading {title.toLowerCase()}...</Text>
           </View>
         </View>
-      </LinearGradient>
+      </ImageBackground>
     );
   }
 
   return (
-    <LinearGradient
-      colors={['#f8f9fa', '#e9ecef']}
-      style={styles.backgroundGradient}
+    <ImageBackground 
+      source={getImageSource(guideData, 'background', getGuideImagePath, require('@/assets/dev/fallback.jpeg'))}
+      style={styles.backgroundImage}
+      resizeMode="cover"
     >
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-        
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      
+      {/* Top Navigation Component */}
+      {renderTopNavigationComponent()}
+      
+      {/* Scrollable Content Area */}
+      <Pressable style={{ flex: 1 }} onPress={closeAllDropdowns}>
         <FlatList
           data={filteredData}
           keyExtractor={item => item.id.toString()}
           renderItem={renderItem}
-          ListHeaderComponent={renderHeader}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
+          style={styles.flatList}
         />
-        
-        {zoomedImage && (
-          <ZoomableImageModal
-            visible={!!zoomedImage}
-            imageUri={zoomedImage}
-            onClose={() => setZoomedImage(null)}
-          />
-        )}
-      </SafeAreaView>
-    </LinearGradient>
+      </Pressable>
+      
+      {/* Bottom Filter Component */}
+      {renderBottomFilterComponent()}
+      
+      {zoomedImage && (
+        <ZoomableImageModal
+          visible={!!zoomedImage}
+          imageUri={zoomedImage}
+          onClose={() => setZoomedImage(null)}
+        />
+      )}
+      
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  backgroundGradient: {
+  backgroundImage: {
     flex: 1,
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
   },
   container: {
     flex: 1,
@@ -248,15 +552,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 16,
     padding: 32,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
     elevation: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   loadingText: {
     marginTop: 16,
@@ -264,78 +570,352 @@ const styles = StyleSheet.create({
     color: '#2d5016',
     fontWeight: '500',
   },
-  listContent: {
-    paddingBottom: 20,
+  topNavigationComponent: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  header: {
+  navigationDropdownContent: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(45, 80, 22, 0.1)',
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    paddingBottom: 20,
+    overflow: 'hidden',
+  },
+  navigationExpandedHeader: {
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(45, 80, 22, 0.1)',
   },
-  headerTitleContainer: {
-    alignItems: 'flex-start',
-    marginBottom: 20,
-  },
-  headerTitle: {
-    fontSize: 24,
+  navigationExpandedTitle: {
+    fontSize: 18,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: '#2d5016',
   },
-  filterSection: {
+  navigationExpandedSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
+  },
+  navigationScrollContent: {
+    maxHeight: 280,
+  },
+  navigationHeader: {
+    width: '100%',
+  },
+  expandedSection: {
+    marginTop: 20,
     marginBottom: 16,
+  },
+  expandedSectionCompact: {
+    marginTop: 8,
+  },
+  expandedSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2d5016',
+    marginBottom: 12,
+  },
+  flatList: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  listContent: {
+    paddingBottom: 20,
+    paddingTop: 20,
+  },
+  bottomFilterComponent: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
+    paddingBottom: 34,
+  },
+  bottomFilterButton: {
+    width: '100%',
+  },
+  separator: {
+    height: 8,
+  },
+  topNavigationContainer: {
+    // position: 'absolute',
+    // top: 0,
+    // left: 0,
+    // right: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(45, 80, 22, 0.1)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 10,
+    zIndex: 100,
+  },
+  navigationBarButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  navigationBarContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  navigationBarLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  navigationBarTextContainer: {
+    flex: 1,
+  },
+  navigationBarTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2d5016',
+    marginBottom: 2,
+  },
+  navigationBarSubtitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  navigationBarSubtitleText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  navigationBarRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  bottomFilterBar: {
+    // position: 'absolute',
+    // bottom: 0,
+    // left: 0,
+    // right: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(45, 80, 22, 0.1)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 10,
+    zIndex: 100,
+  },
+  filterBarButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  filterBarContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  filterBarLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  filterBarIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(45, 80, 22, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  filterBarTextContainer: {
+    flex: 1,
+  },
+  filterBarTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2d5016',
+    marginBottom: 2,
+  },
+  filterBarSubtitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filterBarSubtitleText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  filterBarDivider: {
+    fontSize: 14,
+    color: '#666',
+    marginHorizontal: 4,
+  },
+  activeFiltersText: {
+    fontSize: 14,
+    color: '#2d5016',
+    fontWeight: '500',
+  },
+  activeFilterBadge: {
+    backgroundColor: '#2d5016',
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  activeFilterText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  filterBarRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   filterTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 16,
   },
-  filterTitle: {
+  chipContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  clearAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: 'rgba(102, 102, 102, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(102, 102, 102, 0.2)',
+  },
+  clearAllButtonText: {
+    color: '#666',
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: 6,
+  },
+  categoryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  categoryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(45, 80, 22, 0.1)',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 8,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(45, 80, 22, 0.2)',
+    flex: 1,
+    minWidth: 120,
+  },
+  categoryButtonActive: {
+    backgroundColor: '#2d5016',
+    borderColor: '#2d5016',
+  },
+  categoryButtonText: {
     fontSize: 14,
     fontWeight: '500',
     color: '#2d5016',
-    marginLeft: 6,
+    marginLeft: 8,
+    flex: 1,
   },
-  filterRow: {
-    flexDirection: 'row',
-    paddingRight: 16,
+  categoryButtonTextActive: {
+    color: '#fff',
   },
-  clearButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginBottom: 12,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderWidth: 1,
-    borderColor: 'rgba(102, 102, 102, 0.3)',
-  },
-  clearButtonText: {
-    color: '#666',
-    fontSize: 13,
-    fontWeight: '500',
-    marginLeft: 4,
-  },
-  resultsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-    backgroundColor: 'rgba(45, 80, 22, 0.1)',
-  },
-  resultsCount: {
-    fontSize: 13,
+  categoryGroupTitle: {
+    fontSize: 16,
+    fontWeight: '600',
     color: '#2d5016',
-    fontWeight: '500',
-    marginLeft: 6,
+    marginTop: 8,
+    marginBottom: 12,
   },
-  separator: {
-    height: 12,
+  filterDropdownContent: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(45, 80, 22, 0.1)',
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    overflow: 'hidden',
+  },
+  filterExpandedHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(45, 80, 22, 0.1)',
+  },
+  filterExpandedTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2d5016',
+  },
+  filterScrollContent: {
+    maxHeight: 240,
+  },
+  filterSection: {
+    marginVertical: 20,
+  },
+  filterTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2d5016',
+    marginLeft: 8,
+  },
+  filterFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(45, 80, 22, 0.1)',
+  },
+  filterResultsContainer: {
+    backgroundColor: 'rgba(45, 80, 22, 0.1)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(45, 80, 22, 0.2)',
+  },
+  filterResultsText: {
+    fontSize: 14,
+    color: '#2d5016',
+    fontWeight: '600',
+  },
+  iconWithMargin: {
+    marginRight: 12,
+  },
+  noFiltersText: {
+    fontSize: 14,
+    color: '#999',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingVertical: 8,
   },
 });
