@@ -29,25 +29,26 @@ export default function FilterChip({ label, selected, onPress }: FilterChipProps
 
 const styles = StyleSheet.create({
   filterChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: 'rgba(45, 80, 22, 0.1)',
     borderWidth: 1,
     borderColor: 'rgba(45, 80, 22, 0.2)',
     marginRight: 8,
+    marginBottom: 8,
   },
   filterChipSelected: {
-    backgroundColor: 'rgba(45, 80, 22, 0.1)',
+    backgroundColor: '#2d5016',
     borderColor: '#2d5016',
   },
   filterChipText: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#2d5016',
     fontWeight: '500',
   },
   filterChipTextSelected: {
-    color: '#2d5016',
+    color: '#fff',
     fontWeight: '600',
   },
 });

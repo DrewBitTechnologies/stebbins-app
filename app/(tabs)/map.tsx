@@ -4,7 +4,7 @@ import { FontAwesome, FontAwesome6 as FontAwesomeIcon, Ionicons } from '@expo/ve
 import { ImageZoom } from '@likashefqet/react-native-image-zoom';
 import MapboxGL from "@rnmapbox/maps";
 import * as Location from 'expo-location';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
@@ -20,12 +20,11 @@ import {
 } from '@/utility/mapbox-utils';
 import { 
   AnyMarker, 
-  DisplayMarker, 
   MarkerTypes,
-  createDisplayMarkers,
-  getImagePathForMarker
+  createDisplayMarkers
 } from '@/utility/marker-utils';
 import { useToast, getMarkerTypeDisplayName } from '@/utility/toast-notifications';
+import { getImageSource } from '@/utility/image-source';
 import DetailModal from '@/components/detail-modal';
 import MarkerDetailCard from '@/components/marker-detail-card';
 import InfoModalContent from '@/components/info-modal-content';
@@ -62,7 +61,6 @@ export default function MapScreen() {
     safety: true,
     poi: true,
   });
-  const [displayedMarkers, setDisplayedMarkers] = useState<DisplayMarker[]>([]);
 
   const { data: natureTrailMarkers, getImagePath: getNatureImagePath } = useScreen<NatureTrailMarkerData[]>('nature_trail_marker');
   const { data: mileMarkers } = useScreen<MileMarkerTrailData[]>('mile_marker');
@@ -107,33 +105,23 @@ export default function MapScreen() {
     initializeApp();
   }, [isConnected]); // Re-check if connection status changes
 
-  const selectedMarkerImageUri = selectedMarker?.image ? 
-    getImagePathForMarker(
-      selectedMarker, 
-      false, 
-      getNatureImagePath, 
-      getSafetyImagePath, 
-      getPoiImagePath, 
-      safetyMarkers || undefined, 
-      poiMarkers || undefined
-    ) : null;
+  const selectedMarkerImageSource = selectedMarker ? 
+    getImageSource(selectedMarker, 'image', 
+      'common_name' in selectedMarker ? getNatureImagePath :
+      safetyMarkers?.some(m => m.id === selectedMarker.id) ? getSafetyImagePath :
+      getPoiImagePath) : null;
+  const selectedMarkerImageUri = selectedMarkerImageSource && typeof selectedMarkerImageSource === 'object' && 'uri' in selectedMarkerImageSource ? selectedMarkerImageSource.uri : null;
     
-  const selectedMarkerIconUri = selectedMarker && 'map_icon' in selectedMarker && selectedMarker.map_icon
-    ? getImagePathForMarker(
-        selectedMarker, 
-        true, 
-        getNatureImagePath, 
-        getSafetyImagePath, 
-        getPoiImagePath, 
-        safetyMarkers || undefined, 
-        poiMarkers || undefined
-      )
-    : null;
+  const selectedMarkerIconSource = selectedMarker && 'map_icon' in selectedMarker ? 
+    getImageSource(selectedMarker, 'map_icon',
+      safetyMarkers?.some(m => m.id === selectedMarker.id) ? getSafetyImagePath :
+      getPoiImagePath) : null;
+  const selectedMarkerIconUri = selectedMarkerIconSource && typeof selectedMarkerIconSource === 'object' && 'uri' in selectedMarkerIconSource ? selectedMarkerIconSource.uri : null;
 
-  useEffect(() => {
-    if (isLoading) return; // Don't compute markers while loading
+  const displayedMarkers = useMemo(() => {
+    if (isLoading) return []; // Don't compute markers while loading
 
-    const markersToDisplay = createDisplayMarkers(
+    return createDisplayMarkers(
       activeMarkerTypes,
       zoomLevel,
       natureTrailMarkers || undefined,
@@ -144,8 +132,6 @@ export default function MapScreen() {
       getSafetyImagePath,
       getPoiImagePath
     );
-
-    setDisplayedMarkers(markersToDisplay);
   }, [isLoading, activeMarkerTypes, zoomLevel, natureTrailMarkers, mileMarkers, safetyMarkers, poiMarkers]);
 
   const handleMapUpdate = () => {
