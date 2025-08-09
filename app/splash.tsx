@@ -25,19 +25,58 @@ export default function SplashScreen() {
 
     const initializeApp = async () => {
       try {
-        let processedCount = 0;
+        
+        // Start progress animation to 10%
+        Animated.timing(progress, {
+          toValue: 0.1,
+          duration: 300,
+          useNativeDriver: false,
+        }).start();
 
-        await checkForUpdates(() => {
-          processedCount++;
-          const newProgress = Math.min(processedCount / Math.max(totalScreens, 1), 0.95);
+        // Track progress using screen completion
+        let completedScreens = new Set<string>();
+
+        const updateProgress = (message: string) => {
+          console.log('📊 Progress:', message);
           
-          Animated.timing(progress, {
-            toValue: newProgress,
-            duration: 250,
-            useNativeDriver: false,
-          }).start();
-        });
+          // Look for screen completion indicators in the messages
+          const screenMatch = message.match(/\[([^\]]+)\]/);
+          if (screenMatch) {
+            const screenName = screenMatch[1];
+            
+            // Count screens that are completed or being processed
+            if (message.includes('✅') || 
+                message.includes('Cache is up to date') || 
+                message.includes('Stale cache. Fetching updates') ||
+                message.includes('Syncing:')) {
+              
+              if (!completedScreens.has(screenName)) {
+                completedScreens.add(screenName);
+                // Progress from 10% to 90% based on screen completion
+                const progressValue = 0.1 + (completedScreens.size / totalScreens) * 0.8;
+                console.log(`📊 Progress: ${Math.round(progressValue * 100)}% (${completedScreens.size}/${totalScreens} screens)`);
+                
+                Animated.timing(progress, {
+                  toValue: progressValue,
+                  duration: 200,
+                  useNativeDriver: false,
+                }).start();
+              }
+            }
+          }
+        };
 
+        // Wait for updates to complete
+        await checkForUpdates(updateProgress);
+
+        // Progress to 90% after updates complete
+        Animated.timing(progress, {
+          toValue: 0.9,
+          duration: 200,
+          useNativeDriver: false,
+        }).start();
+
+        // Complete progress and navigate
         Animated.timing(progress, {
           toValue: 1,
           duration: 200,
@@ -48,6 +87,7 @@ export default function SplashScreen() {
         });
         
       } catch (error) {
+        console.warn('Error during app initialization:', error);
         shimmerAnimation.stop();
         router.replace('/(tabs)/home');
       }
