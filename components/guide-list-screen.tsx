@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView, ImageBackground, Pressable } from 'react-native';
+import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView, ImageBackground } from 'react-native';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -284,7 +284,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       
       {/* Expanded Content - Animated Show/Hide */}
       <Animated.View style={[styles.navigationDropdownContent, navigationAnimatedStyle]}> 
-        <Pressable onPress={(e) => e.stopPropagation()}>
+        <View>
           <ScrollView style={styles.navigationScrollContent} showsVerticalScrollIndicator={false}>
 
           {/* Other Categories */}
@@ -346,7 +346,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           </View>
           
           </ScrollView>
-        </Pressable>
+        </View>
         </Animated.View>
     </View>
   );
@@ -366,7 +366,7 @@ export default function GuideListScreen({ route }: { route: any }) {
     <View style={styles.bottomFilterComponent}>
       {/* Expanded Content - Animated Show/Hide */}
       <Animated.View style={[styles.filterDropdownContent, filterAnimatedStyle]}>
-        <Pressable onPress={(e) => e.stopPropagation()}>
+        <View>
           <View style={styles.filterExpandedHeader}>
           <Text style={styles.filterExpandedTitle}>Filter {getFilterCategoryName()}</Text>
           {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
@@ -422,7 +422,7 @@ export default function GuideListScreen({ route }: { route: any }) {
             </View>
           </View>
           </ScrollView>
-        </Pressable>
+        </View>
         </Animated.View>
       
       {/* Footer Section - Always Visible */}
@@ -505,7 +505,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       {renderTopNavigationComponent()}
       
       {/* Scrollable Content Area */}
-      <Pressable style={{ flex: 1 }} onPress={closeAllDropdowns}>
+      <View style={{ flex: 1 }}>
         <FlatList
           data={filteredData}
           keyExtractor={item => item.id.toString()}
@@ -514,8 +514,9 @@ export default function GuideListScreen({ route }: { route: any }) {
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           style={styles.flatList}
+          onScrollBeginDrag={closeAllDropdowns}
         />
-      </Pressable>
+      </View>
       
       {/* Bottom Filter Component */}
       {renderBottomFilterComponent()}
