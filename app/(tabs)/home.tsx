@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useRef } from 'react';
+import { ActivityIndicator, Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { HomeData, useApi, useScreen } from '../../contexts/api';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
+import ScreenHeader from '@/components/screen-header';
 import { getImageSource } from '@/utility/image-source';
 
 interface ButtonItem {
@@ -18,6 +19,9 @@ interface ButtonItem {
 export default function HomeScreen() {
   const { data: homeData, isLoading, getImagePath } = useScreen<HomeData>('home');
   const { checkForUpdates } = useApi();
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+  const rotationCount = useRef(0);
+  const isAnimating = useRef(false);
 
   const mainButtons: ButtonItem[] = [
     {
@@ -75,10 +79,33 @@ export default function HomeScreen() {
   ];
   
   const handleManualRefresh = async () => {
+    if (isAnimating.current || isLoading) return;
+    
     console.log("Starting app update check from home screen...");
-    await checkForUpdates((message) => {
+    
+    // Start the API call first
+    const updatePromise = checkForUpdates((message) => {
         console.log(message);
     });
+    
+    // Check if there will actually be loading (data to fetch)
+    // If no loading state is triggered quickly, do the animation
+    setTimeout(() => {
+      if (!isLoading && !isAnimating.current) {
+        isAnimating.current = true;
+        rotationCount.current += 1;
+        
+        Animated.timing(rotateAnim, {
+          toValue: rotationCount.current,
+          duration: 300,
+          useNativeDriver: true,
+        }).start(() => {
+          isAnimating.current = false;
+        });
+      }
+    }, 100);
+    
+    await updatePromise;
     console.log("App update check complete.");
   };
 
@@ -91,26 +118,50 @@ export default function HomeScreen() {
   const ReserveStatusCard = () => (
     <Card variant="warning" margin="none" style={{ marginBottom: 20 }}>
       <View style={styles.statusHeader}>
-        <Ionicons name="megaphone" size={24} color="#1a1a1a" />
+        <View style={styles.megaphoneContainer}>
+          <Ionicons name="megaphone" size={24} color="#000000" />
+        </View>
         <Text style={styles.statusTitle}>Reserve Status</Text>
         <TouchableOpacity 
           onPress={handleManualRefresh} 
           style={styles.reloadButton} 
           disabled={isLoading}
         >
-          {isLoading ? (
-            <ActivityIndicator size="small" color="#1a1a1a" />
-          ) : (
-            <Ionicons name="refresh" size={22} color="#1a1a1a" />
-          )}
+          <Animated.View
+            style={{
+              transform: [{
+                rotate: rotateAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '360deg'],
+                })
+              }]
+            }}
+          >
+            <Ionicons 
+              name="refresh" 
+              size={20} 
+              color="#000000" 
+            />
+          </Animated.View>
         </TouchableOpacity>
       </View>
-      <Text style={styles.statusText}>{isLoading ? 'Checking for updates...' : status}</Text>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color="#000000" />
+        </View>
+      ) : (
+        <Text style={styles.statusText}>{status}</Text>
+      )}
     </Card>
   );
 
   return (
-    <ScreenBackground backgroundSource={getImageSource(homeData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))} paddingTop={20}>
+    <ScreenBackground backgroundSource={getImageSource(homeData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
+      <ScreenHeader 
+        icon="home"
+        title="Stebbins Nature Reserve"
+        subtitle="Welcome to your outdoor adventure"
+      />
 
         <ReserveStatusCard />
 
@@ -190,10 +241,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#1a1a1a',
-    marginLeft: 8,
+  },
+  megaphoneContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
   reloadButton: {
-    padding: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: 18,
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 22,
   },
   statusText: {
     fontSize: 16,
