@@ -1,6 +1,6 @@
 import { MileMarkerTrailData, NatureTrailMarkerData, POIMarkerData, SafetyMarkerData, useScreen } from '@/contexts/api';
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE_URL } from '@/contexts/api.config';
-import { FontAwesome, FontAwesome6 as FontAwesomeIcon, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { ImageZoom } from '@likashefqet/react-native-image-zoom';
 import MapboxGL from "@rnmapbox/maps";
 import * as Location from 'expo-location';
