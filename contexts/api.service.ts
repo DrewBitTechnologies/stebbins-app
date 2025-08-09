@@ -1,4 +1,5 @@
 import * as FileSystem from 'expo-file-system';
+import * as Application from 'expo-application';
 import { CachedScreenData, ScreenData } from './api';
 import { API_BASE_URL, BEARER_TOKEN, CDN_URL, CACHE_DIR, IMAGE_FIELD_KEYS, getDataFilePath, getImageFilePath } from './api.config';
 
@@ -191,4 +192,77 @@ export const mergeUpdates = (localData: any[], fetchedItems: any[], itemsToDelet
 
     // 4. Combine the updated list with the brand new items.
     return [...updatedLocalData, ...newItems];
+};
+
+// --- App Version & Cache Management ---
+
+const VERSION_FILE_PATH = `${CACHE_DIR}/app_version.json`;
+
+export const getCurrentAppVersion = () => {
+    const version = Application.nativeApplicationVersion || '1.0.0';
+    const buildNumber = Application.nativeBuildVersion || '1';
+    return `${version}-${buildNumber}`;
+};
+
+export const getCacheVersion = async (): Promise<string | null> => {
+    try {
+        const fileInfo = await FileSystem.getInfoAsync(VERSION_FILE_PATH);
+        if (fileInfo.exists) {
+            const versionData = await FileSystem.readAsStringAsync(VERSION_FILE_PATH);
+            const parsed = JSON.parse(versionData);
+            return parsed.version || null;
+        }
+    } catch (error) {
+        console.warn('Failed to read cache version:', error);
+    }
+    return null;
+};
+
+export const saveCacheVersion = async (version: string) => {
+    try {
+        await ensureCacheDir();
+        const versionData = {
+            version,
+            timestamp: new Date().toISOString()
+        };
+        await FileSystem.writeAsStringAsync(VERSION_FILE_PATH, JSON.stringify(versionData));
+    } catch (error) {
+        console.warn('Failed to save cache version:', error);
+    }
+};
+
+export const isCacheVersionValid = async (): Promise<boolean> => {
+    try {
+        const currentVersion = getCurrentAppVersion();
+        const cachedVersion = await getCacheVersion();
+        
+        if (!cachedVersion) {
+            console.log('No cached version found - cache invalid');
+            return false;
+        }
+        
+        const isValid = currentVersion === cachedVersion;
+        console.log(`Version check: current=${currentVersion}, cached=${cachedVersion}, valid=${isValid}`);
+        return isValid;
+    } catch (error) {
+        console.warn('Failed to validate cache version:', error);
+        return false;
+    }
+};
+
+export const wipeCache = async () => {
+    try {
+        console.log('🗑️ Wiping entire cache directory...');
+        const dirInfo = await FileSystem.getInfoAsync(CACHE_DIR);
+        if (dirInfo.exists) {
+            await FileSystem.deleteAsync(CACHE_DIR, { idempotent: true });
+            console.log('✅ Cache directory wiped successfully');
+        }
+        // Recreate the cache directory
+        await ensureCacheDir();
+        console.log('✅ Cache directory recreated');
+    } catch (error) {
+        console.error('❌ Failed to wipe cache:', error);
+        throw error;
+    }
 };

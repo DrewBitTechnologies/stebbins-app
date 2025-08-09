@@ -326,6 +326,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       // Update check failed
       onProgress?.('❌ Error checking updates. Running full sync...');
       await checkAllScreensForUpdates(onProgress);
+      // Save current timestamp after fallback sync
+      await saveLastSyncDate(new Date().toISOString());
     }
   };
 
@@ -394,6 +396,9 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       }
     }
     setInitialLoadCompleted(true);
+    
+    // Save current timestamp after completing all screen updates
+    await saveLastSyncDate(new Date().toISOString());
   };
   
   const getScreenData = <T extends ScreenData>(screenName: string): T | null => {

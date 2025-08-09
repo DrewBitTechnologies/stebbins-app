@@ -2,12 +2,14 @@ import * as React from 'react';
 import { Animated, Image, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { BrandingData, useApi, useScreen } from '@/contexts/api';
-import { SCREEN_CONFIGS } from '@/contexts/api.config';
+import { SCREEN_CONFIGS, CACHE_DIR } from '@/contexts/api.config';
+import { isCacheVersionValid, wipeCache, saveCacheVersion, getCurrentAppVersion, getCacheVersion } from '@/contexts/api.service';
+import * as FileSystem from 'expo-file-system';
 
 import { getImageSource } from '@/utility/image-source';
 
 export default function SplashScreen() {
-  const { checkForUpdates } = useApi();
+  const { checkForUpdates, checkAllScreensForUpdates } = useApi();
   const { data: brandingData, getImagePath } = useScreen<BrandingData>('branding');
   const progress = React.useRef(new Animated.Value(0)).current;
   const screenShimmerTranslate = React.useRef(new Animated.Value(-500)).current;
@@ -23,8 +25,37 @@ export default function SplashScreen() {
     );
     shimmerAnimation.start();
 
+    const performCacheIntegrityChecks = async (): Promise<boolean> => {
+      try {
+        // Check if cache version is valid
+        const isVersionValid = await isCacheVersionValid();
+        if (!isVersionValid) {
+          return false;
+        }
+
+        // Check if cache folder exists
+        const cacheDirInfo = await FileSystem.getInfoAsync(CACHE_DIR);
+        if (!cacheDirInfo.exists) {
+          return false;
+        }
+
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
     const initializeApp = async () => {
       try {
+        // Perform cache integrity checks
+        const cacheIsValid = await performCacheIntegrityChecks();
+        
+        if (!cacheIsValid) {
+          const currentVersion = getCurrentAppVersion();
+          const cachedVersion = await getCacheVersion();
+          console.log(`🔄 Cache invalid - Current: ${currentVersion}, Cached: ${cachedVersion || 'none'}`);
+          await wipeCache();
+        }
         
         // Start progress animation to 10%
         Animated.timing(progress, {
@@ -66,8 +97,12 @@ export default function SplashScreen() {
           }
         };
 
-        // Wait for updates to complete
-        await checkForUpdates(updateProgress);
+        // If cache was wiped, force full sync; otherwise check for updates  
+        if (!cacheIsValid) {
+          await checkAllScreensForUpdates(updateProgress);
+        } else {
+          await checkForUpdates(updateProgress);
+        }
 
         // Progress to 90% after updates complete
         Animated.timing(progress, {
@@ -75,6 +110,10 @@ export default function SplashScreen() {
           duration: 200,
           useNativeDriver: false,
         }).start();
+
+        // Always save current version after successful update
+        const currentVersion = getCurrentAppVersion();
+        await saveCacheVersion(currentVersion);
 
         // Complete progress and navigate
         Animated.timing(progress, {
