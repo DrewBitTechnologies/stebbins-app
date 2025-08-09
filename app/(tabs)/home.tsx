@@ -41,7 +41,7 @@ export default function HomeScreen() {
     {
       title: 'Report an Issue',
       navigateTo: '/(tabs)/report',
-      icon: 'flag-outline',
+      icon: 'warning-outline',
       description: 'Help us maintain the trails',
       color: '#2d5016'
     },

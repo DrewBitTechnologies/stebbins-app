@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { FontAwesome6 as FontAwesomeIcon, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
 const BLUE = '#022851';
 
@@ -10,21 +10,21 @@ export default function InfoModalContent() {
       <Text style={styles.title}>Icon Descriptions</Text>
       
       <View style={styles.iconRow}>
-        <FontAwesomeIcon name="download" size={24} color={BLUE} style={styles.icon} />
+        <Ionicons name="cloud-download-outline" size={25} color={BLUE} style={styles.icon} />
         <Text style={styles.buttonText}>
           Deletes and redownloads the offline map to ensure all trail data is up to date.
         </Text>
       </View>
       
       <View style={styles.iconRow}>
-        <FontAwesomeIcon name="compress" size={24} color={BLUE} style={styles.icon} />
+        <Ionicons name="contract-outline" size={25} color={BLUE} style={styles.icon} />
         <Text style={styles.buttonText}>
           Resets the map view to the initial zoom level.
         </Text>
       </View>
       
       <View style={styles.iconRow}>
-        <Ionicons name="help-circle-sharp" size={24} color={BLUE} style={styles.icon} />
+        <Ionicons name="help-circle-outline" size={25} color={BLUE} style={styles.icon} />
         <Text style={styles.buttonText}>
           Opens this help screen.
         </Text>
