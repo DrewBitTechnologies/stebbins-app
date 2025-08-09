@@ -44,9 +44,9 @@ export default function GuideListScreen({ route }: { route: any }) {
 
   const animalCategories = [
     { title: 'Mammals', route: '/guides/mammals', icon: 'paw-outline' as keyof typeof Ionicons.glyphMap },
-    { title: 'Birds', route: '/guides/birds', icon: 'paw-outline' as keyof typeof Ionicons.glyphMap },
-    { title: 'Herps', route: '/guides/herps', icon: 'bug-outline' as keyof typeof Ionicons.glyphMap },
-    { title: 'Invertebrates', route: '/guides/invertebrates', icon: 'rose-outline' as keyof typeof Ionicons.glyphMap },
+    { title: 'Birds', route: '/guides/birds', icon: 'flight-outline' as keyof typeof Ionicons.glyphMap },
+    { title: 'Herps', route: '/guides/herps', icon: 'lizard-outline' as keyof typeof Ionicons.glyphMap },
+    { title: 'Invertebrates', route: '/guides/invertebrates', icon: 'bug-outline' as keyof typeof Ionicons.glyphMap },
   ];
 
   const getFilterCategoryName = () => {
@@ -260,7 +260,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       >
         <View style={styles.navigationBarContent}>
           <View style={styles.navigationBarLeft}>
-            <Ionicons name="library" size={20} color="#2d5016" style={styles.iconWithMargin} />
+            <Ionicons name="library-outline" size={20} color="#2d5016" style={styles.iconWithMargin} />
             <View style={styles.navigationBarTextContainer}>
               <Text style={styles.navigationBarTitle}>Navigate Guides</Text>
               <View style={styles.navigationBarSubtitle}>
@@ -351,7 +351,6 @@ export default function GuideListScreen({ route }: { route: any }) {
     </View>
   );
 
-
   const handleCategoryChange = (route: string) => {
     setIsNavigationDropdownVisible(false);
     router.replace(route as any);
@@ -371,7 +370,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           <Text style={styles.filterExpandedTitle}>Filter {getFilterCategoryName()}</Text>
           {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
             <TouchableOpacity style={styles.clearAllButton} onPress={clearAllFilters}>
-              <Ionicons name="close-circle" size={16} color="#666" />
+              <Ionicons name="close-circle-outline" size={16} color="#666" />
               <Text style={styles.clearAllButtonText}>Clear All</Text>
             </TouchableOpacity>
           )}
@@ -381,7 +380,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           {/* Color Filter Section - Always Show */}
           <View style={styles.filterSection}>
             <View style={styles.filterTitleContainer}>
-              <Ionicons name="color-filter" size={18} color="#2d5016" />
+              <Ionicons name="color-filter-outline" size={18} color="#2d5016" />
               <Text style={styles.filterTitle}>Filter by Color</Text>
             </View>
             <View style={styles.chipContainer}>
@@ -403,7 +402,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           {/* Season Filter Section - Always Show */}
           <View style={styles.filterSection}>
             <View style={styles.filterTitleContainer}>
-              <Ionicons name="calendar" size={18} color="#2d5016" />
+              <Ionicons name="calendar-outline" size={18} color="#2d5016" />
               <Text style={styles.filterTitle}>Filter by Season</Text>
             </View>
             <View style={styles.chipContainer}>
@@ -432,7 +431,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       >
         <View style={styles.filterBarContent}>
           <View style={styles.filterBarLeft}>
-            <Ionicons name="options" size={20} color="#2d5016" style={styles.iconWithMargin} />
+            <Ionicons name="options-outline" size={20} color="#2d5016" style={styles.iconWithMargin} />
             <View style={styles.filterBarTextContainer}>
               <Text style={styles.filterBarTitle}>Filters</Text>
               <View style={styles.filterBarSubtitle}>

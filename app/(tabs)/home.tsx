@@ -119,7 +119,7 @@ export default function HomeScreen() {
     <Card variant="warning" margin="none" style={{ marginBottom: 20 }}>
       <View style={styles.statusHeader}>
         <View style={styles.megaphoneContainer}>
-          <Ionicons name="megaphone" size={24} color="#000000" />
+          <Ionicons name="megaphone-outline" size={24} color="#000000" />
         </View>
         <Text style={styles.statusTitle}>Reserve Status</Text>
         <TouchableOpacity 
@@ -158,7 +158,7 @@ export default function HomeScreen() {
   return (
     <ScreenBackground backgroundSource={getImageSource(homeData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
       <ScreenHeader 
-        icon="home"
+        icon="leaf-outline"
         title="Stebbins Nature Reserve"
         subtitle="Welcome to your outdoor adventure"
       />

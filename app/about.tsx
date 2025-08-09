@@ -31,7 +31,7 @@ export default function AboutScreen() {
     return (
         <ScreenBackground backgroundSource={getImageSource(aboutData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
             <ScreenHeader 
-                icon="information-circle"
+                icon="information-circle-outline"
                 title="About Stebbins Reserve"
                 subtitle="UC Natural Reserve System"
             />

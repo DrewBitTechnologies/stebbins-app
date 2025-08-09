@@ -48,7 +48,7 @@ export default function EmergencyScreen() {
     return (
         <ScreenBackground backgroundSource={getImageSource(emergencyData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
             <ScreenHeader 
-                icon="alert-circle"
+                icon="alert-circle-outline"
                 title="Emergency Contacts"
                 subtitle="Contacts for trail emergencies"
             />
@@ -57,7 +57,7 @@ export default function EmergencyScreen() {
             <View style={styles.safetyNotice}>
                 <View style={styles.noticeHeader}>
                     <Ionicons 
-                        name="information-circle" 
+                        name="information-circle-outline" 
                         size={20} 
                         color="white" 
                         style={styles.noticeIcon}
@@ -107,7 +107,7 @@ export default function EmergencyScreen() {
                     <Button
                         title={formatPhoneNumber(contact.phone)}
                         onPress={() => openPhoneNumber(contact.phone)}
-                        icon="call"
+                        icon="call-outline"
                         backgroundColor={contact.priority === 'critical' ? ['#ff4444', '#cc0000'] as const : ['#2d5016', '#1a3b0f'] as const}
                         textColor="white"
                         iconColor="white"

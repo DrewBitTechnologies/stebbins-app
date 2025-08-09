@@ -41,7 +41,7 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
           {item.color && item.color.length > 0 && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
-                <Ionicons name="color-palette" size={16} color="#2d5016" />
+                <Ionicons name="color-palette-outline" size={16} color="#2d5016" />
                 <Text style={styles.tagLabel}>Colors</Text>
               </View>
               <View style={styles.tagList}>
@@ -58,7 +58,7 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
           {(!item.color || item.color.length === 0) && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
-                <Ionicons name="color-palette" size={16} color="#2d5016" />
+                <Ionicons name="color-palette-outline" size={16} color="#2d5016" />
                 <Text style={styles.tagLabel}>Colors</Text>
               </View>
               <View style={styles.tagList}>
@@ -72,7 +72,7 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
           {item.season && item.season.length > 0 && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
-                <Ionicons name="leaf" size={16} color="#2d5016" />
+                <Ionicons name="leaf-outline" size={16} color="#2d5016" />
                 <Text style={styles.tagLabel}>Seasons</Text>
               </View>
               <View style={styles.tagList}>
@@ -91,7 +91,7 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
           {(!item.season || item.season.length === 0) && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
-                <Ionicons name="leaf" size={16} color="#2d5016" />
+                <Ionicons name="leaf-outline" size={16} color="#2d5016" />
                 <Text style={styles.tagLabel}>Seasons</Text>
               </View>
               <View style={styles.tagList}>

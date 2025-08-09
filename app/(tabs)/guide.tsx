@@ -52,7 +52,7 @@ export default function GuideScreen() {
   return (
     <ScreenBackground backgroundSource={getImageSource(guideData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
       <ScreenHeader 
-          icon="book"
+          icon="book-outline"
           title="Stebbins Field Guide"
           subtitle="Explore the natural world around you"
       />

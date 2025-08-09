@@ -45,7 +45,7 @@ export default function SafetyScreen() {
     return (
         <ScreenBackground backgroundSource={getImageSource(safetyData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
                 <ScreenHeader 
-                    icon="shield-checkmark"
+                    icon="shield-checkmark-outline"
                     title="Safety Information"
                     subtitle="Stay safe during your outdoor adventure"
                 />
@@ -65,7 +65,7 @@ export default function SafetyScreen() {
                 >
                     <View style={styles.emergencyContent}>
                         <View style={styles.emergencyIconContainer}>
-                            <Ionicons name="call" size={24} color="white" />
+                            <Ionicons name="call-outline" size={24} color="white" />
                         </View>
                         <Text style={styles.emergencyTitle}>Emergency Contacts</Text>
                         <Ionicons name="chevron-forward" size={24} color="white" />

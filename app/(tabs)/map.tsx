@@ -243,28 +243,28 @@ export default function MapScreen() {
           </MapboxGL.MapView>
           <View style={styles.buttonContainer}>
             <Pressable style={[styles.mapActionButton, styles.mapButtonTop]} onPress={handleMapUpdate}>
-              <FontAwesomeIcon name="download" size={22} color={BLUE} />
+              <Ionicons name="cloud-download-outline" size={25} color={BLUE} />
             </Pressable>
             <Pressable style={[styles.mapActionButton, styles.mapButtonMiddle]} onPress={handleResetZoom}>
-              <FontAwesomeIcon name="compress" size={20} color={BLUE} />
+              <Ionicons name="contract-outline" size={25} color={BLUE} />
             </Pressable>
             <Pressable style={[styles.mapActionButton, styles.mapButtonBottom]} onPress={toggleInfoModal}>
-              <Ionicons name="help-circle-sharp" size={28} color={BLUE} />
+              <Ionicons name="help-circle-outline" size={25} color={BLUE} />
             </Pressable>
           </View>
 
           <View style={styles.toggleContainer}>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.nature && styles.toggleButtonActive]} onPress={() => toggleMarkerType('nature')}>
-                <FontAwesome name="leaf" size={16} color={activeMarkerTypes.nature ? '#fff' : BLUE} />
+                <Ionicons name="leaf-outline" size={25} color={activeMarkerTypes.nature ? '#fff' : BLUE} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.mile && styles.toggleButtonActive]} onPress={() => toggleMarkerType('mile')}>
-                <FontAwesomeIcon name="road" size={16} color={activeMarkerTypes.mile ? '#fff' : BLUE} />
+                <Ionicons name="pin-outline" size={25} color={activeMarkerTypes.mile ? '#fff' : BLUE} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.safety && styles.toggleButtonActive]} onPress={() => toggleMarkerType('safety')}>
-                <FontAwesomeIcon name="shield-halved" size={16} color={activeMarkerTypes.safety ? '#fff' : BLUE} />
+                <Ionicons name="shield-checkmark-outline" size={25} color={activeMarkerTypes.safety ? '#fff' : BLUE} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.poi && styles.toggleButtonActive]} onPress={() => toggleMarkerType('poi')}>
-                <FontAwesome name="map-marker" size={16} color={activeMarkerTypes.poi ? '#fff' : BLUE} />
+                <Ionicons name="flag-outline" size={25} color={activeMarkerTypes.poi ? '#fff' : BLUE} />
             </TouchableOpacity>
           </View>
 
