@@ -20,6 +20,8 @@ export default function HomeScreen() {
   const { data: homeData, isLoading, getImagePath } = useScreen<HomeData>('home');
   const { checkForUpdates } = useApi();
   const rotateAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const checkmarkFadeAnim = useRef(new Animated.Value(0)).current;
   const rotationCount = useRef(0);
   const isAnimating = useRef(false);
 
@@ -83,6 +85,9 @@ export default function HomeScreen() {
     
     console.log("Starting app update check from home screen...");
     
+    // Track the initial loading state to detect if checkScreensForUpdates runs
+    const initialLoadingState = isLoading;
+    
     // Start the API call first
     const updatePromise = checkForUpdates((message) => {
         console.log(message);
@@ -95,17 +100,53 @@ export default function HomeScreen() {
         isAnimating.current = true;
         rotationCount.current += 1;
         
+        // Start with rotation
         Animated.timing(rotateAnim, {
           toValue: rotationCount.current,
           duration: 300,
           useNativeDriver: true,
-        }).start(() => {
-          isAnimating.current = false;
+        }).start(async () => {
+          // Wait for the update check to complete and then check if updates occurred
+          await updatePromise;
+          
+          // If isLoading became true during the process, updates were found
+          const updatesOccurred = isLoading || initialLoadingState !== isLoading;
+          
+          if (!updatesOccurred) {
+            // No updates found - show checkmark animation
+            Animated.sequence([
+              Animated.timing(fadeAnim, {
+                toValue: 0,
+                duration: 200,
+                useNativeDriver: true,
+              }),
+              Animated.timing(checkmarkFadeAnim, {
+                toValue: 1,
+                duration: 200,
+                useNativeDriver: true,
+              }),
+              Animated.delay(300), // Show checkmark for 300ms
+              Animated.timing(checkmarkFadeAnim, {
+                toValue: 0,
+                duration: 200,
+                useNativeDriver: true,
+              }),
+              Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 200,
+                useNativeDriver: true,
+              }),
+            ]).start(() => {
+              isAnimating.current = false;
+            });
+          } else {
+            // Updates occurred - just finish the animation
+            isAnimating.current = false;
+          }
         });
       }
     }, 100);
     
-    await updatePromise;
     console.log("App update check complete.");
   };
 
@@ -129,6 +170,7 @@ export default function HomeScreen() {
         >
           <Animated.View
             style={{
+              opacity: fadeAnim,
               transform: [{
                 rotate: rotateAnim.interpolate({
                   inputRange: [0, 1],
@@ -139,6 +181,18 @@ export default function HomeScreen() {
           >
             <Ionicons 
               name="refresh" 
+              size={20} 
+              color="#000000" 
+            />
+          </Animated.View>
+          <Animated.View
+            style={{
+              position: 'absolute',
+              opacity: checkmarkFadeAnim,
+            }}
+          >
+            <Ionicons 
+              name="checkmark" 
               size={20} 
               color="#000000" 
             />

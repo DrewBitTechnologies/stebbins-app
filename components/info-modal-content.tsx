@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const BLUE = '#022851';
 
@@ -26,6 +26,13 @@ export default function InfoModalContent() {
       </View>
       
       <View style={styles.iconRow}>
+        <Ionicons name="compass" size={25} color={BLUE} style={styles.icon} />
+        <Text style={styles.buttonText}>
+          Reorients the map where north is towards the top of the screen.
+        </Text>
+      </View>
+      
+      <View style={styles.iconRow}>
         <Ionicons name="help-circle" size={25} color={BLUE} style={styles.icon} />
         <Text style={styles.buttonText}>
           Opens this help screen with all icon descriptions.
@@ -42,9 +49,7 @@ export default function InfoModalContent() {
       </View>
       
       <View style={styles.iconRow}>
-        <View style={styles.markerContainer}>
-          <Text style={styles.markerText}>M</Text>
-        </View>
+        <MaterialCommunityIcons name="map-marker-radius" size={25} color={BLUE} style={styles.icon} />
         <Text style={styles.buttonText}>
           Toggle mile markers - show or hide distance markers along the trail.
         </Text>

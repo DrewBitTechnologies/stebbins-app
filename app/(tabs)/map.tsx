@@ -155,6 +155,13 @@ export default function MapScreen() {
     });
   };
 
+  const handleResetOrientation = () => {
+    camera.current?.setCamera({
+      heading: 0,
+      animationDuration: 1000,
+    });
+  };
+
   const onCameraChanged = (event: any) => {
     setZoomLevel(event.properties.zoom);
   };
@@ -248,6 +255,9 @@ export default function MapScreen() {
             <Pressable style={[styles.mapActionButton, styles.mapButtonMiddle]} onPress={handleResetZoom}>
               <Ionicons name="contract" size={25} color={BLUE} />
             </Pressable>
+            <Pressable style={[styles.mapActionButton, styles.mapButtonMiddle]} onPress={handleResetOrientation}>
+              <Ionicons name="compass" size={25} color={BLUE} />
+            </Pressable>
             <Pressable style={[styles.mapActionButton, styles.mapButtonBottom]} onPress={toggleInfoModal}>
               <Ionicons name="help-circle" size={25} color={BLUE} />
             </Pressable>
@@ -258,7 +268,7 @@ export default function MapScreen() {
                 <Ionicons name="leaf" size={25} color={activeMarkerTypes.nature ? '#fff' : BLUE} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.mile && styles.toggleButtonActive]} onPress={() => toggleMarkerType('mile')}>
-                <MaterialCommunityIcons name="map-marker" size={25} color={activeMarkerTypes.mile ? '#fff' : BLUE} />
+                <MaterialCommunityIcons name="map-marker-radius" size={25} color={activeMarkerTypes.mile ? '#fff' : BLUE} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.safety && styles.toggleButtonActive]} onPress={() => toggleMarkerType('safety')}>
                 <Ionicons name="shield-checkmark" size={25} color={activeMarkerTypes.safety ? '#fff' : BLUE} />
