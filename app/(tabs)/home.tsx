@@ -8,6 +8,7 @@ import ScreenBackground from '@/components/screen-background';
 import ScreenHeader from '@/components/screen-header';
 import { getImageSource } from '@/utility/image-source';
 import { ColorPalette } from '@/assets/dev/color_palette';
+import * as Haptics from 'expo-haptics';
 
 interface ButtonItem {
   title: string;
@@ -83,6 +84,13 @@ export default function HomeScreen() {
   
   const handleManualRefresh = async () => {
     if (isAnimating.current || isLoading) return;
+    
+    // Immediate haptic feedback on user touch
+    try {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (error) {
+      console.log('Haptic feedback not supported');
+    }
     
     console.log("Starting app update check from home screen...");
     

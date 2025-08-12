@@ -511,7 +511,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
       {/* Top Navigation Component */}
-      <BlurView intensity={5} tint='default' style={
+      {/* <BlurView intensity={5} tint='default' style={
         {
           position: 'absolute',
           top: 0,
@@ -521,7 +521,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           zIndex: 1,
           
         }
-      }/>
+      }/> */}
 
       {renderTopNavigationComponent()}
       
@@ -541,7 +541,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       {/* Bottom Filter Component */}
       {renderBottomFilterComponent()}
 
-      <BlurView intensity={5} tint='default' style={
+      {/* <BlurView intensity={5} tint='default' style={
         {
           position: 'absolute',
           top: '90%',
@@ -551,7 +551,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           zIndex: 1,
           
         }
-      }/>
+      }/> */}
       
       {zoomedImage && (
         <ZoomableImageModal
@@ -606,11 +606,12 @@ const styles = StyleSheet.create({
   },
   topNavigationComponent: {
     position: 'absolute',
-    top: 20,
-    left: 20,
-    right: 20,
+    top: 0,
+    left: 0,
+    right: 0,
     backgroundColor: ColorPalette.white,
-    borderRadius: 16,
+    borderBottomRightRadius: 16,
+    borderBottomLeftRadius: 16,
     shadowColor: ColorPalette.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
@@ -670,11 +671,13 @@ const styles = StyleSheet.create({
   },
   bottomFilterComponent: {
     position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: ColorPalette.white,
-    borderRadius: 16,
+    borderTopRightRadius: 16,
+    borderTopLeftRadius: 16,
+    paddingBottom: 20,
     shadowColor: ColorPalette.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
