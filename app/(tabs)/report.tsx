@@ -25,6 +25,7 @@ export default function ReportScreen() {
     phone: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
   const handlePickFiles = async () => {
     const result = await pickFiles();
@@ -159,7 +160,10 @@ export default function ReportScreen() {
         </View>
 
         <TextInput
-          style={styles.textArea}
+          style={[
+            styles.textArea,
+            focusedInput === 'description' && styles.focusedInput
+          ]}
           multiline
           numberOfLines={4}
           value={description}
@@ -167,6 +171,8 @@ export default function ReportScreen() {
           placeholder="Describe the issue you'd like to report (optional)..."
           placeholderTextColor="#999"
           editable={!isSubmitting}
+          onFocus={() => setFocusedInput('description')}
+          onBlur={() => setFocusedInput(null)}
         />
       </Card>
 
@@ -187,25 +193,40 @@ export default function ReportScreen() {
 
         <View style={styles.inputRow}>
           <TextInput
-            style={[styles.input, styles.halfInput]}
+            style={[
+              styles.input, 
+              styles.halfInput,
+              focusedInput === 'firstName' && styles.focusedInput
+            ]}
             placeholder="First Name"
             placeholderTextColor="#999"
             value={contact.firstName}
             onChangeText={(text) => setContact({ ...contact, firstName: text })}
             editable={!isSubmitting}
+            onFocus={() => setFocusedInput('firstName')}
+            onBlur={() => setFocusedInput(null)}
           />
           <TextInput
-            style={[styles.input, styles.halfInput]}
+            style={[
+              styles.input, 
+              styles.halfInput,
+              focusedInput === 'lastName' && styles.focusedInput
+            ]}
             placeholder="Last Name"
             placeholderTextColor="#999"
             value={contact.lastName}
             onChangeText={(text) => setContact({ ...contact, lastName: text })}
             editable={!isSubmitting}
+            onFocus={() => setFocusedInput('lastName')}
+            onBlur={() => setFocusedInput(null)}
           />
         </View>
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            focusedInput === 'email' && styles.focusedInput
+          ]}
           placeholder="Email Address"
           placeholderTextColor="#999"
           keyboardType="email-address"
@@ -213,16 +234,23 @@ export default function ReportScreen() {
           value={contact.email}
           onChangeText={(text) => setContact({ ...contact, email: text })}
           editable={!isSubmitting}
+          onFocus={() => setFocusedInput('email')}
+          onBlur={() => setFocusedInput(null)}
         />
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            focusedInput === 'phone' && styles.focusedInput
+          ]}
           placeholder="Phone Number"
           placeholderTextColor="#999"
           keyboardType="phone-pad"
           value={contact.phone}
           onChangeText={(text) => setContact({ ...contact, phone: text })}
           editable={!isSubmitting}
+          onFocus={() => setFocusedInput('phone')}
+          onBlur={() => setFocusedInput(null)}
         />
       </Card>
 
@@ -306,6 +334,10 @@ const styles = StyleSheet.create({
   halfInput: {
     flex: 1,
     marginBottom: 0,
+  },
+  focusedInput: {
+    borderWidth: 2,
+    borderColor: '#2d5016',
   },
   privacyNotice: {
     flexDirection: 'row',
