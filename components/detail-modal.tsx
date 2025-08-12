@@ -42,7 +42,7 @@ export default function DetailModal({
           style={styles.closeButton} 
           onPress={onClose}
         >
-          <Ionicons name="close" size={28} color="#fff" />
+          <Ionicons name="close" size={28} color="#022851" />
         </TouchableOpacity>
       </View>
     </Modal>
@@ -53,22 +53,20 @@ const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingVertical: 60,
   },
   modalContainer: {
     width: '100%',
     maxWidth: 500,
     alignItems: 'center',
-    flex: 1,
-    justifyContent: 'flex-end',
-    paddingTop: 60,
+    maxHeight: '80%',
   },
   defaultModal: {
     width: '100%',
-    flex: 1,
+    maxHeight: '100%',
   },
   compactModal: {
     width: '100%',
@@ -78,7 +76,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#022851',
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
