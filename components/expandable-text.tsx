@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withTiming, 
+  interpolate,
+  runOnJS
+} from 'react-native-reanimated';
 
 interface ExpandableTextProps {
   text: string;
@@ -10,22 +17,30 @@ interface ExpandableTextProps {
 export default function ExpandableText({ text, maxLines = 3 }: ExpandableTextProps) {
   const [expanded, setExpanded] = useState(false);
   const [showMoreButton, setShowMoreButton] = useState(false);
+  
+  const animationValue = useSharedValue(0);
 
   const onTextLayout = (event: any) => {
     if (!expanded && event.nativeEvent.lines.length >= maxLines) {
       setShowMoreButton(true);
     }
-    if (expanded) {
-      setShowMoreButton(false);
-    }
   };
 
   const toggleText = () => {
     setExpanded(!expanded);
+    animationValue.value = withTiming(expanded ? 0 : 1);
   };
 
+  const chevronStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { rotate: `${interpolate(animationValue.value, [0, 1], [0, -180])}deg` }
+      ],
+    };
+  });
+
   return (
-    <View>
+    <Animated.View>
       <Text
         style={styles.description}
         numberOfLines={expanded ? undefined : maxLines}
@@ -33,19 +48,17 @@ export default function ExpandableText({ text, maxLines = 3 }: ExpandableTextPro
       >
         {text}
       </Text>
-      {showMoreButton && !expanded && (
+      {(showMoreButton || expanded) && (
         <TouchableOpacity onPress={toggleText} style={styles.moreButton}>
-          <Text style={styles.moreButtonText}>More</Text>
-          <Ionicons name="chevron-down" size={12} color="#2d5016" style={styles.moreButtonIcon} />
+          <Text style={styles.moreButtonText}>
+            {expanded ? 'Less' : 'More'}
+          </Text>
+          <Animated.View style={chevronStyle}>
+            <Ionicons name="chevron-down" size={12} color="#2d5016" style={styles.moreButtonIcon} />
+          </Animated.View>
         </TouchableOpacity>
       )}
-      {expanded && (
-         <TouchableOpacity onPress={toggleText} style={styles.moreButton}>
-          <Text style={styles.moreButtonText}>Less</Text>
-          <Ionicons name="chevron-up" size={12} color="#2d5016" style={styles.moreButtonIcon} />
-        </TouchableOpacity>
-      )}
-    </View>
+    </Animated.View>
   );
 }
 

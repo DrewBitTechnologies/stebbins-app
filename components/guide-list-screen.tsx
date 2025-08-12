@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView, ImageBackground } from 'react-native';
@@ -14,6 +14,7 @@ import GuideCard from './guide-card';
 import ZoomableImageModal from './zoomable-image-modal';
 import { getImageSource } from '@/utility/image-source';
 import { router } from 'expo-router';
+import { BlurView } from 'expo-blur';
 
 
 export default function GuideListScreen({ route }: { route: any }) {
@@ -37,16 +38,16 @@ export default function GuideListScreen({ route }: { route: any }) {
   const filterAnimation = useSharedValue(0);
 
   const guideCategories = [
-    { title: 'Trees & Shrubs', route: '/guides/trees-and-shrubs', icon: 'leaf-outline' as keyof typeof Ionicons.glyphMap },
-    { title: 'Trail Tracks', route: '/guides/trail-tracks', icon: 'footsteps-outline' as keyof typeof Ionicons.glyphMap },
-    { title: 'Wildflowers', route: '/guides/wildflowers', icon: 'flower-outline' as keyof typeof Ionicons.glyphMap },
+    { title: 'Trees & Shrubs', route: '/guides/trees-and-shrubs', icon: 'leaf' as keyof typeof MaterialCommunityIcons.glyphMap },
+    { title: 'Trail Tracks', route: '/guides/trail-tracks', icon: 'foot-print' as keyof typeof MaterialCommunityIcons.glyphMap },
+    { title: 'Wildflowers', route: '/guides/wildflowers', icon: 'flower' as keyof typeof MaterialCommunityIcons.glyphMap },
   ];
 
   const animalCategories = [
-    { title: 'Mammals', route: '/guides/mammals', icon: 'paw-outline' as keyof typeof Ionicons.glyphMap },
-    { title: 'Birds', route: '/guides/birds', icon: 'flight-outline' as keyof typeof Ionicons.glyphMap },
-    { title: 'Herps', route: '/guides/herps', icon: 'lizard-outline' as keyof typeof Ionicons.glyphMap },
-    { title: 'Invertebrates', route: '/guides/invertebrates', icon: 'bug-outline' as keyof typeof Ionicons.glyphMap },
+    { title: 'Mammals', route: '/guides/mammals', icon: 'paw' as keyof typeof MaterialCommunityIcons.glyphMap },
+    { title: 'Birds', route: '/guides/birds', icon: 'feather' as keyof typeof MaterialCommunityIcons.glyphMap },
+    { title: 'Herps', route: '/guides/herps', icon: 'snake' as keyof typeof MaterialCommunityIcons.glyphMap },
+    { title: 'Invertebrates', route: '/guides/invertebrates', icon: 'ladybug' as keyof typeof MaterialCommunityIcons.glyphMap },
   ];
 
   const getFilterCategoryName = () => {
@@ -260,7 +261,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       >
         <View style={styles.navigationBarContent}>
           <View style={styles.navigationBarLeft}>
-            <Ionicons name="library-outline" size={20} color="#2d5016" style={styles.iconWithMargin} />
+            <Ionicons name="book" size={25} color="#2d5016" style={styles.iconWithMargin} />
             <View style={styles.navigationBarTextContainer}>
               <Text style={styles.navigationBarTitle}>Navigate Guides</Text>
               <View style={styles.navigationBarSubtitle}>
@@ -272,9 +273,9 @@ export default function GuideListScreen({ route }: { route: any }) {
           </View>
           <View style={styles.navigationBarRight}>
             <Animated.View style={navigationChevronStyle}>
-              <Ionicons 
+              <MaterialCommunityIcons 
                 name="chevron-down"
-                size={20} 
+                size={25} 
                 color="#2d5016" 
               />
             </Animated.View>
@@ -284,7 +285,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       
       {/* Expanded Content - Animated Show/Hide */}
       <Animated.View style={[styles.navigationDropdownContent, navigationAnimatedStyle]}> 
-        <View>
+        <View style={styles.navigationContentWrapper}>
           <ScrollView style={styles.navigationScrollContent} showsVerticalScrollIndicator={false}>
 
           {/* Other Categories */}
@@ -300,9 +301,9 @@ export default function GuideListScreen({ route }: { route: any }) {
                   ]}
                   onPress={() => handleCategoryChange(category.route)}
                 >
-                  <Ionicons 
+                  <MaterialCommunityIcons 
                     name={category.icon} 
-                    size={20} 
+                    size={25} 
                     color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
                   />
                   <Text style={[
@@ -329,9 +330,9 @@ export default function GuideListScreen({ route }: { route: any }) {
                   ]}
                   onPress={() => handleAnimalCategoryChange(category.route)}
                 >
-                  <Ionicons 
+                  <MaterialCommunityIcons 
                     name={category.icon} 
-                    size={20} 
+                    size={25} 
                     color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
                   />
                   <Text style={[
@@ -365,12 +366,12 @@ export default function GuideListScreen({ route }: { route: any }) {
     <View style={styles.bottomFilterComponent}>
       {/* Expanded Content - Animated Show/Hide */}
       <Animated.View style={[styles.filterDropdownContent, filterAnimatedStyle]}>
-        <View>
+        <View style={styles.filterContentWrapper}>
           <View style={styles.filterExpandedHeader}>
           <Text style={styles.filterExpandedTitle}>Filter {getFilterCategoryName()}</Text>
           {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
             <TouchableOpacity style={styles.clearAllButton} onPress={clearAllFilters}>
-              <Ionicons name="close-circle-outline" size={16} color="#666" />
+              <MaterialCommunityIcons name="close-circle" size={16} color="#000000" />
               <Text style={styles.clearAllButtonText}>Clear All</Text>
             </TouchableOpacity>
           )}
@@ -380,7 +381,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           {/* Color Filter Section - Always Show */}
           <View style={styles.filterSection}>
             <View style={styles.filterTitleContainer}>
-              <Ionicons name="color-filter-outline" size={18} color="#2d5016" />
+              <MaterialCommunityIcons name="palette" size={25} color="#2d5016" />
               <Text style={styles.filterTitle}>Filter by Color</Text>
             </View>
             <View style={styles.chipContainer}>
@@ -402,7 +403,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           {/* Season Filter Section - Always Show */}
           <View style={styles.filterSection}>
             <View style={styles.filterTitleContainer}>
-              <Ionicons name="calendar-outline" size={18} color="#2d5016" />
+              <MaterialCommunityIcons name="calendar" size={25} color="#2d5016" />
               <Text style={styles.filterTitle}>Filter by Season</Text>
             </View>
             <View style={styles.chipContainer}>
@@ -431,7 +432,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       >
         <View style={styles.filterBarContent}>
           <View style={styles.filterBarLeft}>
-            <Ionicons name="options-outline" size={20} color="#2d5016" style={styles.iconWithMargin} />
+            <MaterialCommunityIcons name="filter-variant" size={25} color="#2d5016" style={styles.iconWithMargin} />
             <View style={styles.filterBarTextContainer}>
               <Text style={styles.filterBarTitle}>Filters</Text>
               <View style={styles.filterBarSubtitle}>
@@ -451,9 +452,9 @@ export default function GuideListScreen({ route }: { route: any }) {
           </View>
           <View style={styles.filterBarRight}>
             <Animated.View style={filterChevronStyle}>
-              <Ionicons 
+              <MaterialCommunityIcons 
                 name="chevron-up"
-                size={20} 
+                size={25} 
                 color="#2d5016" 
               />
             </Animated.View>
@@ -501,10 +502,21 @@ export default function GuideListScreen({ route }: { route: any }) {
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
       {/* Top Navigation Component */}
+      <BlurView intensity={5} tint='default' style={
+        {
+          position: 'absolute',
+          top: 0,
+          left: 20,
+          right: 20,
+          bottom: '90%',
+          zIndex: 1,
+          
+        }
+      }/>
+
       {renderTopNavigationComponent()}
       
       {/* Scrollable Content Area */}
-      <View style={{ flex: 1 }}>
         <FlatList
           data={filteredData}
           keyExtractor={item => item.id.toString()}
@@ -515,10 +527,22 @@ export default function GuideListScreen({ route }: { route: any }) {
           style={styles.flatList}
           onScrollBeginDrag={closeAllDropdowns}
         />
-      </View>
+      
       
       {/* Bottom Filter Component */}
       {renderBottomFilterComponent()}
+
+      <BlurView intensity={5} tint='default' style={
+        {
+          position: 'absolute',
+          top: '90%',
+          bottom: 0,
+          left: 20,
+          right: 20,
+          zIndex: 1,
+          
+        }
+      }/>
       
       {zoomedImage && (
         <ZoomableImageModal
@@ -572,14 +596,18 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   topNavigationComponent: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    shadowColor: '#000',
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
+    zIndex: 2,
   },
   navigationDropdownContent: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -587,9 +615,11 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
     borderTopWidth: 1,
     borderTopColor: 'rgba(45, 80, 22, 0.1)',
+    overflow: 'hidden',
+  },
+  navigationContentWrapper: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    overflow: 'hidden',
   },
   navigationExpandedHeader: {
     paddingVertical: 16,
@@ -602,9 +632,9 @@ const styles = StyleSheet.create({
     color: '#2d5016',
   },
   navigationExpandedSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
+    // fontSize: 14,
+    // color: '#666',
+    // marginTop: 2,
   },
   navigationScrollContent: {
     maxHeight: 280,
@@ -628,42 +658,31 @@ const styles = StyleSheet.create({
   flatList: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingTop: 100,
   },
   listContent: {
     paddingBottom: 20,
     paddingTop: 20,
   },
   bottomFilterComponent: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
-    paddingBottom: 34,
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
+    zIndex: 2,
   },
   bottomFilterButton: {
     width: '100%',
   },
   separator: {
     height: 8,
-  },
-  topNavigationContainer: {
-    // position: 'absolute',
-    // top: 0,
-    // left: 0,
-    // right: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(45, 80, 22, 0.1)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 10,
-    zIndex: 100,
   },
   navigationBarButton: {
     paddingHorizontal: 20,
@@ -696,17 +715,17 @@ const styles = StyleSheet.create({
   },
   navigationBarSubtitleText: {
     fontSize: 14,
-    color: '#666',
+    color: '#000000',
   },
   navigationBarRight: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   bottomFilterBar: {
-    // position: 'absolute',
-    // bottom: 0,
-    // left: 0,
-    // right: 0,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderTopWidth: 1,
     borderTopColor: 'rgba(45, 80, 22, 0.1)',
@@ -715,7 +734,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 10,
-    zIndex: 100,
+    zIndex: 2,
   },
   filterBarButton: {
     paddingHorizontal: 20,
@@ -757,7 +776,7 @@ const styles = StyleSheet.create({
   },
   filterBarSubtitleText: {
     fontSize: 14,
-    color: '#666',
+    color: '#000000',
   },
   filterBarDivider: {
     fontSize: 14,
@@ -808,7 +827,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(102, 102, 102, 0.2)',
   },
   clearAllButtonText: {
-    color: '#666',
+    color: '#000000',
     fontSize: 14,
     fontWeight: '500',
     marginLeft: 6,
@@ -859,9 +878,11 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(45, 80, 22, 0.1)',
+    overflow: 'hidden',
+  },
+  filterContentWrapper: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    overflow: 'hidden',
   },
   filterExpandedHeader: {
     flexDirection: 'row',
@@ -914,7 +935,7 @@ const styles = StyleSheet.create({
   },
   noFiltersText: {
     fontSize: 14,
-    color: '#999',
+    color: '#000000',
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: 8,
