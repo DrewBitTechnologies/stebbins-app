@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: screenHeight * 0.7,
     maxHeight: '100%',
+    paddingBottom: 20, // Space for close button
   },
   scrollView: {
     flex: 1,

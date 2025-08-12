@@ -187,7 +187,7 @@ export default function MapScreen() {
         <DetailModal 
           visible={isInfoModalVisible} 
           onClose={toggleInfoModal}
-          variant="compact"
+          variant="default"
         >
           <InfoModalContent />
         </DetailModal>
