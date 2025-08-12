@@ -2,7 +2,7 @@ import React from 'react';
 import { Dimensions, Image, Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const { height: screenHeight } = Dimensions.get('window');
 
 interface ZoomableImageModalProps {
   visible: boolean;
@@ -14,26 +14,29 @@ export default function ZoomableImageModal({ visible, imageUri, onClose }: Zooma
   return (
     <Modal visible={visible} transparent={true} animationType="fade">
       <View style={styles.modalOverlay}>
-        <TouchableOpacity style={styles.modalCloseArea} onPress={onClose}>
-          <View style={styles.modalContent}>
-            <ScrollView
-              maximumZoomScale={3}
-              minimumZoomScale={1}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-            >
-              <Image
-                source={{ uri: imageUri }}
-                style={styles.zoomedImage}
-                resizeMode="contain"
-              />
-            </ScrollView>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <View style={styles.closeButtonBackground}>
-                <Ionicons name="close" size={20} color="#1a1a1a" />
-              </View>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.modalContainer}>
+          <TouchableOpacity style={styles.modalCloseArea} onPress={onClose}>
+            <View style={styles.modalContent}>
+              <ScrollView
+                maximumZoomScale={3}
+                minimumZoomScale={1}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollViewContent}
+              >
+                <Image
+                  source={{ uri: imageUri }}
+                  style={styles.zoomedImage}
+                  resizeMode="contain"
+                />
+              </ScrollView>
+            </View>
+          </TouchableOpacity>
+        </View>
+        
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <Ionicons name="close" size={28} color="#022851" />
         </TouchableOpacity>
       </View>
     </Modal>
@@ -46,6 +49,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 60,
+  },
+  modalContainer: {
+    width: '100%',
+    maxWidth: 500,
+    alignItems: 'center',
+    maxHeight: '80%',
+    flex: 1,
   },
   modalCloseArea: {
     flex: 1,
@@ -54,26 +66,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    width: screenWidth,
-    height: screenHeight * 0.8,
-    position: 'relative',
+    width: '100%',
+    height: screenHeight * 0.7,
+    maxHeight: '100%',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   zoomedImage: {
-    width: screenWidth,
-    height: screenHeight * 0.8,
+    width: '100%',
+    height: screenHeight * 0.7,
   },
   closeButton: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    borderRadius: 25,
-  },
-  closeButtonBackground: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
 });

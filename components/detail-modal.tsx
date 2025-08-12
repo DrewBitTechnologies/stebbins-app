@@ -52,7 +52,7 @@ export default function DetailModal({
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
