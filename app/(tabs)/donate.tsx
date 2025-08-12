@@ -26,7 +26,7 @@ export default function DonateScreen() {
     return (
         <ScreenBackground backgroundSource={getImageSource(donateData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
             <ScreenHeader 
-                icon="heart-outline"
+                icon="heart"
                 title="Support Our Mission"
                 subtitle="Help preserve and enhance Stebbins for future generations"
             />
@@ -35,7 +35,7 @@ export default function DonateScreen() {
                 <View style={styles.donationHeader}>
                     <View style={styles.donationIconContainer}>
                         <Ionicons 
-                            name="leaf-outline" 
+                            name="leaf" 
                             size={28} 
                             color="#2d5016" 
                         />
@@ -50,14 +50,14 @@ export default function DonateScreen() {
                 <Button
                     title="Donate Now"
                     onPress={handleDonatePress}
-                    icon="wallet-outline"
+                    icon="wallet"
                 />
             </Card>
 
             <Card variant="default" margin="none">
                 <View style={styles.thankYouHeader}>
                     <Ionicons 
-                        name="people-outline" 
+                        name="people" 
                         size={24} 
                         color="#2d5016" 
                         style={styles.thankYouIcon}

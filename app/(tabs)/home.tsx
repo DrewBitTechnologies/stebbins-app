@@ -27,21 +27,21 @@ export default function HomeScreen() {
     {
       title: 'Trail Map',
       navigateTo: '/(tabs)/map',
-      icon: 'map-outline',
+      icon: 'map',
       description: 'Navigate the reserve with a live map',
       color: '#2d5016'
     },
     {
       title: 'Field Guides',
       navigateTo: '/(tabs)/guide',
-      icon: 'book-outline',
+      icon: 'book',
       description: 'Identify local flora and fauna',
       color: '#2d5016'
     },
     {
       title: 'Report an Issue',
       navigateTo: '/(tabs)/report',
-      icon: 'warning-outline',
+      icon: 'warning',
       description: 'Help us maintain the trails',
       color: '#2d5016'
     },
@@ -51,28 +51,28 @@ export default function HomeScreen() {
     {
       title: 'Safety Info',
       navigateTo: '/safety',
-      icon: 'shield-checkmark-outline',
+      icon: 'shield-checkmark',
       description: 'Essential safety guidelines',
       color: '#4a7c59'
     },
     {
       title: 'Trail Rules',
       navigateTo: '/rules',
-      icon: 'trail-sign-outline',
+      icon: 'trail-sign',
       description: 'Know before you go',
       color: '#4a7c59'
     },
     {
       title: 'About the Reserve',
       navigateTo: '/about',
-      icon: 'information-circle-outline',
+      icon: 'information-circle',
       description: 'Learn about our mission',
       color: '#4a7c59'
     },
     {
       title: 'Emergency',
       navigateTo: '/emergency',
-      icon: 'call-outline',
+      icon: 'call',
       description: 'Quick access to help',
       color: '#c70000'
     },
@@ -119,7 +119,7 @@ export default function HomeScreen() {
     <Card variant="warning" margin="none" style={{ marginBottom: 20 }}>
       <View style={styles.statusHeader}>
         <View style={styles.megaphoneContainer}>
-          <Ionicons name="megaphone-outline" size={24} color="#000000" />
+          <Ionicons name="megaphone" size={24} color="#000000" />
         </View>
         <Text style={styles.statusTitle}>Reserve Status</Text>
         <TouchableOpacity 
@@ -158,7 +158,7 @@ export default function HomeScreen() {
   return (
     <ScreenBackground backgroundSource={getImageSource(homeData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
       <ScreenHeader 
-        icon="leaf-outline"
+        icon="leaf"
         title="Stebbins Nature Reserve"
         subtitle="Welcome to your outdoor adventure"
       />

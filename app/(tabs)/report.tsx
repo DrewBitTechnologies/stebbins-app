@@ -100,7 +100,7 @@ export default function ReportScreen() {
   return (
     <ScreenBackground backgroundSource={getImageSource(reportData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
       <ScreenHeader 
-        icon="warning-outline"
+        icon="warning"
         title="Report an Issue"
         subtitle={reportData?.instruction_text || 'Help us keep the trails safe and maintained'}
       />
@@ -108,7 +108,7 @@ export default function ReportScreen() {
       <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
         <View style={styles.sectionHeader}>
           <View style={styles.sectionIconContainer}>
-            <Ionicons name="camera-outline" size={24} color="#2d5016" />
+            <Ionicons name="camera" size={24} color="#2d5016" />
           </View>
           <View style={styles.sectionHeaderText}>
             <Text style={styles.sectionTitle}>
@@ -129,7 +129,7 @@ export default function ReportScreen() {
         <Button
           title={files.length === 0 ? 'Select Files' : 'Add More Files'}
           onPress={handlePickFiles}
-          icon={files.length === 0 ? "add-circle-outline" : "add"}
+          icon={files.length === 0 ? "add-circle" : "add"}
           backgroundColor={['#f8f9fa', '#f0f0f0'] as const}
           textColor="#2d5016"
           iconColor="#2d5016"
@@ -146,7 +146,7 @@ export default function ReportScreen() {
       <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
         <View style={styles.sectionHeader}>
           <View style={styles.sectionIconContainer}>
-            <Ionicons name="document-text-outline" size={24} color="#2d5016" />
+            <Ionicons name="document-text" size={24} color="#2d5016" />
           </View>
           <View style={styles.sectionHeaderText}>
             <Text style={styles.sectionTitle}>
@@ -173,7 +173,7 @@ export default function ReportScreen() {
       <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
         <View style={styles.sectionHeader}>
           <View style={styles.sectionIconContainer}>
-            <Ionicons name="person-outline" size={24} color="#2d5016" />
+            <Ionicons name="person" size={24} color="#2d5016" />
           </View>
           <View style={styles.sectionHeaderText}>
             <Text style={styles.sectionTitle}>
@@ -229,7 +229,7 @@ export default function ReportScreen() {
       <Button
         title="Submit Report"
         onPress={handleSubmit}
-        icon="send-outline"
+        icon="send"
         loading={isSubmitting}
         loadingText="Submitting..."
         disabled={isSubmitting}
@@ -238,7 +238,7 @@ export default function ReportScreen() {
 
       {/* Privacy Notice */}
       <View style={styles.privacyNotice}>
-        <Ionicons name="shield-checkmark-outline" size={16} color="rgba(255,255,255,0.8)" style={{ marginRight: 8 }} />
+        <Ionicons name="shield-checkmark" size={16} color="rgba(255,255,255,0.8)" style={{ marginRight: 8 }} />
         <Text style={styles.privacyText}>
           Your information is kept private and used only to address reported issues.
         </Text>

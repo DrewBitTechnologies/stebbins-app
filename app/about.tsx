@@ -31,7 +31,7 @@ export default function AboutScreen() {
     return (
         <ScreenBackground backgroundSource={getImageSource(aboutData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
             <ScreenHeader 
-                icon="information-circle-outline"
+                icon="information-circle"
                 title="About Stebbins Reserve"
                 subtitle="UC Natural Reserve System"
             />
@@ -42,7 +42,7 @@ export default function AboutScreen() {
                 <Button
                     title={linkText}
                     onPress={handleWebsitePress}
-                    icon="globe-outline"
+                    icon="globe"
                     backgroundColor={['rgba(45, 80, 22, 0.1)', 'rgba(45, 80, 22, 0.05)'] as const}
                     textColor="#2d5016"
                     iconColor="#2d5016"
@@ -58,7 +58,7 @@ export default function AboutScreen() {
             <Card variant="default" margin="none">
                 <View style={styles.missionHeader}>
                     <Ionicons 
-                        name="heart-outline" 
+                        name="heart" 
                         size={24} 
                         color="#2d5016" 
                         style={styles.missionIcon}

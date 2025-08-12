@@ -18,27 +18,27 @@ interface ButtonItem {
 export default function GuideScreen() {
   const guideItems: ButtonItem[] = [
     { 
+      title: 'Wildflowers', 
+      navigateTo: '/guides/wildflowers',
+      icon: 'flower',
+      description: 'Explore seasonal blooms and meadow flowers'
+    },
+    { 
       title: 'Animals', 
       navigateTo: '/guides/mammals',
-      icon: 'paw-outline',
+      icon: 'paw',
       description: 'Discover local wildlife and their habitats'
     },
     { 
       title: 'Trees and Shrubs', 
       navigateTo: '/guides/trees-and-shrubs',
-      icon: 'leaf-outline',
+      icon: 'leaf',
       description: 'Identify native trees and woodland plants'
-    },
-    { 
-      title: 'Wildflowers', 
-      navigateTo: '/guides/wildflowers',
-      icon: 'flower-outline',
-      description: 'Explore seasonal blooms and meadow flowers'
     },
     { 
       title: 'Trail Tracks', 
       navigateTo: '/guides/trail-tracks',
-      icon: 'footsteps-outline',
+      icon: 'footsteps',
       description: 'Learn to read animal tracks and signs'
     },
   ];
@@ -52,7 +52,7 @@ export default function GuideScreen() {
   return (
     <ScreenBackground backgroundSource={getImageSource(guideData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
       <ScreenHeader 
-          icon="book-outline"
+          icon="book"
           title="Stebbins Field Guide"
           subtitle="Explore the natural world around you"
       />

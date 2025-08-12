@@ -32,14 +32,14 @@ export default function EmergencyScreen() {
         {
             message: text1,
             phone: phone1,
-            icon: 'call-outline' as keyof typeof Ionicons.glyphMap,
+            icon: 'call' as keyof typeof Ionicons.glyphMap,
             priority: 'primary' as const,
             description: 'Primary emergency contact for the reserve area'
         },
         {
             message: text2,
             phone: phone2,
-            icon: 'warning-outline' as keyof typeof Ionicons.glyphMap,
+            icon: 'warning' as keyof typeof Ionicons.glyphMap,
             priority: 'critical' as const,
             description: 'Emergency services - use when no cell service available'
         }
@@ -48,7 +48,7 @@ export default function EmergencyScreen() {
     return (
         <ScreenBackground backgroundSource={getImageSource(emergencyData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
             <ScreenHeader 
-                icon="alert-circle-outline"
+                icon="alert-circle"
                 title="Emergency Contacts"
                 subtitle="Contacts for trail emergencies"
             />
@@ -57,7 +57,7 @@ export default function EmergencyScreen() {
             <View style={styles.safetyNotice}>
                 <View style={styles.noticeHeader}>
                     <Ionicons 
-                        name="information-circle-outline" 
+                        name="information-circle" 
                         size={20} 
                         color="white" 
                         style={styles.noticeIcon}
@@ -107,7 +107,7 @@ export default function EmergencyScreen() {
                     <Button
                         title={formatPhoneNumber(contact.phone)}
                         onPress={() => openPhoneNumber(contact.phone)}
-                        icon="call-outline"
+                        icon="call"
                         backgroundColor={contact.priority === 'critical' ? ['#ff4444', '#cc0000'] as const : ['#2d5016', '#1a3b0f'] as const}
                         textColor="white"
                         iconColor="white"

@@ -13,7 +13,7 @@ export default function RulesScreen() {
     return (
         <ScreenBackground backgroundSource={getImageSource(rulesData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
             <ScreenHeader 
-                icon="trail-sign-outline"
+                icon="trail-sign"
                 title="Trail Rules"
                 subtitle="Please follow these guidelines to help preserve the reserve"
             />
@@ -27,7 +27,7 @@ export default function RulesScreen() {
 
             <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
                 <View style={styles.rulesHeader}>
-                    <Ionicons name="checkmark-circle-outline" size={24} color="#374151" />
+                    <Ionicons name="checkmark-circle" size={24} color="#374151" />
                     <Text style={styles.rulesHeaderTitle}>Guidelines to Follow</Text>
                 </View>
 
@@ -53,7 +53,7 @@ export default function RulesScreen() {
 
             <Card variant="default" margin="none">
                 <View style={styles.footerContent}>
-                    <Ionicons name="heart-outline" size={24} color="#dc2626" />
+                    <Ionicons name="heart" size={24} color="#dc2626" />
                     <Text style={styles.footerText}>
                         Thank you for helping us protect and preserve this natural space for future generations.
                     </Text>

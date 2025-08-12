@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { GuideDataItem } from '../contexts/api';
 import ExpandableText from './expandable-text';
 
@@ -72,7 +72,7 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
           {item.season && item.season.length > 0 && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
-                <MaterialCommunityIcons name="leaf" size={25} color="#2d5016" />
+                <Ionicons name="leaf" size={25} color="#2d5016" />
                 <Text style={styles.tagLabel}>Seasons</Text>
               </View>
               <View style={styles.tagList}>

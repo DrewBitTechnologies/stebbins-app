@@ -1,6 +1,6 @@
 import { MileMarkerTrailData, NatureTrailMarkerData, POIMarkerData, SafetyMarkerData, useScreen } from '@/contexts/api';
 import { MAPBOX_ACCESS_TOKEN, MAPBOX_STYLE_URL } from '@/contexts/api.config';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ImageZoom } from '@likashefqet/react-native-image-zoom';
 import MapboxGL from "@rnmapbox/maps";
 import * as Location from 'expo-location';
@@ -243,28 +243,28 @@ export default function MapScreen() {
           </MapboxGL.MapView>
           <View style={styles.buttonContainer}>
             <Pressable style={[styles.mapActionButton, styles.mapButtonTop]} onPress={handleMapUpdate}>
-              <Ionicons name="cloud-download-outline" size={25} color={BLUE} />
+              <Ionicons name="cloud-download" size={25} color={BLUE} />
             </Pressable>
             <Pressable style={[styles.mapActionButton, styles.mapButtonMiddle]} onPress={handleResetZoom}>
-              <Ionicons name="contract-outline" size={25} color={BLUE} />
+              <Ionicons name="contract" size={25} color={BLUE} />
             </Pressable>
             <Pressable style={[styles.mapActionButton, styles.mapButtonBottom]} onPress={toggleInfoModal}>
-              <Ionicons name="help-circle-outline" size={25} color={BLUE} />
+              <Ionicons name="help-circle" size={25} color={BLUE} />
             </Pressable>
           </View>
 
           <View style={styles.toggleContainer}>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.nature && styles.toggleButtonActive]} onPress={() => toggleMarkerType('nature')}>
-                <Ionicons name="leaf-outline" size={25} color={activeMarkerTypes.nature ? '#fff' : BLUE} />
+                <Ionicons name="leaf" size={25} color={activeMarkerTypes.nature ? '#fff' : BLUE} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.mile && styles.toggleButtonActive]} onPress={() => toggleMarkerType('mile')}>
-                <Ionicons name="pin-outline" size={25} color={activeMarkerTypes.mile ? '#fff' : BLUE} />
+                <MaterialCommunityIcons name="map-marker" size={25} color={activeMarkerTypes.mile ? '#fff' : BLUE} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.safety && styles.toggleButtonActive]} onPress={() => toggleMarkerType('safety')}>
-                <Ionicons name="shield-checkmark-outline" size={25} color={activeMarkerTypes.safety ? '#fff' : BLUE} />
+                <Ionicons name="shield-checkmark" size={25} color={activeMarkerTypes.safety ? '#fff' : BLUE} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.poi && styles.toggleButtonActive]} onPress={() => toggleMarkerType('poi')}>
-                <Ionicons name="flag-outline" size={25} color={activeMarkerTypes.poi ? '#fff' : BLUE} />
+                <Ionicons name="flag" size={25} color={activeMarkerTypes.poi ? '#fff' : BLUE} />
             </TouchableOpacity>
           </View>
 

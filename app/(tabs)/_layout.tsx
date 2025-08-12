@@ -40,8 +40,8 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="home"
           options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home-outline" size={size} color={color} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? "home" : "home-outline"} size={size} color={color} />
             ),
             tabBarLabel: 'Home',
           }}
@@ -49,8 +49,8 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="map"
           options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="map-outline" size={size} color={color} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? "map" : "map-outline"} size={size} color={color} />
             ),
             tabBarLabel: 'Map',
           }}
@@ -58,8 +58,8 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="guide"
           options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="book-outline" size={size} color={color} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? "book" : "book-outline"} size={size} color={color} />
             ),
             tabBarLabel: 'Guide',
           }}
@@ -67,8 +67,8 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="report"
           options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="warning-outline" size={size} color={color} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? "warning" : "warning-outline"} size={size} color={color} />
             ),
             tabBarLabel: 'Report',
           }}
@@ -76,8 +76,8 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="donate"
           options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="wallet-outline" size={size} color={color} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons name={focused ? "wallet" : "wallet-outline"} size={size} color={color} />
             ),
             tabBarLabel: 'Donate',
           }}

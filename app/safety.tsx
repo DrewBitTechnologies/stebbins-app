@@ -33,7 +33,7 @@ export default function SafetyScreen() {
         return (
             <View style={styles.loadingContainer}>
                 <View style={styles.loadingContent}>
-                    <Ionicons name="shield-outline" size={48} color="#dc2626" />
+                    <Ionicons name="shield" size={48} color="#dc2626" />
                     <Text style={styles.loadingText}>Loading safety information...</Text>
                 </View>
             </View>
@@ -45,7 +45,7 @@ export default function SafetyScreen() {
     return (
         <ScreenBackground backgroundSource={getImageSource(safetyData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
                 <ScreenHeader 
-                    icon="shield-checkmark-outline"
+                    icon="shield-checkmark"
                     title="Safety Information"
                     subtitle="Stay safe during your outdoor adventure"
                 />
@@ -65,7 +65,7 @@ export default function SafetyScreen() {
                 >
                     <View style={styles.emergencyContent}>
                         <View style={styles.emergencyIconContainer}>
-                            <Ionicons name="call-outline" size={24} color="white" />
+                            <Ionicons name="call" size={24} color="white" />
                         </View>
                         <Text style={styles.emergencyTitle}>Emergency Contacts</Text>
                         <Ionicons name="chevron-forward" size={24} color="white" />
@@ -74,7 +74,7 @@ export default function SafetyScreen() {
 
                 <Card variant="default" margin="standard">
                     <View style={styles.guidelinesHeader}>
-                        <Ionicons name="list-outline" size={24} color="#374151" />
+                        <Ionicons name="list" size={24} color="#374151" />
                         <Text style={styles.guidelinesTitle}>Safety Guidelines</Text>
                     </View>
                     

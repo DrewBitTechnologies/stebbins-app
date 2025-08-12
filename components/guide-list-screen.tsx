@@ -38,17 +38,25 @@ export default function GuideListScreen({ route }: { route: any }) {
   const filterAnimation = useSharedValue(0);
 
   const guideCategories = [
-    { title: 'Trees & Shrubs', route: '/guides/trees-and-shrubs', icon: 'leaf' as keyof typeof MaterialCommunityIcons.glyphMap },
-    { title: 'Trail Tracks', route: '/guides/trail-tracks', icon: 'foot-print' as keyof typeof MaterialCommunityIcons.glyphMap },
-    { title: 'Wildflowers', route: '/guides/wildflowers', icon: 'flower' as keyof typeof MaterialCommunityIcons.glyphMap },
+    { title: 'Trees & Shrubs', route: '/guides/trees-and-shrubs', iconLibrary: 'Ionicons', icon: 'leaf' },
+    { title: 'Trail Tracks', route: '/guides/trail-tracks', iconLibrary: 'Ionicons', icon: 'footsteps' },
+    { title: 'Wildflowers', route: '/guides/wildflowers', iconLibrary: 'Ionicons', icon: 'flower' },
   ];
 
   const animalCategories = [
-    { title: 'Mammals', route: '/guides/mammals', icon: 'paw' as keyof typeof MaterialCommunityIcons.glyphMap },
-    { title: 'Birds', route: '/guides/birds', icon: 'feather' as keyof typeof MaterialCommunityIcons.glyphMap },
-    { title: 'Herps', route: '/guides/herps', icon: 'snake' as keyof typeof MaterialCommunityIcons.glyphMap },
-    { title: 'Invertebrates', route: '/guides/invertebrates', icon: 'ladybug' as keyof typeof MaterialCommunityIcons.glyphMap },
+    { title: 'Mammals', route: '/guides/mammals', iconLibrary: 'Ionicons', icon: 'paw' },
+    { title: 'Birds', route: '/guides/birds', iconLibrary: 'MaterialCommunityIcons', icon: 'feather' },
+    { title: 'Herps', route: '/guides/herps', iconLibrary: 'MaterialCommunityIcons', icon: 'snake' },
+    { title: 'Invertebrates', route: '/guides/invertebrates', iconLibrary: 'MaterialCommunityIcons', icon: 'ladybug' },
   ];
+
+  const renderCategoryIcon = (category: { iconLibrary: string; icon: string }, color: string, size: number = 25) => {
+    if (category.iconLibrary === 'Ionicons') {
+      return <Ionicons name={category.icon as any} size={size} color={color} />;
+    } else {
+      return <MaterialCommunityIcons name={category.icon as any} size={size} color={color} />;
+    }
+  };
 
   const getFilterCategoryName = () => {
     const titleLower = title.toLowerCase();
@@ -301,11 +309,11 @@ export default function GuideListScreen({ route }: { route: any }) {
                   ]}
                   onPress={() => handleCategoryChange(category.route)}
                 >
-                  <MaterialCommunityIcons 
-                    name={category.icon} 
-                    size={25} 
-                    color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
-                  />
+                  {renderCategoryIcon(
+                    category, 
+                    isCurrentCategory(category.title) ? '#fff' : '#2d5016', 
+                    25
+                  )}
                   <Text style={[
                     styles.categoryButtonText,
                     isCurrentCategory(category.title) && styles.categoryButtonTextActive
@@ -330,11 +338,11 @@ export default function GuideListScreen({ route }: { route: any }) {
                   ]}
                   onPress={() => handleAnimalCategoryChange(category.route)}
                 >
-                  <MaterialCommunityIcons 
-                    name={category.icon} 
-                    size={25} 
-                    color={isCurrentCategory(category.title) ? '#fff' : '#2d5016'} 
-                  />
+                  {renderCategoryIcon(
+                    category, 
+                    isCurrentCategory(category.title) ? '#fff' : '#2d5016', 
+                    25
+                  )}
                   <Text style={[
                     styles.categoryButtonText,
                     isCurrentCategory(category.title) && styles.categoryButtonTextActive
