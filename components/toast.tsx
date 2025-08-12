@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 interface ToastProps {
   message: string | null;
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
     bottom: 90,
   },
   text: {
-    color: 'white',
+    color: ColorPalette.white,
     fontSize: 14,
     textAlign: 'center',
   },

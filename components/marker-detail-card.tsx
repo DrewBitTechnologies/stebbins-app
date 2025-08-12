@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { ImageZoom } from '@likashefqet/react-native-image-zoom';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AnyMarker, getMarkerTitle, getMarkerSubtitle } from '@/utility/marker-utils';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 interface MarkerDetailCardProps {
   marker: AnyMarker;
@@ -77,13 +78,13 @@ const styles = StyleSheet.create({
   commonName: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: ColorPalette.text_primary,
     marginBottom: 4,
   },
   latinName: {
     fontSize: 16,
     fontStyle: 'italic',
-    color: '#666',
+    color: ColorPalette.text_secondary,
   },
   imageContainer: {
     height: 300,
@@ -101,6 +102,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     lineHeight: 24,
-    color: '#444',
+    color: ColorPalette.text_primary,
   },
 });

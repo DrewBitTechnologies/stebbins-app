@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 interface FilterChipProps {
   label: string;
@@ -39,16 +40,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   filterChipSelected: {
-    backgroundColor: '#2d5016',
-    borderColor: '#2d5016',
+    backgroundColor: ColorPalette.primary_green,
+    borderColor: ColorPalette.primary_green,
   },
   filterChipText: {
     fontSize: 14,
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     fontWeight: '500',
   },
   filterChipTextSelected: {
-    color: '#fff',
+    color: ColorPalette.white,
     fontWeight: '600',
   },
 });

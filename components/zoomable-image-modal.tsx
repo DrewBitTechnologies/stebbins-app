@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dimensions, Image, Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 const { height: screenHeight } = Dimensions.get('window');
 
@@ -87,11 +88,11 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#fff',
+    backgroundColor: ColorPalette.white,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
-    shadowColor: '#000',
+    shadowColor: ColorPalette.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

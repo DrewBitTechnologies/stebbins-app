@@ -1,3 +1,4 @@
+import { ColorPalette } from '@/assets/dev/color_palette';
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
     // Base card with common properties
     baseCard: {
         borderRadius: 16,
-        shadowColor: '#000',
+        shadowColor: ColorPalette.black,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.15,
         shadowRadius: 8,
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
     },
     
     emergencyCard: {
-        backgroundColor: '#e63946',
+        backgroundColor: ColorPalette.primary_red,
         padding: 20,
         shadowOpacity: 0.25,
         borderColor: 'rgba(255, 255, 255, 0.3)',

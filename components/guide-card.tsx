@@ -151,13 +151,13 @@ const styles = StyleSheet.create({
   commonName: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: ColorPalette.text_primary,
     marginBottom: 4,
   },
   latinName: {
     fontSize: 15,
     fontStyle: 'italic',
-    color: '#666',
+    color: ColorPalette.text_secondary,
     marginBottom: 2,
   },
   tagContainer: {
@@ -216,6 +216,6 @@ const styles = StyleSheet.create({
   emptyTagText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#6c757d',
+    color: ColorPalette.text_secondary,
   },
 });

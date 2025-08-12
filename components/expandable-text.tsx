@@ -8,6 +8,7 @@ import Animated, {
   interpolate,
   runOnJS
 } from 'react-native-reanimated';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 interface ExpandableTextProps {
   text: string;
@@ -54,7 +55,7 @@ export default function ExpandableText({ text, maxLines = 3 }: ExpandableTextPro
             {expanded ? 'Less' : 'More'}
           </Text>
           <Animated.View style={chevronStyle}>
-            <Ionicons name="chevron-down" size={12} color="#2d5016" style={styles.moreButtonIcon} />
+            <Ionicons name="chevron-down" size={12} color={ColorPalette.primary_green} style={styles.moreButtonIcon} />
           </Animated.View>
         </TouchableOpacity>
       )}
@@ -65,7 +66,7 @@ export default function ExpandableText({ text, maxLines = 3 }: ExpandableTextPro
 const styles = StyleSheet.create({
   description: {
     fontSize: 15,
-    color: '#495057',
+    color: ColorPalette.text_secondary,
     lineHeight: 22,
     marginBottom: 4,
   },
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
   },
   moreButtonText: {
     fontSize: 14,
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     fontWeight: '500',
   },
   moreButtonIcon: {

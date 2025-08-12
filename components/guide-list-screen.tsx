@@ -784,7 +784,7 @@ const styles = StyleSheet.create({
   },
   filterBarDivider: {
     fontSize: 14,
-    color: '#666',
+    color: ColorPalette.text_secondary,
     marginHorizontal: 4,
   },
   activeFiltersText: {

@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { getFileSizeDisplay } from '@/utility/image-processing';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 interface FileThumbnailProps {
   file: ImagePicker.ImagePickerAsset;
@@ -18,7 +19,7 @@ export default function FileThumbnail({ file, index, onRemove }: FileThumbnailPr
       <View style={styles.imageContainer}>
         {isVideo ? (
           <View style={styles.videoThumbnail}>
-            <Ionicons name="videocam" size={24} color="white" />
+            <Ionicons name="videocam" size={24} color={ColorPalette.white} />
           </View>
         ) : (
           <Image source={{ uri: file.uri }} style={styles.imageThumbnail} />
@@ -40,7 +41,7 @@ export default function FileThumbnail({ file, index, onRemove }: FileThumbnailPr
         onPress={() => onRemove(index)} 
         style={styles.removeButton}
       >
-        <Ionicons name="close" size={16} color="white" />
+        <Ionicons name="close" size={16} color={ColorPalette.white} />
       </TouchableOpacity>
     </View>
   );
@@ -79,18 +80,18 @@ const styles = StyleSheet.create({
   fileName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: ColorPalette.text_primary,
     marginBottom: 2,
   },
   fileSize: {
     fontSize: 12,
-    color: '#666',
+    color: ColorPalette.text_secondary,
   },
   removeButton: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#ff4444',
+    backgroundColor: ColorPalette.primary_red,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 interface ButtonProps {
     title: string;
@@ -22,8 +23,8 @@ export default function Button({
     title,
     onPress,
     icon,
-    backgroundColor = ['#f3c436', '#e6b429'] as const,
-    textColor = '#1a1a1a',
+    backgroundColor = [ColorPalette.primary_gold, ColorPalette.ucd_gold_80] as const,
+    textColor = ColorPalette.text_primary,
     iconColor,
     disabled = false,
     loading = false,
@@ -37,7 +38,7 @@ export default function Button({
     const displayIcon = loading ? loadingIcon : icon;
     const finalIconColor = iconColor || textColor;
     
-    const disabledColors = ['#cccccc', '#999999'] as const;
+    const disabledColors = [ColorPalette.black_20, ColorPalette.black_60] as const;
     const gradientColors = isDisabled ? disabledColors : backgroundColor;
     
     const sizeStyles = {
@@ -113,7 +114,7 @@ export default function Button({
 const styles = StyleSheet.create({
     button: {
         borderRadius: 12,
-        shadowColor: '#000',
+        shadowColor: ColorPalette.black,
         shadowOffset: {
             width: 0,
             height: 4,

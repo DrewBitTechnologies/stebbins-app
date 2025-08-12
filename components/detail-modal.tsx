@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Card from './card';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 interface DetailModalProps {
   visible: boolean;
@@ -42,7 +43,7 @@ export default function DetailModal({
           style={styles.closeButton} 
           onPress={onClose}
         >
-          <Ionicons name="close" size={28} color="#022851" />
+          <Ionicons name="close" size={28} color={ColorPalette.primary_blue} />
         </TouchableOpacity>
       </View>
     </Modal>
@@ -76,11 +77,11 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#fff',
+    backgroundColor: ColorPalette.white,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
-    shadowColor: '#000',
+    shadowColor: ColorPalette.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
