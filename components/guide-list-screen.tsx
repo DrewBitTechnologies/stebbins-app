@@ -15,6 +15,7 @@ import ZoomableImageModal from './zoomable-image-modal';
 import { getImageSource } from '@/utility/image-source';
 import { router } from 'expo-router';
 import { BlurView } from 'expo-blur';
+import { ColorPalette } from '../assets/dev/color_palette';
 
 
 export default function GuideListScreen({ route }: { route: any }) {
@@ -269,7 +270,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       >
         <View style={styles.navigationBarContent}>
           <View style={styles.navigationBarLeft}>
-            <Ionicons name="book" size={25} color="#2d5016" style={styles.iconWithMargin} />
+            <Ionicons name="book" size={25} color={ColorPalette.primary_green}style={styles.iconWithMargin} />
             <View style={styles.navigationBarTextContainer}>
               <Text style={styles.navigationBarTitle}>Navigate Guides</Text>
               <View style={styles.navigationBarSubtitle}>
@@ -284,7 +285,7 @@ export default function GuideListScreen({ route }: { route: any }) {
               <MaterialCommunityIcons 
                 name="chevron-down"
                 size={25} 
-                color="#2d5016" 
+                color={ColorPalette.primary_green}
               />
             </Animated.View>
           </View>
@@ -311,7 +312,7 @@ export default function GuideListScreen({ route }: { route: any }) {
                 >
                   {renderCategoryIcon(
                     category, 
-                    isCurrentCategory(category.title) ? '#fff' : '#2d5016', 
+                    isCurrentCategory(category.title) ? ColorPalette.white : ColorPalette.primary_green, 
                     25
                   )}
                   <Text style={[
@@ -340,7 +341,7 @@ export default function GuideListScreen({ route }: { route: any }) {
                 >
                   {renderCategoryIcon(
                     category, 
-                    isCurrentCategory(category.title) ? '#fff' : '#2d5016', 
+                    isCurrentCategory(category.title) ? ColorPalette.white : ColorPalette.primary_green, 
                     25
                   )}
                   <Text style={[
@@ -379,7 +380,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           <Text style={styles.filterExpandedTitle}>Filter {getFilterCategoryName()}</Text>
           {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
             <TouchableOpacity style={styles.clearAllButton} onPress={clearAllFilters}>
-              <MaterialCommunityIcons name="close-circle" size={16} color="#000000" />
+              <MaterialCommunityIcons name="close-circle" size={16} color={ColorPalette.black} />
               <Text style={styles.clearAllButtonText}>Clear All</Text>
             </TouchableOpacity>
           )}
@@ -389,7 +390,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           {/* Color Filter Section - Always Show */}
           <View style={styles.filterSection}>
             <View style={styles.filterTitleContainer}>
-              <MaterialCommunityIcons name="palette" size={25} color="#2d5016" />
+              <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green}/>
               <Text style={styles.filterTitle}>Filter by Color</Text>
             </View>
             <View style={styles.chipContainer}>
@@ -411,7 +412,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           {/* Season Filter Section - Always Show */}
           <View style={styles.filterSection}>
             <View style={styles.filterTitleContainer}>
-              <MaterialCommunityIcons name="calendar" size={25} color="#2d5016" />
+              <MaterialCommunityIcons name="calendar" size={25} color={ColorPalette.primary_green}/>
               <Text style={styles.filterTitle}>Filter by Season</Text>
             </View>
             <View style={styles.chipContainer}>
@@ -440,7 +441,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       >
         <View style={styles.filterBarContent}>
           <View style={styles.filterBarLeft}>
-            <MaterialCommunityIcons name="filter-variant" size={25} color="#2d5016" style={styles.iconWithMargin} />
+            <MaterialCommunityIcons name="filter-variant" size={25} color={ColorPalette.primary_green}style={styles.iconWithMargin} />
             <View style={styles.filterBarTextContainer}>
               <Text style={styles.filterBarTitle}>Filters</Text>
               <View style={styles.filterBarSubtitle}>
@@ -463,7 +464,7 @@ export default function GuideListScreen({ route }: { route: any }) {
               <MaterialCommunityIcons 
                 name="chevron-up"
                 size={25} 
-                color="#2d5016" 
+                color={ColorPalette.primary_green}
               />
             </Animated.View>
             {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
@@ -492,7 +493,7 @@ export default function GuideListScreen({ route }: { route: any }) {
         />
         <View style={styles.loadingContainer}>
           <View style={styles.loadingCard}>
-            <ActivityIndicator size="large" color="#2d5016" />
+            <ActivityIndicator size="large" color={ColorPalette.primary_green}/>
             <Text style={styles.loadingText}>Loading {title.toLowerCase()}...</Text>
           </View>
         </View>
@@ -589,7 +590,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 32,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: ColorPalette.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
@@ -600,7 +601,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     fontWeight: '500',
   },
   topNavigationComponent: {
@@ -608,9 +609,9 @@ const styles = StyleSheet.create({
     top: 20,
     left: 20,
     right: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: ColorPalette.white,
     borderRadius: 16,
-    shadowColor: '#000000',
+    shadowColor: ColorPalette.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
     shadowRadius: 10,
@@ -637,12 +638,7 @@ const styles = StyleSheet.create({
   navigationExpandedTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2d5016',
-  },
-  navigationExpandedSubtitle: {
-    // fontSize: 14,
-    // color: '#666',
-    // marginTop: 2,
+    color: ColorPalette.primary_green,
   },
   navigationScrollContent: {
     maxHeight: 280,
@@ -660,7 +656,7 @@ const styles = StyleSheet.create({
   expandedSectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     marginBottom: 12,
   },
   flatList: {
@@ -677,9 +673,9 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: ColorPalette.white,
     borderRadius: 16,
-    shadowColor: '#000000',
+    shadowColor: ColorPalette.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
     shadowRadius: 10,
@@ -714,7 +710,7 @@ const styles = StyleSheet.create({
   navigationBarTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     marginBottom: 2,
   },
   navigationBarSubtitle: {
@@ -723,7 +719,7 @@ const styles = StyleSheet.create({
   },
   navigationBarSubtitleText: {
     fontSize: 14,
-    color: '#000000',
+    color: ColorPalette.text_secondary,
   },
   navigationBarRight: {
     flexDirection: 'row',
@@ -737,7 +733,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderTopWidth: 1,
     borderTopColor: 'rgba(45, 80, 22, 0.1)',
-    shadowColor: '#000',
+    shadowColor: ColorPalette.black,
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
@@ -775,7 +771,7 @@ const styles = StyleSheet.create({
   filterBarTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     marginBottom: 2,
   },
   filterBarSubtitle: {
@@ -784,7 +780,7 @@ const styles = StyleSheet.create({
   },
   filterBarSubtitleText: {
     fontSize: 14,
-    color: '#000000',
+    color: ColorPalette.text_secondary,
   },
   filterBarDivider: {
     fontSize: 14,
@@ -793,11 +789,11 @@ const styles = StyleSheet.create({
   },
   activeFiltersText: {
     fontSize: 14,
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     fontWeight: '500',
   },
   activeFilterBadge: {
-    backgroundColor: '#2d5016',
+    backgroundColor: ColorPalette.primary_green,
     borderRadius: 12,
     minWidth: 24,
     height: 24,
@@ -835,7 +831,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(102, 102, 102, 0.2)',
   },
   clearAllButtonText: {
-    color: '#000000',
+    color: ColorPalette.text_primary,
     fontSize: 14,
     fontWeight: '500',
     marginLeft: 6,
@@ -860,23 +856,23 @@ const styles = StyleSheet.create({
     minWidth: 120,
   },
   categoryButtonActive: {
-    backgroundColor: '#2d5016',
-    borderColor: '#2d5016',
+    backgroundColor: ColorPalette.primary_green,
+    borderColor: ColorPalette.primary_green,
   },
   categoryButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     marginLeft: 8,
     flex: 1,
   },
   categoryButtonTextActive: {
-    color: '#fff',
+    color: ColorPalette.white,
   },
   categoryGroupTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     marginTop: 8,
     marginBottom: 12,
   },
@@ -903,7 +899,7 @@ const styles = StyleSheet.create({
   filterExpandedTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
   },
   filterScrollContent: {
     maxHeight: 240,
@@ -914,7 +910,7 @@ const styles = StyleSheet.create({
   filterTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     marginLeft: 8,
   },
   filterFooter: {
@@ -935,7 +931,7 @@ const styles = StyleSheet.create({
   },
   filterResultsText: {
     fontSize: 14,
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     fontWeight: '600',
   },
   iconWithMargin: {
@@ -943,7 +939,7 @@ const styles = StyleSheet.create({
   },
   noFiltersText: {
     fontSize: 14,
-    color: '#000000',
+    color: ColorPalette.black,
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: 8,

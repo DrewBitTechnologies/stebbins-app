@@ -6,6 +6,7 @@ import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import { getImageSource } from '@/utility/image-source';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 export default function RulesScreen() {
     const { data: rulesData, getImagePath } = useScreen<RulesData>('rules');
@@ -27,7 +28,7 @@ export default function RulesScreen() {
 
             <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
                 <View style={styles.rulesHeader}>
-                    <Ionicons name="checkmark-circle" size={24} color="#374151" />
+                    <Ionicons name="checkmark-circle" size={24} color={ColorPalette.primary_green} />
                     <Text style={styles.rulesHeaderTitle}>Guidelines to Follow</Text>
                 </View>
 
@@ -53,7 +54,7 @@ export default function RulesScreen() {
 
             <Card variant="default" margin="none">
                 <View style={styles.footerContent}>
-                    <Ionicons name="heart" size={24} color="#dc2626" />
+                    <Ionicons name="heart" size={24} color={ColorPalette.primary_red} />
                     <Text style={styles.footerText}>
                         Thank you for helping us protect and preserve this natural space for future generations.
                     </Text>
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
     rulesHeaderTitle: {
         fontSize: 20,
         fontWeight: '600',
-        color: '#374151',
+        color: ColorPalette.text_primary,
         marginLeft: 12,
     },
     rulesContainer: {
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     },
     ruleItem: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
+        alignItems: 'center',
     },
     ruleIconContainer: {
         width: 85,
@@ -107,12 +108,10 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
     },
     ruleText: {
-        fontSize: 18,
-        
+        fontSize: 20,
         lineHeight: 24,
-        color: '#374151',
+        color: ColorPalette.text_secondary,
         flex: 1,
-        marginTop: 2,
     },
     footerContent: {
         flexDirection: 'row',
@@ -121,7 +120,7 @@ const styles = StyleSheet.create({
     footerText: {
         fontSize: 16,
         lineHeight: 24,
-        color: '#374151',
+        color: ColorPalette.text_secondary,
         flex: 1,
         marginLeft: 12,
         fontStyle: 'italic',
@@ -129,7 +128,7 @@ const styles = StyleSheet.create({
     ruleCard: {
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
         borderRadius: 12,
-        shadowColor: '#000',
+        shadowColor: ColorPalette.black,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,

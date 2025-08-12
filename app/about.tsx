@@ -8,6 +8,7 @@ import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import Button from '@/components/button';
 import { getImageSource } from '@/utility/image-source';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 export default function AboutScreen() {
     const { data: aboutData, getImagePath } = useScreen<AboutData>('about');
@@ -44,8 +45,8 @@ export default function AboutScreen() {
                     onPress={handleWebsitePress}
                     icon="globe"
                     backgroundColor={['rgba(45, 80, 22, 0.1)', 'rgba(45, 80, 22, 0.05)'] as const}
-                    textColor="#2d5016"
-                    iconColor="#2d5016"
+                    textColor={ColorPalette.primary_green}
+                    iconColor={ColorPalette.primary_green}
                     size="small"
                     style={{
                         borderWidth: 1,
@@ -60,7 +61,7 @@ export default function AboutScreen() {
                     <Ionicons 
                         name="heart" 
                         size={24} 
-                        color="#2d5016" 
+                        color={ColorPalette.primary_green} 
                         style={styles.missionIcon}
                     />
                     <Text style={styles.missionTitle}>Our Mission</Text>
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
     mainText: {
         fontSize: 16,
         lineHeight: 24,
-        color: '#333',
+        color: ColorPalette.text_primary,
         marginBottom: 20,
     },
     missionHeader: {
@@ -93,12 +94,12 @@ const styles = StyleSheet.create({
     missionTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#2d5016',
+        color: ColorPalette.primary_green,
     },
     missionText: {
         fontSize: 15,
         lineHeight: 22,
-        color: '#555',
+        color: ColorPalette.text_secondary,
         textAlign: 'center',
         fontStyle: 'italic',
     },

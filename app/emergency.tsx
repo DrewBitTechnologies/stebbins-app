@@ -8,6 +8,7 @@ import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import Button from '@/components/button';
 import { getImageSource } from '@/utility/image-source';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 const openPhoneNumber = (phoneNumber: string) => {
     Linking.openURL(`tel:${phoneNumber}`).catch((err) => console.error('An error occurred', err));
@@ -88,7 +89,7 @@ export default function EmergencyScreen() {
                             <Ionicons 
                                 name={contact.icon} 
                                 size={24} 
-                                color={contact.priority === 'critical' ? '#ff4444' : '#2d5016'} 
+                                color={contact.priority === 'critical' ? ColorPalette.primary_red : ColorPalette.primary_green} 
                             />
                         </View>
                         <View style={styles.contactInfo}>
@@ -108,7 +109,7 @@ export default function EmergencyScreen() {
                         title={formatPhoneNumber(contact.phone)}
                         onPress={() => openPhoneNumber(contact.phone)}
                         icon="call"
-                        backgroundColor={contact.priority === 'critical' ? ['#ff4444', '#cc0000'] as const : ['#2d5016', '#1a3b0f'] as const}
+                        backgroundColor={contact.priority === 'critical' ? [ColorPalette.primary_red, '#cc0000'] as const : [ColorPalette.primary_green, '#1a3b0f'] as const}
                         textColor="white"
                         iconColor="white"
                     />
@@ -138,16 +139,16 @@ const styles = StyleSheet.create({
     noticeTitle: {
         fontSize: 16,
         fontWeight: '600',
-        color: 'white',
+        color: ColorPalette.text_on_dark,
     },
     noticeText: {
         fontSize: 14,
-        color: 'rgba(255,255,255,0.9)',
+        color: ColorPalette.text_on_dark,
         lineHeight: 20,
     },
     criticalCard: {
         borderLeftWidth: 4,
-        borderLeftColor: '#ff4444',
+        borderLeftColor: ColorPalette.primary_red,
     },
     contactHeader: {
         flexDirection: 'row',
@@ -172,16 +173,16 @@ const styles = StyleSheet.create({
     contactMessage: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#1a1a1a',
+        color: ColorPalette.text_primary,
         marginBottom: 4,
         textTransform: 'uppercase',
     },
     criticalMessage: {
-        color: '#cc0000',
+        color: ColorPalette.primary_red,
     },
     contactDescription: {
         fontSize: 14,
-        color: '#666',
+        color: ColorPalette.text_secondary,
         lineHeight: 18,
     },
     tipsCard: {
@@ -212,7 +213,7 @@ const styles = StyleSheet.create({
     tipsTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#2d5016',
+        color: ColorPalette.primary_green,
     },
     tipsList: {
         gap: 8,
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
     },
     tipText: {
         fontSize: 14,
-        color: '#555',
+        color: ColorPalette.text_secondary,
         flex: 1,
     },
 });

@@ -7,6 +7,7 @@ import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import { getImageSource } from '@/utility/image-source';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 interface ButtonItem {
   title: string;
@@ -74,7 +75,7 @@ export default function GuideScreen() {
               <Ionicons 
                 name={item.icon} 
                 size={28} 
-                color="#2d5016" 
+                color={ColorPalette.primary_green} 
               />
             </View>
             
@@ -120,19 +121,17 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: ColorPalette.text_primary,
     marginBottom: 4,
   },
   cardDescription: {
     fontSize: 14,
-    color: '#666',
+    color: ColorPalette.text_secondary,
     lineHeight: 20,
   },
   arrowContainer: {
     width: 32,
     height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
     justifyContent: 'center',
     alignItems: 'center',
   },

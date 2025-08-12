@@ -5,8 +5,8 @@ import { BrandingData, useApi, useScreen } from '@/contexts/api';
 import { SCREEN_CONFIGS, CACHE_DIR } from '@/contexts/api.config';
 import { isCacheVersionValid, wipeCache, saveCacheVersion, getCurrentAppVersion, getCacheVersion } from '@/contexts/api.service';
 import * as FileSystem from 'expo-file-system';
-
 import { getImageSource } from '@/utility/image-source';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 export default function SplashScreen() {
   const { checkForUpdates, checkAllScreensForUpdates } = useApi();
@@ -169,7 +169,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: ColorPalette.white,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#1D4776',
+    backgroundColor: ColorPalette.primary_blue,
     borderRadius: 4,
   },
   screenShimmer: {

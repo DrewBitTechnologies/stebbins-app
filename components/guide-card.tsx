@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { GuideDataItem } from '../contexts/api';
 import ExpandableText from './expandable-text';
+import { ColorPalette } from '../assets/dev/color_palette';
 
 interface GuideCardProps {
   item: GuideDataItem;
@@ -25,7 +26,7 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
               resizeMode="cover"
             />
             <View style={styles.zoomIndicator}>
-              <MaterialCommunityIcons name="magnify-expand" size={16} color="#2d5016" />
+              <MaterialCommunityIcons name="magnify-expand" size={16} color={ColorPalette.primary_green} />
             </View>
           </TouchableOpacity>
         )}
@@ -41,7 +42,7 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
           {item.color && item.color.length > 0 && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
-                <MaterialCommunityIcons name="palette" size={25} color="#2d5016" />
+                <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green} />
                 <Text style={styles.tagLabel}>Colors</Text>
               </View>
               <View style={styles.tagList}>
@@ -58,7 +59,7 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
           {(!item.color || item.color.length === 0) && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
-                <MaterialCommunityIcons name="palette" size={25} color="#2d5016" />
+                <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green} />
                 <Text style={styles.tagLabel}>Colors</Text>
               </View>
               <View style={styles.tagList}>
@@ -72,7 +73,7 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
           {item.season && item.season.length > 0 && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
-                <Ionicons name="leaf" size={25} color="#2d5016" />
+                <Ionicons name="leaf" size={25} color={ColorPalette.primary_green} />
                 <Text style={styles.tagLabel}>Seasons</Text>
               </View>
               <View style={styles.tagList}>
@@ -91,7 +92,7 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
           {(!item.season || item.season.length === 0) && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
-                <MaterialCommunityIcons name="leaf" size={25} color="#2d5016" />
+                <MaterialCommunityIcons name="leaf" size={25} color={ColorPalette.primary_green} />
                 <Text style={styles.tagLabel}>Seasons</Text>
               </View>
               <View style={styles.tagList}>
@@ -110,7 +111,7 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
 const styles = StyleSheet.create({
   cardContainer: {
     borderRadius: 16,
-    shadowColor: '#000',
+    shadowColor: ColorPalette.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
   tagLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
     marginLeft: 6,
   },
   tagList: {
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#2d5016',
+    color: ColorPalette.primary_green,
   },
   emptyTagText: {
     fontSize: 12,

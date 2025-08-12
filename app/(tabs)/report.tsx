@@ -12,7 +12,7 @@ import FilesList from '@/components/files-list';
 import { getImageSource } from '@/utility/image-source';
 import { pickFiles, removeFile, removeAllFiles } from '@/utility/file-management';
 import { submitCompleteReport, ContactInfo } from '@/utility/report-api';
-
+import { ColorPalette }from '@/assets/dev/color_palette';
 
 export default function ReportScreen() {
   const { data: reportData, getImagePath } = useScreen<ReportData>('report');
@@ -109,7 +109,7 @@ export default function ReportScreen() {
       <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
         <View style={styles.sectionHeader}>
           <View style={styles.sectionIconContainer}>
-            <Ionicons name="camera" size={24} color="#2d5016" />
+            <Ionicons name="camera" size={24} color={ColorPalette.primary_green} />
           </View>
           <View style={styles.sectionHeaderText}>
             <Text style={styles.sectionTitle}>
@@ -132,12 +132,12 @@ export default function ReportScreen() {
           onPress={handlePickFiles}
           icon={files.length === 0 ? "add-circle" : "add"}
           backgroundColor={['#f8f9fa', '#f0f0f0'] as const}
-          textColor="#2d5016"
-          iconColor="#2d5016"
+          textColor={ColorPalette.primary_green}
+          iconColor={ColorPalette.primary_green}
           disabled={isSubmitting}
           style={{ 
             borderWidth: 2,
-            borderColor: '#2d5016',
+            borderColor: ColorPalette.primary_green,
             borderStyle: 'dashed',
             shadowOpacity: 0
           }}
@@ -147,7 +147,7 @@ export default function ReportScreen() {
       <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
         <View style={styles.sectionHeader}>
           <View style={styles.sectionIconContainer}>
-            <Ionicons name="document-text" size={24} color="#2d5016" />
+            <Ionicons name="document-text" size={24} color={ColorPalette.primary_green} />
           </View>
           <View style={styles.sectionHeaderText}>
             <Text style={styles.sectionTitle}>
@@ -169,7 +169,7 @@ export default function ReportScreen() {
           value={description}
           onChangeText={setDescription}
           placeholder="Describe the issue you'd like to report (optional)..."
-          placeholderTextColor="#999"
+          placeholderTextColor={ColorPalette.text_light}
           editable={!isSubmitting}
           onFocus={() => setFocusedInput('description')}
           onBlur={() => setFocusedInput(null)}
@@ -179,7 +179,7 @@ export default function ReportScreen() {
       <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
         <View style={styles.sectionHeader}>
           <View style={styles.sectionIconContainer}>
-            <Ionicons name="person" size={24} color="#2d5016" />
+            <Ionicons name="person" size={24} color={ColorPalette.primary_green} />
           </View>
           <View style={styles.sectionHeaderText}>
             <Text style={styles.sectionTitle}>
@@ -199,7 +199,7 @@ export default function ReportScreen() {
               focusedInput === 'firstName' && styles.focusedInput
             ]}
             placeholder="First Name"
-            placeholderTextColor="#999"
+            placeholderTextColor={ColorPalette.text_light}
             value={contact.firstName}
             onChangeText={(text) => setContact({ ...contact, firstName: text })}
             editable={!isSubmitting}
@@ -213,7 +213,7 @@ export default function ReportScreen() {
               focusedInput === 'lastName' && styles.focusedInput
             ]}
             placeholder="Last Name"
-            placeholderTextColor="#999"
+            placeholderTextColor={ColorPalette.text_light}
             value={contact.lastName}
             onChangeText={(text) => setContact({ ...contact, lastName: text })}
             editable={!isSubmitting}
@@ -228,7 +228,7 @@ export default function ReportScreen() {
             focusedInput === 'email' && styles.focusedInput
           ]}
           placeholder="Email Address"
-          placeholderTextColor="#999"
+          placeholderTextColor={ColorPalette.text_light}
           keyboardType="email-address"
           autoCapitalize="none"
           value={contact.email}
@@ -244,7 +244,7 @@ export default function ReportScreen() {
             focusedInput === 'phone' && styles.focusedInput
           ]}
           placeholder="Phone Number"
-          placeholderTextColor="#999"
+          placeholderTextColor={ColorPalette.text_light}
           keyboardType="phone-pad"
           value={contact.phone}
           onChangeText={(text) => setContact({ ...contact, phone: text })}
@@ -296,12 +296,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: ColorPalette.text_primary,
     marginBottom: 2,
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: ColorPalette.text_secondary,
     lineHeight: 18,
   },
   // Form input styles
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   },
   focusedInput: {
     borderWidth: 2,
-    borderColor: '#2d5016',
+    borderColor: ColorPalette.primary_green,
   },
   privacyNotice: {
     flexDirection: 'row',

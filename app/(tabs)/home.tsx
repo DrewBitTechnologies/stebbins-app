@@ -7,6 +7,7 @@ import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import ScreenHeader from '@/components/screen-header';
 import { getImageSource } from '@/utility/image-source';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 interface ButtonItem {
   title: string;
@@ -31,21 +32,21 @@ export default function HomeScreen() {
       navigateTo: '/(tabs)/map',
       icon: 'map',
       description: 'Navigate the reserve with a live map',
-      color: '#2d5016'
+      color: ColorPalette.primary_green
     },
     {
       title: 'Field Guides',
       navigateTo: '/(tabs)/guide',
       icon: 'book',
       description: 'Identify local flora and fauna',
-      color: '#2d5016'
+      color: ColorPalette.primary_green
     },
     {
       title: 'Report an Issue',
       navigateTo: '/(tabs)/report',
       icon: 'warning',
       description: 'Help us maintain the trails',
-      color: '#2d5016'
+      color: ColorPalette.primary_green
     },
   ];
 
@@ -55,28 +56,28 @@ export default function HomeScreen() {
       navigateTo: '/safety',
       icon: 'shield-checkmark',
       description: 'Essential safety guidelines',
-      color: '#4a7c59'
+      color: ColorPalette.primary_green
     },
     {
       title: 'Trail Rules',
       navigateTo: '/rules',
       icon: 'trail-sign',
       description: 'Know before you go',
-      color: '#4a7c59'
+      color: ColorPalette.primary_green
     },
     {
       title: 'About the Reserve',
       navigateTo: '/about',
       icon: 'information-circle',
       description: 'Learn about our mission',
-      color: '#4a7c59'
+      color: ColorPalette.primary_green
     },
     {
       title: 'Emergency',
       navigateTo: '/emergency',
       icon: 'call',
       description: 'Quick access to help',
-      color: '#c70000'
+      color: ColorPalette.primary_red
     },
   ];
   
@@ -294,7 +295,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1a1a1a',
+    color: ColorPalette.text_primary,
   },
   megaphoneContainer: {
     width: 36,
@@ -320,7 +321,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 16,
-    color: '#333',
+    color: ColorPalette.text_secondary,
     lineHeight: 22,
   },
   cardsContainer: {
@@ -340,11 +341,11 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: ColorPalette.text_primary,
   },
   cardDescription: {
     fontSize: 14,
-    color: '#666',
+    color: ColorPalette.text_secondary,
     marginTop: 2,
   },
   secondaryGrid: {
@@ -370,7 +371,7 @@ const styles = StyleSheet.create({
   secondaryTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: ColorPalette.text_secondary,
     textAlign: 'center',
   },
   emergencyTitle: {

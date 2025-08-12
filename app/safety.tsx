@@ -7,6 +7,7 @@ import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import { getImageSource } from '@/utility/image-source';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 export default function SafetyScreen() {
     const { data: safetyData, getImagePath, isLoading } = useScreen<SafetyData>('safety');
@@ -33,7 +34,7 @@ export default function SafetyScreen() {
         return (
             <View style={styles.loadingContainer}>
                 <View style={styles.loadingContent}>
-                    <Ionicons name="shield" size={48} color="#dc2626" />
+                    <Ionicons name="shield" size={48} color={ColorPalette.primary_red} />
                     <Text style={styles.loadingText}>Loading safety information...</Text>
                 </View>
             </View>
@@ -65,16 +66,16 @@ export default function SafetyScreen() {
                 >
                     <View style={styles.emergencyContent}>
                         <View style={styles.emergencyIconContainer}>
-                            <Ionicons name="call" size={24} color="white" />
+                            <Ionicons name="call" size={24} color={ColorPalette.white} />
                         </View>
                         <Text style={styles.emergencyTitle}>Emergency Contacts</Text>
-                        <Ionicons name="chevron-forward" size={24} color="white" />
+                        <Ionicons name="chevron-forward" size={24} color={ColorPalette.white} />
                     </View>
                 </TouchableOpacity>
 
                 <Card variant="default" margin="standard">
                     <View style={styles.guidelinesHeader}>
-                        <Ionicons name="list" size={24} color="#374151" />
+                        <Ionicons name="list" size={24} color={ColorPalette.text_primary} />
                         <Text style={styles.guidelinesTitle}>Safety Guidelines</Text>
                     </View>
                     
@@ -101,11 +102,11 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
     emergencyCard: {
-        backgroundColor: '#dc2626',
+        backgroundColor: ColorPalette.primary_red,
         borderRadius: 16,
         padding: 20,
         marginBottom: 20,
-        shadowColor: '#000',
+        shadowColor: ColorPalette.black,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.25,
         shadowRadius: 8,
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     guidelinesTitle: {
         fontSize: 20,
         fontWeight: '600',
-        color: '#374151',
+        color: ColorPalette.text_primary,
         marginLeft: 12,
     },
     bulletPointsContainer: {
@@ -182,13 +183,13 @@ const styles = StyleSheet.create({
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: '#dc2626',
+        backgroundColor: ColorPalette.primary_red,
     },
     bulletText: {
         fontSize: 16,
         flex: 1,
         lineHeight: 24,
-        color: '#374151',
+        color: ColorPalette.text_secondary,
     },
     loadingContainer: {
         flex: 1,
@@ -202,7 +203,7 @@ const styles = StyleSheet.create({
     },
     loadingText: {
         fontSize: 18,
-        color: '#64748b',
+        color: ColorPalette.text_secondary,
         marginTop: 16,
         textAlign: 'center',
     },

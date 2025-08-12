@@ -29,6 +29,7 @@ import DetailModal from '@/components/detail-modal';
 import MarkerDetailCard from '@/components/marker-detail-card';
 import InfoModalContent from '@/components/info-modal-content';
 import Toast from '@/components/toast';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 // Initialize Mapbox
 if (MAPBOX_ACCESS_TOKEN) {
@@ -39,7 +40,6 @@ if (MAPBOX_ACCESS_TOKEN) {
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
 const DEVICE_HEIGHT = Dimensions.get('window').height;
-const BLUE = '#022851';
 
 
 
@@ -183,7 +183,7 @@ export default function MapScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={BLUE} />
+        <ActivityIndicator size="large" color={ColorPalette.ucd_blue} />
       </View>
     );
   }
@@ -250,31 +250,31 @@ export default function MapScreen() {
           </MapboxGL.MapView>
           <View style={styles.buttonContainer}>
             <Pressable style={[styles.mapActionButton, styles.mapButtonTop]} onPress={handleMapUpdate}>
-              <Ionicons name="cloud-download" size={25} color={BLUE} />
+              <Ionicons name="cloud-download" size={25} color={ColorPalette.ucd_blue} />
             </Pressable>
             <Pressable style={[styles.mapActionButton, styles.mapButtonMiddle]} onPress={handleResetZoom}>
-              <Ionicons name="contract" size={25} color={BLUE} />
+              <Ionicons name="contract" size={25} color={ColorPalette.ucd_blue} />
             </Pressable>
             <Pressable style={[styles.mapActionButton, styles.mapButtonMiddle]} onPress={handleResetOrientation}>
-              <Ionicons name="compass" size={25} color={BLUE} />
+              <Ionicons name="compass" size={25} color={ColorPalette.ucd_blue} />
             </Pressable>
             <Pressable style={[styles.mapActionButton, styles.mapButtonBottom]} onPress={toggleInfoModal}>
-              <Ionicons name="help-circle" size={25} color={BLUE} />
+              <Ionicons name="help-circle" size={25} color={ColorPalette.ucd_blue} />
             </Pressable>
           </View>
 
           <View style={styles.toggleContainer}>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.nature && styles.toggleButtonActive]} onPress={() => toggleMarkerType('nature')}>
-                <Ionicons name="leaf" size={25} color={activeMarkerTypes.nature ? '#fff' : BLUE} />
+                <Ionicons name="leaf" size={25} color={activeMarkerTypes.nature ? ColorPalette.white : ColorPalette.ucd_blue} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.mile && styles.toggleButtonActive]} onPress={() => toggleMarkerType('mile')}>
-                <MaterialCommunityIcons name="map-marker-radius" size={25} color={activeMarkerTypes.mile ? '#fff' : BLUE} />
+                <MaterialCommunityIcons name="map-marker-radius" size={25} color={activeMarkerTypes.mile ? ColorPalette.white : ColorPalette.ucd_blue} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.safety && styles.toggleButtonActive]} onPress={() => toggleMarkerType('safety')}>
-                <Ionicons name="shield-checkmark" size={25} color={activeMarkerTypes.safety ? '#fff' : BLUE} />
+                <Ionicons name="shield-checkmark" size={25} color={activeMarkerTypes.safety ? ColorPalette.white : ColorPalette.ucd_blue} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.poi && styles.toggleButtonActive]} onPress={() => toggleMarkerType('poi')}>
-                <Ionicons name="flag" size={25} color={activeMarkerTypes.poi ? '#fff' : BLUE} />
+                <Ionicons name="flag" size={25} color={activeMarkerTypes.poi ? ColorPalette.white : ColorPalette.ucd_blue} />
             </TouchableOpacity>
           </View>
 
@@ -339,11 +339,11 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 12,
   },
   markerWrapper: { alignItems: 'center' },
-  markerContainer: { backgroundColor: '#fff', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', borderColor: BLUE, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3, elevation: 5, padding: 2 },
-  markerText: { color: BLUE, fontWeight: 'bold', fontSize: 14, textAlign: 'center' },
-  markerPin: { width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 10, borderStyle: 'solid', backgroundColor: 'transparent', borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: BLUE },
+  markerContainer: { backgroundColor: ColorPalette.white, width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', borderColor: ColorPalette.ucd_blue, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3, elevation: 5, padding: 2 },
+  markerText: { color: ColorPalette.ucd_blue, fontWeight: 'bold', fontSize: 14, textAlign: 'center' },
+  markerPin: { width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 10, borderStyle: 'solid', backgroundColor: 'transparent', borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: ColorPalette.ucd_blue },
   customMarkerIcon: { width: 36, height: 36, resizeMode: 'contain' },
   toggleContainer: { position: 'absolute', bottom: 30, alignSelf: 'center', flexDirection: 'row', backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 2, padding: 4 },
   toggleButton: { width: 50, height: 40, borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginHorizontal: 2 },
-  toggleButtonActive: { backgroundColor: BLUE },
+  toggleButtonActive: { backgroundColor: ColorPalette.ucd_blue },
 });

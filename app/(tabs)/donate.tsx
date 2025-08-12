@@ -8,6 +8,7 @@ import Card from '@/components/card';
 import ScreenBackground from '@/components/screen-background';
 import Button from '@/components/button';
 import { getImageSource } from '@/utility/image-source';
+import { ColorPalette } from '@/assets/dev/color_palette';
 
 export default function DonateScreen() {
     const { data: donateData, getImagePath} = useScreen<DonateData>('donate');
@@ -37,7 +38,7 @@ export default function DonateScreen() {
                         <Ionicons 
                             name="leaf" 
                             size={28} 
-                            color="#2d5016" 
+                            color={ColorPalette.primary_green}
                         />
                     </View>
                     <Text style={styles.donationTitle}>Make a Difference</Text>
@@ -59,7 +60,7 @@ export default function DonateScreen() {
                     <Ionicons 
                         name="people" 
                         size={24} 
-                        color="#2d5016" 
+                        color={ColorPalette.primary_green}
                         style={styles.thankYouIcon}
                     />
                     <Text style={styles.thankYouTitle}>Thank You</Text>
@@ -92,11 +93,11 @@ const styles = StyleSheet.create({
     donationTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#1a1a1a',
+        color: ColorPalette.text_primary,
     },
     donationText: {
         fontSize: 16,
-        color: '#444',
+        color: ColorPalette.text_secondary,
         lineHeight: 24,
         marginBottom: 24,
     },
@@ -112,11 +113,11 @@ const styles = StyleSheet.create({
     thankYouTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#2d5016',
+        color: ColorPalette.primary_green,
     },
     thankYouText: {
         fontSize: 14,
-        color: '#555',
+        color: ColorPalette.text_secondary,
         lineHeight: 20,
         textAlign: 'center',
     },
