@@ -682,7 +682,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   separator: {
-    height: 8,
+    height: 20,
   },
   navigationBarButton: {
     paddingHorizontal: 20,

@@ -20,6 +20,18 @@ export default function MarkerDetailCard({
 
   return (
     <View style={styles.container}>
+      {imageUri && (
+        <GestureHandlerRootView style={styles.imageContainer}>
+          <ImageZoom
+            uri={imageUri}
+            style={styles.image}
+            isDoubleTapEnabled={true}
+            isPanEnabled={true}
+            resizeMode="cover"
+          />
+        </GestureHandlerRootView>
+      )}
+
       <View style={styles.titleSection}>
         {iconUri && (
           <Image 
@@ -34,17 +46,6 @@ export default function MarkerDetailCard({
           )}
         </View>
       </View>
-
-      {imageUri && (
-        <GestureHandlerRootView style={styles.imageContainer}>
-          <ImageZoom
-            uri={imageUri}
-            style={styles.image}
-            isDoubleTapEnabled={true}
-            isPanEnabled={true}
-          />
-        </GestureHandlerRootView>
-      )}
 
       <View style={styles.content}>
         {marker.description && (
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   imageContainer: {
-    height: 220,
+    height: 300,
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 15,

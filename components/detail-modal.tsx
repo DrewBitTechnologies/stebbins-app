@@ -25,56 +25,67 @@ export default function DetailModal({
       visible={visible} 
       onRequestClose={onClose}
     >
-      <View style={styles.modalContainer}>
-        <Card 
-          variant="default" 
-          margin="none" 
-          style={variant === 'compact' ? styles.compactModal : styles.defaultModal}
-        >
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {children}
-          </ScrollView>
-          
-          <TouchableOpacity 
-            style={styles.closeButton} 
-            onPress={onClose}
+      <View style={styles.outerContainer}>
+        <View style={styles.modalContainer}>
+          <Card 
+            variant="default" 
+            margin="none" 
+            style={variant === 'compact' ? styles.compactModal : styles.defaultModal}
           >
-            <Ionicons name="close" size={28} color={BLUE} />
-          </TouchableOpacity>
-        </Card>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {children}
+            </ScrollView>
+          </Card>
+        </View>
+        
+        <TouchableOpacity 
+          style={styles.closeButton} 
+          onPress={onClose}
+        >
+          <Ionicons name="close" size={28} color="#fff" />
+        </TouchableOpacity>
       </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  modalContainer: {
+  outerContainer: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    backgroundColor: 'transparent',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  modalContainer: {
+    width: '100%',
+    maxWidth: 500,
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingTop: 60,
   },
   defaultModal: {
     width: '100%',
-    maxHeight: '80%',
-    maxWidth: 500,
+    flex: 1,
   },
   compactModal: {
     width: '100%',
     maxHeight: '60%',
-    maxWidth: 400,
   },
   closeButton: {
-    position: 'absolute',
-    top: 15,
-    right: 15,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#022851',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
 });
