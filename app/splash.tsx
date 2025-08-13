@@ -7,6 +7,7 @@ import { isCacheVersionValid, wipeCache, saveCacheVersion, getCurrentAppVersion,
 import * as FileSystem from 'expo-file-system';
 import { getImageSource } from '@/utility/image-source';
 import { ColorPalette } from '@/assets/dev/color_palette';
+import * as Haptics from 'expo-haptics';
 
 export default function SplashScreen() {
   const { checkForUpdates, checkAllScreensForUpdates } = useApi();
@@ -121,6 +122,11 @@ export default function SplashScreen() {
           duration: 200,
           useNativeDriver: false,
         }).start(() => {
+          try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          } catch (error) {
+            console.log('Haptic feedback not supported');
+          }
           shimmerAnimation.stop();
           router.replace('/(tabs)/home');
         });

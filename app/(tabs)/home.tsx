@@ -87,7 +87,7 @@ export default function HomeScreen() {
     
     // Immediate haptic feedback on user touch
     try {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     } catch (error) {
       console.log('Haptic feedback not supported');
     }

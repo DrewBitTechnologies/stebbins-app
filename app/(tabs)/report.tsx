@@ -13,6 +13,7 @@ import { getImageSource } from '@/utility/image-source';
 import { pickFiles, removeFile, removeAllFiles } from '@/utility/file-management';
 import { submitCompleteReport, ContactInfo } from '@/utility/report-api';
 import { ColorPalette }from '@/assets/dev/color_palette';
+import * as Haptics from 'expo-haptics';
 
 export default function ReportScreen() {
   const { data: reportData, getImagePath } = useScreen<ReportData>('report');
@@ -29,6 +30,7 @@ export default function ReportScreen() {
 
   const handlePickFiles = async () => {
     const result = await pickFiles();
+
     if (result.files.length > 0) {
       setFiles(prevFiles => [...prevFiles, ...result.files]);
     }
@@ -45,6 +47,12 @@ export default function ReportScreen() {
 
   const handleSubmit = async () => {
     if (isSubmitting) return;
+
+    try {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    } catch (error) {
+      console.log('Haptic feedback not supported');
+    }
     
     const hasFiles = files.length > 0;
     const hasDescription = description.trim().length > 0;
@@ -80,7 +88,6 @@ export default function ReportScreen() {
         'Success', 
         `Report submitted successfully with ${result.fileCount} file(s)`,
         [{ text: 'OK', onPress: () => {
-          // Reset form
           setFiles([]);
           setDescription('');
           setContact({ firstName: '', lastName: '', email: '', phone: '' });

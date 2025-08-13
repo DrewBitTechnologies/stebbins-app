@@ -30,6 +30,7 @@ import MarkerDetailCard from '@/components/marker-detail-card';
 import InfoModalContent from '@/components/info-modal-content';
 import Toast from '@/components/toast';
 import { ColorPalette } from '@/assets/dev/color_palette';
+import * as Haptics from 'expo-haptics';
 
 // Initialize Mapbox
 if (MAPBOX_ACCESS_TOKEN) {
@@ -139,6 +140,12 @@ export default function MapScreen() {
   }, [isLoading, activeMarkerTypes, zoomLevel, natureTrailMarkers, mileMarkers, safetyMarkers, poiMarkers]);
 
   const handleMapUpdate = () => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    } catch (error) {
+      console.log('Haptic feedback not supported');
+    }
+
     checkMapForUpdate(
       isConnected, 
       getStyleUrl(MAPBOX_STYLE_URL), 
