@@ -88,13 +88,6 @@ export const ColorPalette = {
   border_light: '#eee',
   border_lighter: '#e9ecef',
   
-  // Transparency variants for common use
-  redwood_10: 'rgba(38, 96, 65, 0.1)',
-  black_05: 'rgba(0, 0, 0, 0.05)',
-  white_80_alpha: 'rgba(255,255,255,0.8)',
-  white_90: 'rgba(255, 255, 255, 0.9)',
-  black_50_alpha: 'rgba(0,0,0,0.5)',
-  
 } as const;
 
 export type ColorPaletteKeys = keyof typeof ColorPalette;

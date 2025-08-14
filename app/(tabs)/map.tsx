@@ -8,21 +8,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import NetInfo from '@react-native-community/netinfo';
-import { 
-  getStyleUrl, 
-  checkMapState, 
-  checkMapForUpdate,
-  CENTER_LONGITUDE,
-  CENTER_LATITUDE,
-  DEFAULT_ZOOM,
-  BOUNDS,
-  MIN_ZOOM
-} from '@/utility/mapbox-utils';
-import { 
-  AnyMarker, 
-  MarkerTypes,
-  createDisplayMarkers
-} from '@/utility/marker-utils';
+import { getStyleUrl, checkMapState, checkMapForUpdate,CENTER_LONGITUDE,CENTER_LATITUDE,DEFAULT_ZOOM,BOUNDS,MIN_ZOOM } from '@/utility/mapbox-utils';
+import { AnyMarker, MarkerTypes,createDisplayMarkers } from '@/utility/marker-utils';
 import { useToast, getMarkerTypeDisplayName } from '@/utility/toast-notifications';
 import { getImageSource } from '@/utility/image-source';
 import DetailModal from '@/components/detail-modal';
@@ -41,8 +28,6 @@ if (MAPBOX_ACCESS_TOKEN) {
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
 const DEVICE_HEIGHT = Dimensions.get('window').height;
-
-
 
 export default function MapScreen() {
   const mapview = useRef<MapboxGL.MapView | null>(null);
@@ -345,12 +330,71 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
   },
-  markerWrapper: { alignItems: 'center' },
-  markerContainer: { backgroundColor: ColorPalette.white, width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center', borderColor: ColorPalette.ucd_blue, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3, elevation: 5, padding: 2 },
-  markerText: { color: ColorPalette.ucd_blue, fontWeight: 'bold', fontSize: 14, textAlign: 'center' },
-  markerPin: { width: 0, height: 0, borderLeftWidth: 6, borderRightWidth: 6, borderTopWidth: 10, borderStyle: 'solid', backgroundColor: 'transparent', borderLeftColor: 'transparent', borderRightColor: 'transparent', borderTopColor: ColorPalette.ucd_blue },
-  customMarkerIcon: { width: 36, height: 36, resizeMode: 'contain' },
-  toggleContainer: { position: 'absolute', bottom: 30, alignSelf: 'center', flexDirection: 'row', backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 2, padding: 4 },
-  toggleButton: { width: 50, height: 40, borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginHorizontal: 2 },
-  toggleButtonActive: { backgroundColor: ColorPalette.ucd_blue },
+  markerWrapper: { 
+    alignItems: 'center' 
+  },
+  markerContainer: {
+    backgroundColor: ColorPalette.white, 
+    width: 32, 
+    height: 32, 
+    borderRadius: 16, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    borderColor: ColorPalette.ucd_blue, 
+    borderWidth: 2, 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.25, 
+    shadowRadius: 3, 
+    elevation: 5, 
+    padding: 2 
+  },
+  markerText: {
+     color: ColorPalette.ucd_blue, 
+     fontWeight: 'bold', 
+     fontSize: 14, 
+     textAlign: 'center' 
+    },
+  markerPin: {
+     width: 0, 
+     height: 0, 
+     borderLeftWidth: 6, 
+     borderRightWidth: 6, 
+     borderTopWidth: 10, 
+     borderStyle: 'solid', 
+     backgroundColor: 'transparent', 
+     borderLeftColor: 'transparent', 
+     borderRightColor: 'transparent', 
+     borderTopColor: ColorPalette.ucd_blue 
+    },
+  customMarkerIcon: {
+     width: 36, 
+     height: 36, 
+     resizeMode: 'contain' 
+    },
+  toggleContainer: {
+     position: 'absolute', 
+     bottom: 15, 
+     alignSelf: 'center', 
+     flexDirection: 'row', 
+     backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+     borderRadius: 12, 
+     elevation: 4, 
+     shadowColor: '#000', 
+     shadowOffset: { width: 0, height: 1 }, 
+     shadowOpacity: 0.2, 
+     shadowRadius: 2, 
+     padding: 4 
+    },
+  toggleButton: {
+     width: 50, 
+     height: 40, 
+     borderRadius: 8, 
+     justifyContent: 'center', 
+     alignItems: 'center', 
+     marginHorizontal: 2 
+    },
+  toggleButtonActive: {
+     backgroundColor: ColorPalette.ucd_blue 
+    },
 });

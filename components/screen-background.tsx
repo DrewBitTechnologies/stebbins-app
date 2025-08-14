@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { ImageBackground, ScrollView, StyleSheet } from 'react-native';
+import AppHeader from './app-header';
 
 interface ScreenBackgroundProps {
     children: React.ReactNode;
@@ -35,6 +36,7 @@ export default function ScreenBackground({
             >
                 {children}
             </ScrollView>
+
         </ImageBackground>
     );
 }
@@ -58,6 +60,6 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: 20,
-        paddingBottom: 40,
+        paddingBottom: 20,
     },
 });

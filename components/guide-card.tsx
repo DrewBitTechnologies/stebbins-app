@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   colorTag: {
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 8,
     marginRight: 6,
     marginBottom: 4,
     backgroundColor: 'rgba(45, 80, 22, 0.1)',
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   seasonTag: {
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 8,
     marginRight: 6,
     marginBottom: 4,
     backgroundColor: 'rgba(45, 80, 22, 0.1)',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   emptyTag: {
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 8,
     marginRight: 6,
     marginBottom: 4,
     backgroundColor: 'rgba(108, 117, 125, 0.1)',

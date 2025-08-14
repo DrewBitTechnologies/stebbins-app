@@ -18,16 +18,16 @@ export default function TabsLayout() {
           tabBarStyle: {
             height: 60 + (insets.bottom > 0 ? insets.bottom : 16),
             paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
-            paddingTop: 8,
+            paddingTop: 10,
             // Add elevation for Android and shadow for iOS
             ...Platform.select({
               android: {
-                elevation: 8,
+                elevation: 10,
               },
               ios: {
                 shadowColor: ColorPalette.black,
                 shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: 0.1,
+                shadowOpacity: 0.5,
                 shadowRadius: 3,
               },
             }),

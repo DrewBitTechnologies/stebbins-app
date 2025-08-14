@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   filterChip: {
     paddingHorizontal: 12,
     paddingVertical: 10,
-    borderRadius: 12,
+    borderRadius: 8,
     backgroundColor: 'rgba(45, 80, 22, 0.1)',
     borderWidth: 1,
     borderColor: 'rgba(45, 80, 22, 0.2)',

@@ -63,7 +63,7 @@ export default function GuideScreen() {
           key={item.title}
           variant="navigation"
           margin="none"
-          style={{ marginBottom: index === guideItems.length - 1 ? 0 : 20 }}
+          style={{ marginBottom: index === guideItems.length - 1 ? 0 : 15 }}
         >
           <TouchableOpacity
             onPress={() => handleNavigation(item.navigateTo)}
@@ -103,7 +103,6 @@ const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
   },
   iconContainer: {
     width: 56,

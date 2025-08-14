@@ -36,8 +36,9 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     alignSelf: 'center',
+    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 20,
+    borderRadius: 16,
     paddingVertical: 8,
     paddingHorizontal: 16,
     elevation: 5,
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
     transform: [{ translateY: -20 }],
   },
   positionBottom: {
-    bottom: 90,
+    bottom: 75,
   },
   text: {
     color: ColorPalette.white,

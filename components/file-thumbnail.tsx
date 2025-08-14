@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   imageThumbnail: {
     width: 50,
     height: 50,
-    borderRadius: 8,
+    borderRadius: 4,
     backgroundColor: '#e0e0e0',
   },
   videoThumbnail: {

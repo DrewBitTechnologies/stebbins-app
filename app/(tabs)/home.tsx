@@ -166,10 +166,10 @@ export default function HomeScreen() {
   };
 
   const ReserveStatusCard = () => (
-    <Card variant="warning" margin="none" style={{ marginBottom: 20 }}>
+    <Card variant="warning" margin="none" style={{ marginBottom: 25 }}>
       <View style={styles.statusHeader}>
         <View style={styles.megaphoneContainer}>
-          <Ionicons name="megaphone" size={24} color="#000000" />
+          <Ionicons name="megaphone" size={24} color={ColorPalette.black} />
         </View>
         <Text style={styles.statusTitle}>Reserve Status</Text>
         <TouchableOpacity 
@@ -191,7 +191,7 @@ export default function HomeScreen() {
             <Ionicons 
               name="refresh" 
               size={20} 
-              color="#000000" 
+              color={ColorPalette.black} 
             />
           </Animated.View>
           <Animated.View
@@ -203,14 +203,14 @@ export default function HomeScreen() {
             <Ionicons 
               name="checkmark" 
               size={20} 
-              color="#000000" 
+              color={ColorPalette.black} 
             />
           </Animated.View>
         </TouchableOpacity>
       </View>
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color="#000000" />
+          <ActivityIndicator size="small" color={ColorPalette.black} />
         </View>
       ) : (
         <Text style={styles.statusText}>{status}</Text>
@@ -229,12 +229,16 @@ export default function HomeScreen() {
         <ReserveStatusCard />
 
         <View style={styles.cardsContainer}>
-          {mainButtons.map((item) => (
+          {mainButtons.map((item, index) => (
             <Card 
               key={item.title}
               variant="navigation"
               margin="none"
-              style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}
+              style={{ 
+                flexDirection: 'row', 
+                alignItems: 'center', 
+                marginBottom: index === mainButtons.length - 1 ? 0 : 15 
+              }}
             >
               <TouchableOpacity
                 onPress={() => handleNavigation(item.navigateTo)}
@@ -333,7 +337,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   cardsContainer: {
-    marginBottom: 10,
+    marginBottom: 25,
   },
   iconContainer: {
     width: 56,

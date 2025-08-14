@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
   // Form input styles
   textArea: {
     backgroundColor: '#f8f9fa',
-    borderRadius: 12,
+    borderRadius: 8,
     padding: 16,
     fontSize: 16,
     color: '#333',
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: '#f8f9fa',
-    borderRadius: 12,
+    borderRadius: 8,
     padding: 16,
     fontSize: 16,
     color: '#333',

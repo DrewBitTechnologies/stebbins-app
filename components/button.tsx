@@ -113,7 +113,7 @@ export default function Button({
 
 const styles = StyleSheet.create({
     button: {
-        borderRadius: 12,
+        borderRadius: 16,
         shadowColor: ColorPalette.black,
         shadowOffset: {
             width: 0,
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
     },
     gradient: {
-        borderRadius: 12,
+        borderRadius: 16,
     },
     content: {
         flexDirection: 'row',
