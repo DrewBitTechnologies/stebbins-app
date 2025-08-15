@@ -19,18 +19,11 @@ export default function TabsLayout() {
             height: 60 + (insets.bottom > 0 ? insets.bottom : 16),
             paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
             paddingTop: 10,
-            // Add elevation for Android and shadow for iOS
-            ...Platform.select({
-              android: {
-                elevation: 10,
-              },
-              ios: {
-                shadowColor: ColorPalette.black,
-                shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: 0.5,
-                shadowRadius: 3,
-              },
-            }),
+            elevation: 10,
+            shadowColor: ColorPalette.black,
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.5,
+            shadowRadius: 3,
           },
           // Add padding to the tab bar items to center them better when accounting for safe area
           tabBarItemStyle: {

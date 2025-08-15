@@ -8,6 +8,7 @@ import * as FileSystem from 'expo-file-system';
 import { getImageSource } from '@/utility/image-source';
 import { ColorPalette } from '@/assets/dev/color_palette';
 import * as Haptics from 'expo-haptics';
+import * as DefaultSplashScreen from 'expo-splash-screen';
 
 export default function SplashScreen() {
   const { checkForUpdates, checkAllScreensForUpdates } = useApi();
@@ -17,6 +18,9 @@ export default function SplashScreen() {
   const totalScreens = Object.keys(SCREEN_CONFIGS).length;
 
   React.useEffect(() => {
+    // Hide the stock splash screen immediately when custom splash loads
+    DefaultSplashScreen.hideAsync();
+    
     const shimmerAnimation = Animated.loop(
       Animated.timing(screenShimmerTranslate, {
         toValue: 500,

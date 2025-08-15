@@ -13,8 +13,8 @@ export default (): ExpoConfig => {
     splash: {
       image: "./assets/images/splash-icon.png",
       resizeMode: "contain",
-      width: "0",
-      height: "0",
+      width: "512",
+      height: "512",
       backgroundColor: "#ffffff"
     },
     assetBundlePatterns: [
