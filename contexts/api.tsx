@@ -314,7 +314,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      if (response.update_signal === 'resync') {
+      if ((response.update_signal === 'resync') && (localSyncDate <= serverUpdateDate)) {
         onProgress?.('🔄 Resync signal received. Wiping cache and redownloading data...');
         await ApiService.wipeCache();
         await fullSync(onProgress);
