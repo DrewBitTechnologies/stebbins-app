@@ -509,19 +509,6 @@ export default function GuideListScreen({ route }: { route: any }) {
       blurRadius={5}
     >
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      
-      {/* Top Navigation Component */}
-      {/* <BlurView intensity={5} tint='default' style={
-        {
-          position: 'absolute',
-          top: 0,
-          left: 20,
-          right: 20,
-          bottom: '90%',
-          zIndex: 1,
-          
-        }
-      }/> */}
 
       {renderTopNavigationComponent()}
       
@@ -540,18 +527,6 @@ export default function GuideListScreen({ route }: { route: any }) {
       
       {/* Bottom Filter Component */}
       {renderBottomFilterComponent()}
-
-      {/* <BlurView intensity={5} tint='default' style={
-        {
-          position: 'absolute',
-          top: '90%',
-          bottom: 0,
-          left: 20,
-          right: 20,
-          zIndex: 1,
-          
-        }
-      }/> */}
       
       {zoomedImage && (
         <ZoomableImageModal
@@ -661,13 +636,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   flatList: {
-    flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 100,
   },
   listContent: {
-    paddingBottom: 20,
-    paddingTop: 20,
+    paddingBottom: 125,
+    paddingTop: 105,
   },
   bottomFilterComponent: {
     position: 'absolute',

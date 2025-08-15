@@ -1,7 +1,7 @@
-import * as FileSystem from 'expo-file-system';
 import * as Application from 'expo-application';
+import * as FileSystem from 'expo-file-system';
 import { CachedScreenData, ScreenData } from './api';
-import { API_BASE_URL, BEARER_TOKEN, CDN_URL, CACHE_DIR, IMAGE_FIELD_KEYS, getDataFilePath, getImageFilePath } from './api.config';
+import { API_BASE_URL, BEARER_TOKEN, CACHE_DIR, CDN_URL, IMAGE_FIELD_KEYS, getDataFilePath, getImageFilePath } from './api.config';
 
 // --- File System Operations ---
 export const ensureCacheDir = async () => {
@@ -34,6 +34,17 @@ export const loadFromCache = async (cacheKey: string): Promise<CachedScreenData 
   }
   return null;
 };
+
+export const performCacheIntegrityCheck = async (): Promise<boolean> => {
+      try {
+        // Check if cache version is valid
+        const isVersionValid = await isCacheVersionValid();
+        const cacheDirInfo = await FileSystem.getInfoAsync(CACHE_DIR);
+        return true ? isVersionValid && cacheDirInfo.exists : false;
+      } catch {
+        return false;
+      }
+    };
 
 // --- API & Image Processing ---
 const fetchFromApi = async (endpoint: string) => {

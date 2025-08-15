@@ -1,6 +1,6 @@
 // src/api/ApiContext.tsx
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 import { getImageFilePath, SCREEN_CONFIGS } from './api.config';
 import * as ApiService from './api.service';
 
@@ -198,7 +198,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     setLoadingStates(prev => ({ ...prev, [screenName]: loading }));
   };
 
-  const fetchScreenData = async <T extends ScreenData>(screenName:string, onProgress?: (message: string) => void): Promise<T | null> => {
+  const fetchScreenData = async <T extends ScreenData>(screenName:string): Promise<T | null> => {
     const config = SCREEN_CONFIGS[screenName];
     if (!config) return null;
 
@@ -276,15 +276,16 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       onProgress?.('Checking for updates...');
       
       const response = await ApiService.fetchFullData<UpdateData>('/items/update/');
+
       if (!response) {
         onProgress?.('Failed to check for updates. Running full sync...');
-        await checkAllScreensForUpdates(onProgress);
+        await fullSync(onProgress);
         return;
       }
 
       if (!response.date_updated) {
         onProgress?.('No update date from server. Running full sync...');
-        await checkAllScreensForUpdates(onProgress);
+        await fullSync(onProgress);
         return;
       }
 
@@ -293,17 +294,33 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       const serverUpdateDate = new Date(response.date_updated);
       if (isNaN(serverUpdateDate.getTime())) {
         onProgress?.('Invalid server date format. Running full sync...');
-        await checkAllScreensForUpdates(onProgress);
+        await fullSync(onProgress);
         return;
       }
 
       const localSyncDate = lastSyncDateString ? new Date(lastSyncDateString) : new Date(0);
       if (lastSyncDateString && isNaN(localSyncDate.getTime())) {
         onProgress?.('Invalid local sync date. Running full sync...');
-        await checkAllScreensForUpdates(onProgress);
+        await fullSync(onProgress);
         return;
       }
 
+      const cacheIsValid = await ApiService.performCacheIntegrityCheck();
+
+      if (!cacheIsValid) {
+        onProgress?.('🔄 Cache integrity checks failed. Running full sync...');
+        await ApiService.wipeCache();
+        await fullSync(onProgress);
+        return;
+      }
+
+      if (response.update_signal === 'resync') {
+        onProgress?.('🔄 Resync signal received. Wiping cache and redownloading data...');
+        await ApiService.wipeCache();
+        await fullSync(onProgress);
+        return;
+      }
+      
       onProgress?.(`Server last update: ${serverUpdateDate.toISOString()}`);
       onProgress?.(`Local last sync: ${localSyncDate.toISOString()}`);
 
@@ -318,20 +335,17 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       }
 
       onProgress?.('🔄 Updates available. Running full sync...');
-      await checkAllScreensForUpdates(onProgress);
-      
-      await saveLastSyncDate(serverUpdateDate.toISOString());
-      
+      await fullSync(onProgress);
+      return;
     } catch (error) {
-      // Update check failed
+
       onProgress?.('❌ Error checking updates. Running full sync...');
-      await checkAllScreensForUpdates(onProgress);
-      // Save current timestamp after fallback sync
-      await saveLastSyncDate(new Date().toISOString());
+      await fullSync(onProgress);
+      return;
     }
   };
 
-  const checkAllScreensForUpdates = async (onProgress?: (message: string) => void) => {
+  const fullSync = async (onProgress?: (message: string) => void) => {
     for (const screenName of Object.keys(SCREEN_CONFIGS)) {
       setLoading(screenName, true);
       const config = SCREEN_CONFIGS[screenName];
@@ -344,7 +358,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
           if (!localCache || !Array.isArray(localCache.data)) {
             onProgress?.(`[${screenName}] 🔄 Stale cache. Fetching updates...`);
-            await fetchScreenData(screenName, onProgress);
+            await fetchScreenData(screenName);
             continue;
           }
 
@@ -395,10 +409,11 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         setLoading(screenName, false);
       }
     }
+
     setInitialLoadCompleted(true);
-    
-    // Save current timestamp after completing all screen updates
     await saveLastSyncDate(new Date().toISOString());
+    const currentVersion = ApiService.getCurrentAppVersion();
+    await ApiService.saveCacheVersion(currentVersion);
   };
   
   const getScreenData = <T extends ScreenData>(screenName: string): T | null => {
@@ -416,6 +431,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     if (imageName) {
       return getImageFilePath(screenName, imageName.split('/').pop() || imageName);
     }
+
     return undefined;
   };
 
@@ -426,7 +442,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     fetchScreenData,
     getImagePath,
     isLoading,
-    checkAllScreensForUpdates,
+    checkAllScreensForUpdates: fullSync,
     checkForUpdates,
   };
 
