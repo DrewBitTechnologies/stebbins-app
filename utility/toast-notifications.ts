@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 export interface ToastState {
   message: string | null;
@@ -8,7 +8,7 @@ export interface ToastState {
 export const useToast = () => {
   const toastTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const showToast = (
+  const showToast = useCallback((
     message: string,
     setToastMessage: (message: string | null) => void,
     duration: number = 2000
@@ -23,15 +23,15 @@ export const useToast = () => {
       setToastMessage(null);
       toastTimer.current = null;
     }, duration);
-  };
+  }, []);
 
-  const clearToast = (setToastMessage: (message: string | null) => void) => {
+  const clearToast = useCallback((setToastMessage: (message: string | null) => void) => {
     if (toastTimer.current) {
       clearTimeout(toastTimer.current);
       toastTimer.current = null;
     }
     setToastMessage(null);
-  };
+  }, []);
 
   return { showToast, clearToast };
 };

@@ -48,7 +48,7 @@ export default function InfoModalContent() {
       </View>
       
       <View style={styles.iconRow}>
-        <MaterialCommunityIcons name="map-marker-radius" size={25} color={ColorPalette.primary_blue} style={styles.icon} />
+        <MaterialCommunityIcons name="map-marker" size={25} color={ColorPalette.primary_blue} style={styles.icon} />
         <Text style={styles.buttonText}>
           Toggle mile markers - show or hide distance markers along the trail.
         </Text>

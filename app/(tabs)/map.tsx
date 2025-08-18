@@ -4,7 +4,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ImageZoom } from '@likashefqet/react-native-image-zoom';
 import MapboxGL from "@rnmapbox/maps";
 import * as Location from 'expo-location';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import NetInfo from '@react-native-community/netinfo';
@@ -122,7 +122,7 @@ export default function MapScreen() {
       getSafetyImagePath,
       getPoiImagePath
     );
-  }, [isLoading, activeMarkerTypes, zoomLevel, natureTrailMarkers, mileMarkers, safetyMarkers, poiMarkers]);
+  }, [isLoading, activeMarkerTypes, zoomLevel, natureTrailMarkers, mileMarkers, safetyMarkers, poiMarkers, setSelectedMarker, getSafetyImagePath, getPoiImagePath]);
 
   const handleMapUpdate = () => {
     try {
@@ -160,7 +160,7 @@ export default function MapScreen() {
 
   const toggleInfoModal = () => setInfoModalVisible(!isInfoModalVisible);
 
-  const toggleMarkerType = (type: keyof MarkerTypes) => {
+  const toggleMarkerType = useCallback((type: keyof MarkerTypes) => {
     const willBeActive = !activeMarkerTypes[type];
     const typeName = getMarkerTypeDisplayName(type);
     
@@ -170,7 +170,7 @@ export default function MapScreen() {
     );
 
     setActiveMarkerTypes(prev => ({ ...prev, [type]: !prev[type] }));
-  };
+  }, [activeMarkerTypes, showToast, setToastMessage]);
 
   if (isLoading) {
     return (
@@ -260,7 +260,7 @@ export default function MapScreen() {
                 <Ionicons name="leaf" size={25} color={activeMarkerTypes.nature ? ColorPalette.white : ColorPalette.ucd_blue} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.mile && styles.toggleButtonActive]} onPress={() => toggleMarkerType('mile')}>
-                <MaterialCommunityIcons name="map-marker-radius" size={25} color={activeMarkerTypes.mile ? ColorPalette.white : ColorPalette.ucd_blue} />
+                <MaterialCommunityIcons name="map-marker" size={25} color={activeMarkerTypes.mile ? ColorPalette.white : ColorPalette.ucd_blue} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.toggleButton, activeMarkerTypes.safety && styles.toggleButtonActive]} onPress={() => toggleMarkerType('safety')}>
                 <Ionicons name="shield-checkmark" size={25} color={activeMarkerTypes.safety ? ColorPalette.white : ColorPalette.ucd_blue} />
