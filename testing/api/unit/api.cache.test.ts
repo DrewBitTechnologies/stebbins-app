@@ -1,5 +1,5 @@
 import * as FileSystem from 'expo-file-system';
-import * as ApiService from '../../contexts/api.service';
+import * as ApiService from '../../../contexts/api.service';
 
 // Create a partial mock where only the problematic function is mocked
 jest.mock('expo-file-system');
@@ -14,7 +14,7 @@ const {
   processAndCacheImages,
   getCurrentAppVersion,
   isCacheVersionValid
-} = jest.requireActual('../../contexts/api.service');
+} = jest.requireActual('../../../contexts/api.service');
 
 // Create a mock for the problematic wipeCache function
 const mockWipeCache = jest.fn();
@@ -191,7 +191,7 @@ describe('Cache Management', () => {
       mockFileSystem.makeDirectoryAsync.mockResolvedValue();
 
       // Use the real wipeCache for the success test
-      const { wipeCache } = jest.requireActual('../../contexts/api.service');
+      const { wipeCache } = jest.requireActual('../../../contexts/api.service');
       await wipeCache();
 
       expect(mockFileSystem.deleteAsync).toHaveBeenCalledWith(

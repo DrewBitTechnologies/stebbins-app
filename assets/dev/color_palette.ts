@@ -87,6 +87,8 @@ export const ColorPalette = {
   bg_lighter_gray: '#f8f9fa',
   border_light: '#eee',
   border_lighter: '#e9ecef',
+
+  transparent_white_primary: 'rgba(255, 255, 255, 0.9)',
   
 } as const;
 

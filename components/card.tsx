@@ -80,12 +80,12 @@ const styles = StyleSheet.create({
     
     // Variant styles
     defaultCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backgroundColor: ColorPalette.transparent_white_primary,
         padding: 20,
     },
     
     compactCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.92)',
+        backgroundColor: ColorPalette.transparent_white_primary,
         padding: 16,
         borderRadius: 16,
         shadowOffset: { width: 0, height: 2 },
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     },
     
     navigationCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backgroundColor: ColorPalette.transparent_white_primary,
         padding: 20,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.2)',
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     },
     
     warningCard: {
-        backgroundColor: 'rgba(255, 191, 0, 0.85)',
+        backgroundColor: 'rgba(255, 191, 0, 0.9)',
         padding: 16,
         shadowOpacity: 0.2,
         shadowRadius: 5,
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     },
     
     transparentCard: {
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backgroundColor: ColorPalette.transparent_white_primary,
         padding: 16,
         shadowOpacity: 0.1,
         shadowRadius: 4,

@@ -1,8 +1,8 @@
-import { SCREEN_CONFIGS } from '../../contexts/api.config';
-import * as ApiService from '../../contexts/api.service';
+import { SCREEN_CONFIGS } from '../../../contexts/api.config';
+import * as ApiService from '../../../contexts/api.service';
 
 // Mock the service layer
-jest.mock('../../contexts/api.service');
+jest.mock('../../../contexts/api.service');
 const mockApiService = ApiService as jest.Mocked<typeof ApiService>;
 
 describe('API Context Logic Integration', () => {

@@ -15,7 +15,7 @@ import {
   saveCacheVersion,
   isCacheVersionValid,
   wipeCache
-} from '../../contexts/api.service';
+} from '../../../contexts/api.service';
 
 // Mock the modules
 jest.mock('expo-file-system');

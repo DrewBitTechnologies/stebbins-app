@@ -7,7 +7,7 @@ import {
   BEARER_TOKEN,
   CDN_URL,
   CACHE_DIR
-} from '../../contexts/api.config';
+} from '../../../contexts/api.config';
 
 describe('API Configuration', () => {
   describe('Constants', () => {

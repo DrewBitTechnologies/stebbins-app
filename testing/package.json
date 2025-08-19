@@ -6,9 +6,15 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:api": "jest --testPathPattern=api",
-    "test:unit": "jest --testPathPattern=unit",
-    "test:integration": "jest --testPathPattern=integration"
+    "test:fast": "jest --config=config/jest.fast.config.js",
+    "test:api": "jest --config=config/jest.api.config.js",
+    "test:ui": "jest --config=config/jest.ui.config.js",
+    "test:build": "jest --config=config/jest.build.config.js --runInBand --detectOpenHandles",
+    "test:integration": "jest --config=config/jest.api.config.js --testPathPattern=integration",
+    "test:unit": "jest --config=config/jest.fast.config.js",
+    "test:real-api": "NODE_ENV=test jest api/real/ --runInBand",
+    "audit:security": "npm audit --audit-level moderate",
+    "audit:dependencies": "npx npm-check-updates --doctor"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.0",

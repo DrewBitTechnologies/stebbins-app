@@ -1,4 +1,4 @@
-import * as ApiService from '../../contexts/api.service';
+import * as ApiService from '../../../contexts/api.service';
 import { 
   saveToCache, 
   loadFromCache, 
@@ -7,10 +7,10 @@ import {
   mergeUpdates,
   processAndCacheImages,
   isCacheVersionValid 
-} from '../../contexts/api.service';
+} from '../../../contexts/api.service';
 
 // Mock the service layer
-jest.mock('../../contexts/api.service');
+jest.mock('../../../contexts/api.service');
 const mockApiService = ApiService as jest.Mocked<typeof ApiService>;
 
 describe('API Integration Tests', () => {

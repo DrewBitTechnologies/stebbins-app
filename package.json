@@ -8,7 +8,12 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test": "cd testing && npm test",
+    "test:fast": "cd testing && npm run test:fast",
+    "test:api": "cd testing && npm run test:api",
+    "test:ui": "cd testing && npm run test:ui",
+    "test:watch": "cd testing && npm run test:watch"
   },
   "dependencies": {
     "@expo/config-plugins": "~10.1.1",
