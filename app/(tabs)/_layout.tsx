@@ -20,13 +20,13 @@ export default function TabsLayout() {
   const animateTabPress = (scaleValue: Animated.Value) => {
     Animated.sequence([
       Animated.timing(scaleValue, {
-        toValue: 0.75,
-        duration: 100,
+        toValue: 0.85,
+        duration: 75,
         useNativeDriver: true,
       }),
       Animated.timing(scaleValue, {
         toValue: 1,
-        duration: 100,
+        duration: 75,
         useNativeDriver: true,
       }),
     ]).start();
