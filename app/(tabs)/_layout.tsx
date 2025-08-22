@@ -1,20 +1,122 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Platform } from 'react-native';
+import { Animated, Text, Pressable } from 'react-native';
 import { ColorPalette } from '@/assets/dev/color_palette';
+import { useRef, useEffect } from 'react';
 
 export default function TabsLayout() {
   // Get the safe area insets
   const insets = useSafeAreaInsets();
   
+  // Create animated values for each tab
+  const homeScale = useRef(new Animated.Value(1)).current;
+  const mapScale = useRef(new Animated.Value(1)).current;
+  const guideScale = useRef(new Animated.Value(1)).current;
+  const reportScale = useRef(new Animated.Value(1)).current;
+  const donateScale = useRef(new Animated.Value(1)).current;
+
+  // Animation function for tab press
+  const animateTabPress = (scaleValue: Animated.Value) => {
+    Animated.sequence([
+      Animated.timing(scaleValue, {
+        toValue: 0.75,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleValue, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  // Animated tab button component
+  const AnimatedTabButton = ({ 
+    children, 
+    onPress, 
+    accessibilityState, 
+    isFocused, 
+    iconName, 
+    label, 
+    scaleValue,
+    ...props
+  }: {
+    children?: React.ReactNode;
+    onPress?: (event: any) => void;
+    accessibilityState?: any;
+    isFocused?: boolean;
+    iconName: string;
+    label: string;
+    scaleValue: Animated.Value;
+    [key: string]: any;
+  }) => {
+    // Extract focused state from aria-selected prop
+    const isTabFocused = isFocused || accessibilityState?.selected || props['aria-selected'] || false;
+    
+    useEffect(() => {
+      if (isTabFocused) {
+        animateTabPress(scaleValue);
+      }
+    }, [isTabFocused, scaleValue]);
+
+    const handlePress = (event: any) => {
+      animateTabPress(scaleValue);
+      if (onPress) {
+        onPress(event);
+      }
+    };
+
+    const iconColor = isTabFocused ? ColorPalette.primary_blue : '#8E8E93';
+    const textColor = isTabFocused ? ColorPalette.primary_blue : '#8E8E93';
+
+    return (
+      <Pressable
+        {...props}
+        onPress={handlePress}
+        accessibilityState={accessibilityState}
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingBottom: 6,
+        }}
+      >
+        <Animated.View 
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: [{ scale: scaleValue }]
+          }}
+        >
+          <Ionicons
+            name={isTabFocused ? iconName : `${iconName}-outline` as any}
+            size={24}
+            color={iconColor}
+            style={{ marginBottom: 2 }}
+          />
+          <Text 
+            style={{
+              fontSize: 10,
+              color: textColor,
+              textAlign: 'center',
+              fontWeight: isTabFocused ? '600' : '400'
+            }}
+          >
+            {label}
+          </Text>
+        </Animated.View>
+      </Pressable>
+    );
+  };
+  
   return (
     <Tabs
         screenOptions={{
-          tabBarActiveTintColor: ColorPalette.primary_blue,
-          tabBarInactiveTintColor: ColorPalette.primary_blue,
           headerShown: false,
           animation: 'fade',
+          tabBarShowLabel: false,
           tabBarStyle: {
             height: 60 + (insets.bottom > 0 ? insets.bottom : 16),
             paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
@@ -25,55 +127,71 @@ export default function TabsLayout() {
             shadowOpacity: 0.5,
             shadowRadius: 3,
           },
-          // Add padding to the tab bar items to center them better when accounting for safe area
-          tabBarItemStyle: {
-            paddingBottom: insets.bottom > 0 ? 6 : 0,
-          },
         }}
       >
         <Tabs.Screen
           name="home"
           options={{
-            tabBarIcon: ({ color, size, focused }) => (
-              <Ionicons name={focused ? "home" : "home-outline"} size={size} color={color} />
+            tabBarButton: (props) => (
+              <AnimatedTabButton
+                {...props}
+                iconName="home"
+                label="Home"
+                scaleValue={homeScale}
+              />
             ),
-            tabBarLabel: 'Home',
           }}
         />
         <Tabs.Screen
           name="map"
           options={{
-            tabBarIcon: ({ color, size, focused }) => (
-              <Ionicons name={focused ? "map" : "map-outline"} size={size} color={color} />
+            tabBarButton: (props) => (
+              <AnimatedTabButton
+                {...props}
+                iconName="map"
+                label="Map"
+                scaleValue={mapScale}
+              />
             ),
-            tabBarLabel: 'Map',
           }}
         />
         <Tabs.Screen
           name="guide"
           options={{
-            tabBarIcon: ({ color, size, focused }) => (
-              <Ionicons name={focused ? "book" : "book-outline"} size={size} color={color} />
+            tabBarButton: (props) => (
+              <AnimatedTabButton
+                {...props}
+                iconName="book"
+                label="Guide"
+                scaleValue={guideScale}
+              />
             ),
-            tabBarLabel: 'Guide',
           }}
         />
         <Tabs.Screen
           name="report"
           options={{
-            tabBarIcon: ({ color, size, focused }) => (
-              <Ionicons name={focused ? "warning" : "warning-outline"} size={size} color={color} />
+            tabBarButton: (props) => (
+              <AnimatedTabButton
+                {...props}
+                iconName="warning"
+                label="Report"
+                scaleValue={reportScale}
+              />
             ),
-            tabBarLabel: 'Report',
           }}
         />
         <Tabs.Screen
           name="donate"
           options={{
-            tabBarIcon: ({ color, size, focused }) => (
-              <Ionicons name={focused ? "wallet" : "wallet-outline"} size={size} color={color} />
+            tabBarButton: (props) => (
+              <AnimatedTabButton
+                {...props}
+                iconName="wallet"
+                label="Donate"
+                scaleValue={donateScale}
+              />
             ),
-            tabBarLabel: 'Donate',
           }}
         />
       </Tabs>

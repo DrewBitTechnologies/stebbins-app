@@ -426,7 +426,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     if (cachedPath) {
       return cachedPath;
     }
-
     // Restore the fallback for robustness
     if (imageName) {
       return getImageFilePath(screenName, imageName.split('/').pop() || imageName);
@@ -464,6 +463,5 @@ export function useScreen<T extends ScreenData>(screenName: string) {
     data: api.getScreenData<T>(screenName),
     getImagePath: (imageName: string) => api.getImagePath(screenName, imageName),
     isLoading: api.isLoading(screenName),
-    fetch: () => api.fetchScreenData<T>(screenName),
   };
 }

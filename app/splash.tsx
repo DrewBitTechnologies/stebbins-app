@@ -9,7 +9,7 @@ import * as Haptics from 'expo-haptics';
 import * as DefaultSplashScreen from 'expo-splash-screen';
 
 export default function SplashScreen() {
-  const { checkForUpdates, checkAllScreensForUpdates } = useApi();
+  const { checkForUpdates } = useApi();
   const { data: brandingData, getImagePath } = useScreen<BrandingData>('branding');
   const progress = React.useRef(new Animated.Value(0)).current;
   const screenShimmerTranslate = React.useRef(new Animated.Value(-500)).current;
@@ -25,6 +25,7 @@ export default function SplashScreen() {
         useNativeDriver: true,
       })
     );
+    
     shimmerAnimation.start();
 
     const initializeApp = async () => {

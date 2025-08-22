@@ -94,67 +94,59 @@ export default function HomeScreen() {
     
     console.log("Starting app update check from home screen...");
     
-    // Track the initial loading state to detect if checkScreensForUpdates runs
+    // Track the initial loading state to detect if updates occurred
     const initialLoadingState = isLoading;
     
-    // Start the API call first
-    const updatePromise = checkForUpdates((message) => {
+    // Start the API call and wait for it to complete
+    await checkForUpdates((message) => {
         console.log(message);
     });
     
-    // Check if there will actually be loading (data to fetch)
-    // If no loading state is triggered quickly, do the animation
-    setTimeout(() => {
-      if (!isLoading && !isAnimating.current) {
-        isAnimating.current = true;
-        rotationCount.current += 1;
-        
-        // Start with rotation
+    // Check if updates occurred by seeing if loading state changed
+    const updatesOccurred = isLoading || initialLoadingState !== isLoading;
+    
+    if (!updatesOccurred) {
+      // No updates found - show the animation
+      isAnimating.current = true;
+      rotationCount.current += 1;
+      
+      Animated.sequence([
+        // Rotate refresh icon
         Animated.timing(rotateAnim, {
           toValue: rotationCount.current,
           duration: 300,
           useNativeDriver: true,
-        }).start(async () => {
-          // Wait for the update check to complete and then check if updates occurred
-          await updatePromise;
-          
-          // If isLoading became true during the process, updates were found
-          const updatesOccurred = isLoading || initialLoadingState !== isLoading;
-          
-          if (!updatesOccurred) {
-            // No updates found - show checkmark animation
-            Animated.sequence([
-              Animated.timing(fadeAnim, {
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(checkmarkFadeAnim, {
-                toValue: 1,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.delay(300), // Show checkmark for 300ms
-              Animated.timing(checkmarkFadeAnim, {
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-            ]).start(() => {
-              isAnimating.current = false;
-            });
-          } else {
-            // Updates occurred - just finish the animation
-            isAnimating.current = false;
-          }
-        });
-      }
-    }, 100);
+        }),
+        // Fade out refresh icon
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        // Fade in checkmark
+        Animated.timing(checkmarkFadeAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        // Show checkmark for 300ms
+        Animated.delay(300),
+        // Fade out checkmark
+        Animated.timing(checkmarkFadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        // Fade refresh icon back in
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        isAnimating.current = false;
+      });
+    }
     
     console.log("App update check complete.");
   };
@@ -168,10 +160,13 @@ export default function HomeScreen() {
   const ReserveStatusCard = () => (
     <Card variant="warning" margin="none" style={{ marginBottom: 25 }}>
       <View style={styles.statusHeader}>
+        
         <View style={styles.megaphoneContainer}>
           <Ionicons name="megaphone" size={24} color={ColorPalette.black} />
         </View>
+
         <Text style={styles.statusTitle}>Reserve Status</Text>
+
         <TouchableOpacity 
           onPress={handleManualRefresh} 
           style={styles.reloadButton} 
@@ -194,6 +189,7 @@ export default function HomeScreen() {
               color={ColorPalette.black} 
             />
           </Animated.View>
+
           <Animated.View
             style={{
               position: 'absolute',
@@ -206,6 +202,7 @@ export default function HomeScreen() {
               color={ColorPalette.black} 
             />
           </Animated.View>
+
         </TouchableOpacity>
       </View>
       {isLoading ? (

@@ -7,6 +7,5 @@ SplashScreen.setOptions({
 });
 
 export default function Index() {
-  // Redirect to the splash screen by default
   return <Redirect href="/splash" />;
 }
