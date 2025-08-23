@@ -11,7 +11,7 @@ export default (): ExpoConfig => {
     scheme: "stebbinsapp",
     userInterfaceStyle: "light",
     splash: {
-      image: "./assets/images/splash-icon.png",
+      image: "./assets/images/white-square.png",
       resizeMode: "contain",
       width: "512",
       height: "512",
@@ -52,7 +52,7 @@ export default (): ExpoConfig => {
         "expo-splash-screen",
         {
           "backgroundColor": "#ffffff",
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/white-square.png",
           "resizeMode": "contain"
         }
       ],
