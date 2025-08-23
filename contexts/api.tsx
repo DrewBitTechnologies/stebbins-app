@@ -1,7 +1,7 @@
 // src/api/ApiContext.tsx
 
 import React, { createContext, ReactNode, useContext, useState } from 'react';
-import { getImageFilePath, SCREEN_CONFIGS } from './api.config';
+import { getImageFilePath, SCREEN_CONFIGS, CONCURRENT_SCREENS } from './api.config';
 import * as ApiService from './api.service';
 
 // --- TYPE DEFINITIONS ---
@@ -182,7 +182,7 @@ interface ApiContextType {
   fetchScreenData: <T extends ScreenData>(screenName: string) => Promise<T | null>;
   getImagePath: (screenName: string, imageName: string) => string | undefined;
   isLoading: (screenName: string) => boolean;
-  checkAllScreensForUpdates: (onProgress?: (message: string) => void) => Promise<void>;
+  fullSync: (onProgress?: (message: string) => void) => Promise<void>;
   checkForUpdates: (onProgress?: (message: string) => void) => Promise<void>;
 }
 
@@ -346,69 +346,79 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   };
 
   const fullSync = async (onProgress?: (message: string) => void) => {
-    for (const screenName of Object.keys(SCREEN_CONFIGS)) {
-      setLoading(screenName, true);
-      const config = SCREEN_CONFIGS[screenName];
-      try {
-        onProgress?.(`[${screenName}] Checking for updates...`);
-        
-        if (config.isCollection) {
-          const localCache = await ApiService.loadFromCache(config.cacheKey);
-          const remoteItems = await ApiService.fetchMetadata(config.endpoint);
+    await ApiService.ensureCacheDir();
+    
+    const screenNames = Object.keys(SCREEN_CONFIGS);
+    
+    const processScreenBatch = async (screenBatch: string[]) => {
+      const batchPromises = screenBatch.map(async (screenName) => {
+        setLoading(screenName, true);
+        const config = SCREEN_CONFIGS[screenName];
+        try {
+          onProgress?.(`[${screenName}] Checking for updates...`);
+          
+          if (config.isCollection) {
+            const localCache = await ApiService.loadFromCache(config.cacheKey);
+            const remoteItems = await ApiService.fetchMetadata(config.endpoint);
 
-          if (!localCache || !Array.isArray(localCache.data)) {
+            if (!localCache || !Array.isArray(localCache.data)) {
+              onProgress?.(`[${screenName}] 🔄 Stale cache. Fetching updates...`);
+              await fetchScreenData(screenName);
+              return;
+            }
+
+            const { itemsToFetchIds, itemsToDeleteIds, remoteItemMap } = ApiService.determineSyncActions(localCache.data as any[], remoteItems);
+
+            if (itemsToFetchIds.length === 0 && itemsToDeleteIds.length === 0) {
+              onProgress?.(`[${screenName}] ✅ Cache is up to date.`);
+              setScreenDataCache(prev => ({ ...prev, [screenName]: localCache }));
+              return;
+            }
+
+            onProgress?.(`[${screenName}] 🔄 Syncing: ${itemsToFetchIds.length} new/updated, ${itemsToDeleteIds.length} to delete.`);
+            
+            const fetchedItems = await ApiService.fetchItemsByIds(config.endpoint, itemsToFetchIds);
+            const updatedData = ApiService.mergeUpdates(localCache.data, fetchedItems, itemsToDeleteIds);
+            const imagePaths = await ApiService.processAndCacheImages(screenName, fetchedItems, localCache.imagePaths);
+            const latestTimestamp = Array.from(remoteItemMap.values()).sort().pop() || null;
+
+            const newCacheData: CachedScreenData = { data: updatedData, imagePaths, lastItemUpdateTimestamp: latestTimestamp };
+            await ApiService.saveToCache(config.cacheKey, newCacheData);
+            setScreenDataCache(prev => ({ ...prev, [screenName]: newCacheData }));
+
+          } else {
+            const localCache = await ApiService.loadFromCache(config.cacheKey);
+            const remoteMetadata = await ApiService.fetchSingletonMetadata(config.endpoint);
+            
+
+            if (localCache?.data && remoteMetadata && 
+                new Date(localCache.lastItemUpdateTimestamp) >= new Date(remoteMetadata.date_updated)) {
+              
+              onProgress?.(`[${screenName}] ✅ Cache is up to date.`);
+              
+              setScreenDataCache(prev => ({ ...prev, [screenName]: localCache }));
+              return;
+            }
+
             onProgress?.(`[${screenName}] 🔄 Stale cache. Fetching updates...`);
             await fetchScreenData(screenName);
-            continue;
           }
-
-          const { itemsToFetchIds, itemsToDeleteIds, remoteItemMap } = ApiService.determineSyncActions(localCache.data as any[], remoteItems);
-
-          if (itemsToFetchIds.length === 0 && itemsToDeleteIds.length === 0) {
-            onProgress?.(`[${screenName}] ✅ Cache is up to date.`);
-            setScreenDataCache(prev => ({ ...prev, [screenName]: localCache }));
-            continue;
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : "Unknown error";
+          onProgress?.(`[${screenName}] ❌ Error: ${errorMessage}. Loading from cache.`);
+          const cachedData = await ApiService.loadFromCache(config.cacheKey);
+          if (cachedData) {
+            setScreenDataCache(prev => ({ ...prev, [screenName]: cachedData }));
           }
-
-          onProgress?.(`[${screenName}] 🔄 Syncing: ${itemsToFetchIds.length} new/updated, ${itemsToDeleteIds.length} to delete.`);
-          
-          const fetchedItems = await ApiService.fetchItemsByIds(config.endpoint, itemsToFetchIds);
-          const updatedData = ApiService.mergeUpdates(localCache.data, fetchedItems, itemsToDeleteIds);
-          const imagePaths = await ApiService.processAndCacheImages(screenName, fetchedItems, localCache.imagePaths);
-          const latestTimestamp = Array.from(remoteItemMap.values()).sort().pop() || null;
-
-          const newCacheData: CachedScreenData = { data: updatedData, imagePaths, lastItemUpdateTimestamp: latestTimestamp };
-          await ApiService.saveToCache(config.cacheKey, newCacheData);
-          setScreenDataCache(prev => ({ ...prev, [screenName]: newCacheData }));
-
-        } else {
-          const localCache = await ApiService.loadFromCache(config.cacheKey);
-          const remoteMetadata = await ApiService.fetchSingletonMetadata(config.endpoint);
-          
-
-          if (localCache?.data && remoteMetadata && 
-              new Date(localCache.lastItemUpdateTimestamp) >= new Date(remoteMetadata.date_updated)) {
-            
-            onProgress?.(`[${screenName}] ✅ Cache is up to date.`);
-            
-            setScreenDataCache(prev => ({ ...prev, [screenName]: localCache }));
-            continue;
-          }
-
-          onProgress?.(`[${screenName}] 🔄 Stale cache. Fetching updates...`);
-          await fetchScreenData(screenName);
+        } finally {
+          setLoading(screenName, false);
         }
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
-        onProgress?.(`[${screenName}] ❌ Error: ${errorMessage}. Loading from cache.`);
-        const cachedData = await ApiService.loadFromCache(config.cacheKey);
-        if (cachedData) {
-          setScreenDataCache(prev => ({ ...prev, [screenName]: cachedData }));
-        }
-      } finally {
-        setLoading(screenName, false);
-      }
-    }
+      });
+
+      await Promise.allSettled(batchPromises);
+    };
+
+    await ApiService.processBatch(screenNames, CONCURRENT_SCREENS, processScreenBatch);
 
     setInitialLoadCompleted(true);
     await saveLastSyncDate(new Date().toISOString());
@@ -441,7 +451,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     fetchScreenData,
     getImagePath,
     isLoading,
-    checkAllScreensForUpdates: fullSync,
+    fullSync,
     checkForUpdates,
   };
 

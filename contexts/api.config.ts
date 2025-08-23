@@ -1,14 +1,23 @@
 import * as FileSystem from 'expo-file-system';
+import * as Device from 'expo-device';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
-// --- Constants ---
-export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
-export const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
-export const CDN_URL = process.env.EXPO_PUBLIC_CDN_URL;
-export const REPORT_FILES_FOLDER_ID = process.env.EXPO_PUBLIC_REPORT_FILES_FOLDER_ID;
-export const MAPBOX_ACCESS_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
-export const MAPBOX_STYLE_URL = process.env.EXPO_PUBLIC_MAPBOX_STYLE_URL;
-export const CACHE_DIR = FileSystem.documentDirectory + 'cache/';
-export const IMAGE_FIELD_KEYS = ['image', 'background', 'rules_image', 'safety_image', 'icon', 'map_icon', 'header_image', 'splash_image'];
+const getOptimalConrurrency = () => {
+  console.log(Device.osName + " " + Device.deviceYearClass);
+  if (Device.osName === 'iOS'){
+    if(Device.deviceYearClass && Device.deviceYearClass < 2018) {
+      return 2;
+    }
+    return 6;
+  } else if (Device.osName === 'Android') {
+    if(Device.deviceYearClass && Device.deviceYearClass < 2016) {
+      return 4;
+    }
+    return 8;
+  } else {
+    return 4;
+  }
+}
 
 // --- Screen Configuration ---
 export interface ScreenConfig {
@@ -39,6 +48,20 @@ export const SCREEN_CONFIGS: Record<string, ScreenConfig> = {
   poi_marker: { endpoint: '/items/point_of_interest_marker/', cacheKey: 'poi_marker', isCollection: true },
   branding: { endpoint: '/items/branding/', cacheKey: 'branding_data', isCollection: false },
 };
+
+// --- Constants ---
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+export const BEARER_TOKEN = process.env.EXPO_PUBLIC_API_KEY;
+export const CDN_URL = process.env.EXPO_PUBLIC_CDN_URL;
+export const REPORT_FILES_FOLDER_ID = process.env.EXPO_PUBLIC_REPORT_FILES_FOLDER_ID;
+export const MAPBOX_ACCESS_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
+export const MAPBOX_STYLE_URL = process.env.EXPO_PUBLIC_MAPBOX_STYLE_URL;
+export const CACHE_DIR = FileSystem.documentDirectory + 'cache/';
+export const IMAGE_FIELD_KEYS = ['image', 'background', 'rules_image', 'safety_image', 'icon', 'map_icon', 'header_image', 'splash_image'];
+
+// --- Concurrency Configuration ---
+export const CONCURRENT_SCREENS = Object.keys(SCREEN_CONFIGS).length;
+export const CONCURRENT_IMAGES = getOptimalConrurrency();
 
 // --- Helper Functions for Paths ---
 export const getDataFilePath = (cacheKey: string) => `${CACHE_DIR}${cacheKey}.json`;

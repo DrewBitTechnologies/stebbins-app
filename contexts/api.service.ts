@@ -1,7 +1,7 @@
 import * as Application from 'expo-application';
 import * as FileSystem from 'expo-file-system';
 import { CachedScreenData, ScreenData } from './api';
-import { API_BASE_URL, BEARER_TOKEN, CACHE_DIR, CDN_URL, IMAGE_FIELD_KEYS, getDataFilePath, getImageFilePath } from './api.config';
+import { API_BASE_URL, BEARER_TOKEN, CACHE_DIR, CDN_URL, IMAGE_FIELD_KEYS, CONCURRENT_IMAGES, getDataFilePath, getImageFilePath } from './api.config';
 
 // --- File System Operations ---
 export const ensureCacheDir = async () => {
@@ -13,7 +13,6 @@ export const ensureCacheDir = async () => {
 
 export const saveToCache = async (cacheKey: string, data: CachedScreenData) => {
   try {
-    await ensureCacheDir();
     const filePath = getDataFilePath(cacheKey);
     await FileSystem.writeAsStringAsync(filePath, JSON.stringify(data));
   } catch (error) {
@@ -82,7 +81,6 @@ export const fetchItemsByIds = async <T>(endpoint: string, ids: (string | number
 
 const downloadImage = async (screenName: string, imageName: string): Promise<string | undefined> => {
   try {
-    await ensureCacheDir();
     const localPath = getImageFilePath(screenName, imageName);
     
     // Try CDN with common extensions
@@ -115,33 +113,44 @@ const downloadImage = async (screenName: string, imageName: string): Promise<str
 
 export const processAndCacheImages = async (screenName: string, data: any[], existingImagePaths: Record<string, string> = {}) => {
   const imagePaths = { ...existingImagePaths };
+  const imagesToDownload: { imageId: string, screenName: string }[] = [];
   
-  const processItem = async (item: any) => {
-      if (!item || typeof item !== 'object') return;
+  const collectImages = (item: any) => {
+    if (!item || typeof item !== 'object') return;
 
-      for (const key of IMAGE_FIELD_KEYS) {
-          if (item[key] && typeof item[key] === 'string' && !imagePaths[item[key]]) {
-              const imageId = item[key];
-              const localPath = await downloadImage(screenName, imageId);
-              if (localPath) {
-                  
-                  imagePaths[imageId] = localPath;
-              }
-          }
+    for (const key of IMAGE_FIELD_KEYS) {
+      if (item[key] && typeof item[key] === 'string' && !imagePaths[item[key]]) {
+        imagesToDownload.push({ imageId: item[key], screenName });
       }
+    }
 
-      for (const key in item) {
-          if (Array.isArray(item[key])) {
-              for (const subItem of item[key]) {
-                  await processItem(subItem);
-              }
-          }
+    for (const key in item) {
+      if (Array.isArray(item[key])) {
+        for (const subItem of item[key]) {
+          collectImages(subItem);
+        }
       }
+    }
   };
 
+  // First pass: collect all images that need downloading
   for (const topLevelItem of data) {
-      await processItem(topLevelItem);
+    collectImages(topLevelItem);
   }
+
+  // Second pass: download images in batches
+  const downloadImageBatch = async (imageBatch: { imageId: string, screenName: string }[]) => {
+    const downloadPromises = imageBatch.map(async ({ imageId, screenName: imgScreenName }) => {
+      const localPath = await downloadImage(imgScreenName, imageId);
+      if (localPath) {
+        imagePaths[imageId] = localPath;
+      }
+    });
+    
+    await Promise.allSettled(downloadPromises);
+  };
+
+  await processBatch(imagesToDownload, CONCURRENT_IMAGES, downloadImageBatch);
   
   return imagePaths;
 };
@@ -205,6 +214,26 @@ export const mergeUpdates = (localData: any[], fetchedItems: any[], itemsToDelet
     return [...updatedLocalData, ...newItems];
 };
 
+// --- Batch Processing Utility ---
+
+export const processBatch = async <T>(
+  items: T[],
+  batchSize: number,
+  processor: (batch: T[]) => Promise<any>
+): Promise<any[]> => {
+  const results = [];
+  
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await Promise.allSettled(
+      batch.map(item => processor([item]))
+    );
+    results.push(...batchResults);
+  }
+  
+  return results;
+};
+
 // --- App Version & Cache Management ---
 
 const VERSION_FILE_PATH = `${CACHE_DIR}/app_version.json`;
@@ -231,7 +260,6 @@ export const getCacheVersion = async (): Promise<string | null> => {
 
 export const saveCacheVersion = async (version: string) => {
     try {
-        await ensureCacheDir();
         const versionData = {
             version,
             timestamp: new Date().toISOString()

@@ -29,6 +29,7 @@ export default function SplashScreen() {
     shimmerAnimation.start();
 
     const initializeApp = async () => {
+      const startTime = performance.now();
       try {
         
         // Start progress animation to 10%
@@ -85,6 +86,10 @@ export default function SplashScreen() {
           duration: 200,
           useNativeDriver: false,
         }).start(() => {
+          const endTime = performance.now();
+          const totalTime = (endTime - startTime) / 1000;
+          console.log(`📊 Total download time: ${totalTime.toFixed(1)} seconds`);
+          
           try {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
           } catch (error) {
@@ -95,6 +100,9 @@ export default function SplashScreen() {
         });
         
       } catch (error) {
+        const endTime = performance.now();
+        const totalTime = (endTime - startTime) / 1000;
+        console.log(`📊 Download failed after: ${totalTime.toFixed(1)} seconds`);
         console.warn('Error during app initialization:', error);
         shimmerAnimation.stop();
         router.replace('/(tabs)/home');
