@@ -1,6 +1,5 @@
 import * as FileSystem from 'expo-file-system';
 import * as Device from 'expo-device';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 const getOptimalConrurrency = () => {
   console.log(Device.osName + " " + Device.deviceYearClass);
