@@ -3,6 +3,8 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 import { getImageFilePath, SCREEN_CONFIGS, CONCURRENT_SCREENS } from './api.config';
 import * as ApiService from './api.service';
+import { usePolling } from '../hooks/usePolling';
+import { useBatchedUpdates } from '../hooks/useBatchedUpdates';
 
 // --- TYPE DEFINITIONS ---
 export interface HomeData {
@@ -184,6 +186,9 @@ interface ApiContextType {
   isLoading: (screenName: string) => boolean;
   fullSync: (onProgress?: (message: string) => void) => Promise<void>;
   checkForUpdates: (onProgress?: (message: string) => void) => Promise<void>;
+  // Batched versions for manual refresh (battery efficient)
+  batchedCheckForUpdates: (onProgress?: (message: string) => void) => Promise<void>;
+  batchedFullSync: (onProgress?: (message: string) => void) => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -193,6 +198,58 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const [screenDataCache, setScreenDataCache] = useState<Record<string, CachedScreenData>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [initialLoadCompleted, setInitialLoadCompleted] = useState(false);
+
+  // Batching system for efficient updates
+  const { addToBatch } = useBatchedUpdates();
+
+  // Background update checker - uses efficient single endpoint check
+  const backgroundUpdateCheck = async (): Promise<boolean> => {
+    // Only run background polling if initial load is complete
+    if (!initialLoadCompleted) {
+      console.log('⏳ Skipping background poll - initial load not complete');
+      return false;
+    }
+
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(`🔄 [${timestamp}] Background polling started - checking for updates via single endpoint`);
+
+    return new Promise<boolean>((resolve) => {
+      let foundUpdates = false;
+
+      // Add single high-priority update check to batch
+      addToBatch(
+        'global-update-check',
+        async () => {
+          console.log('🔍 [HIGH] Running global update check...');
+          
+          // Use the existing checkForUpdates logic but with custom logging
+          await checkForUpdates((message: string) => {
+            console.log(`📡 Update check: ${message}`);
+            
+            // Detect if updates were found based on progress messages
+            if (message.includes('🔄 Updates available') || 
+                message.includes('Running full sync') ||
+                message.includes('Resync signal received') ||
+                message.includes('Wiping cache')) {
+              foundUpdates = true;
+            }
+          });
+          
+          console.log(`✅ Global update check completed${foundUpdates ? ' (updates found)' : ' (no updates)'}`);
+          resolve(foundUpdates);
+        },
+        'high'
+      );
+    });
+  };
+
+  // Background polling system - only enabled after initial load completes
+  usePolling(backgroundUpdateCheck, {
+    baseInterval: 10000,      // 10 seconds
+    maxJitter: 5000,          // +/- 5 seconds jitter
+    enabled: initialLoadCompleted, // Only enable after initial load
+    runImmediately: false     // Don't run on mount
+  });
 
   const setLoading = (screenName: string, loading: boolean) => {
     setLoadingStates(prev => ({ ...prev, [screenName]: loading }));
@@ -254,6 +311,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       return null;
     }
   };
+
 
   const loadAllCachedData = async (onProgress?: (message: string) => void) => {
     for (const screenName of Object.keys(SCREEN_CONFIGS)) {
@@ -446,6 +504,52 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
   const isLoading = (screenName: string): boolean => !!loadingStates[screenName];
 
+  // Batched version of checkForUpdates for manual refresh
+  const batchedCheckForUpdates = async (onProgress?: (message: string) => void) => {
+    console.log('🔄 Manual refresh requested - using batched update check');
+    
+    return new Promise<void>((resolve, reject) => {
+      addToBatch(
+        'manual-update-check',
+        async () => {
+          try {
+            onProgress?.('🔄 Starting batched update check...');
+            await checkForUpdates(onProgress);
+            onProgress?.('✅ Batched update check completed');
+            resolve();
+          } catch (error) {
+            onProgress?.('❌ Batched update check failed');
+            reject(error);
+          }
+        },
+        'high' // High priority for user-initiated actions
+      );
+    });
+  };
+
+  // Batched version of fullSync for manual refresh
+  const batchedFullSync = async (onProgress?: (message: string) => void) => {
+    console.log('🔄 Manual full sync requested - using batched approach');
+    
+    return new Promise<void>((resolve, reject) => {
+      addToBatch(
+        'manual-full-sync',
+        async () => {
+          try {
+            onProgress?.('🔄 Starting batched full sync...');
+            await fullSync(onProgress);
+            onProgress?.('✅ Batched full sync completed');
+            resolve();
+          } catch (error) {
+            onProgress?.('❌ Batched full sync failed');
+            reject(error);
+          }
+        },
+        'high' // High priority for user-initiated actions
+      );
+    });
+  };
+
   const value: ApiContextType = {
     getScreenData,
     fetchScreenData,
@@ -453,6 +557,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     isLoading,
     fullSync,
     checkForUpdates,
+    batchedCheckForUpdates,
+    batchedFullSync,
   };
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;

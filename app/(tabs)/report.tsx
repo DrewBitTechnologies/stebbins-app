@@ -27,12 +27,67 @@ export default function ReportScreen() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
+  
+  const MAX_TOTAL_SIZE_MB = 50;
+  const MAX_TOTAL_SIZE_BYTES = MAX_TOTAL_SIZE_MB * 1024 * 1024;
+  
+  // Calculate current total file size
+  const getTotalFileSize = (fileList: ImagePicker.ImagePickerAsset[]): number => {
+    return fileList.reduce((total, file) => {
+      return total + (file.fileSize || 0);
+    }, 0);
+  };
+  
+  const getTotalFileSizeMB = (fileList: ImagePicker.ImagePickerAsset[]): number => {
+    return getTotalFileSize(fileList) / (1024 * 1024);
+  };
 
   const handlePickFiles = async () => {
     const result = await pickFiles();
 
     if (result.files.length > 0) {
-      setFiles(prevFiles => [...prevFiles, ...result.files]);
+      const currentTotalSize = getTotalFileSize(files);
+      const newFilesTotalSize = getTotalFileSize(result.files);
+      const combinedTotalSize = currentTotalSize + newFilesTotalSize;
+      
+      if (combinedTotalSize > MAX_TOTAL_SIZE_BYTES) {
+        const currentSizeMB = Math.round(currentTotalSize / (1024 * 1024) * 10) / 10;
+        const newSizeMB = Math.round(newFilesTotalSize / (1024 * 1024) * 10) / 10;
+        const combinedSizeMB = Math.round(combinedTotalSize / (1024 * 1024) * 10) / 10;
+        
+        Alert.alert(
+          'File Size Limit Exceeded',
+          `Adding these files would exceed the ${MAX_TOTAL_SIZE_MB}MB total limit.\n\n` +
+          `Current files: ${currentSizeMB}MB\n` +
+          `New files: ${newSizeMB}MB\n` +
+          `Combined total: ${combinedSizeMB}MB\n\n` +
+          `Please select fewer or smaller files.`,
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+      
+      // Filter files that would fit within the limit
+      const filteredFiles: ImagePicker.ImagePickerAsset[] = [];
+      let runningTotal = currentTotalSize;
+      
+      for (const file of result.files) {
+        const fileSize = file.fileSize || 0;
+        if (runningTotal + fileSize <= MAX_TOTAL_SIZE_BYTES) {
+          filteredFiles.push(file);
+          runningTotal += fileSize;
+        }
+      }
+      
+      if (filteredFiles.length < result.files.length) {
+        Alert.alert(
+          'Some Files Excluded',
+          `${result.files.length - filteredFiles.length} file(s) were excluded to stay within the ${MAX_TOTAL_SIZE_MB}MB total limit.\n\n${filteredFiles.length} file(s) were added.`,
+          [{ text: 'OK' }]
+        );
+      }
+      
+      setFiles(prevFiles => [...prevFiles, ...filteredFiles]);
     }
   };
 
@@ -125,6 +180,26 @@ export default function ReportScreen() {
             <Text style={styles.sectionSubtitle}>
               Visual evidence helps us understand the issue better
             </Text>
+            {files.length > 0 && (
+              <View style={styles.fileSizeIndicator}>
+                <Text style={styles.fileSizeText}>
+                  {getTotalFileSizeMB(files).toFixed(1)}MB / {MAX_TOTAL_SIZE_MB}MB used
+                </Text>
+                <View style={styles.fileSizeBar}>
+                  <View 
+                    style={[
+                      styles.fileSizeBarFill,
+                      { 
+                        width: `${Math.min((getTotalFileSize(files) / MAX_TOTAL_SIZE_BYTES) * 100, 100)}%`,
+                        backgroundColor: getTotalFileSize(files) > MAX_TOTAL_SIZE_BYTES * 0.8 
+                          ? '#ff6b6b' 
+                          : ColorPalette.primary_green
+                      }
+                    ]} 
+                  />
+                </View>
+              </View>
+            )}
           </View>
         </View>
 
@@ -345,6 +420,24 @@ const styles = StyleSheet.create({
   focusedInput: {
     borderWidth: 2,
     borderColor: ColorPalette.primary_green,
+  },
+  fileSizeIndicator: {
+    marginTop: 8,
+  },
+  fileSizeText: {
+    fontSize: 12,
+    color: ColorPalette.text_secondary,
+    marginBottom: 4,
+  },
+  fileSizeBar: {
+    height: 4,
+    backgroundColor: '#e9ecef',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  fileSizeBarFill: {
+    height: '100%',
+    borderRadius: 2,
   },
   privacyNotice: {
     flexDirection: 'row',

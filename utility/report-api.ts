@@ -44,7 +44,7 @@ export const uploadFile = async (
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`File upload failed: ${response.status} - ${errorText}`);
+    throw new Error(`File upload failed.`);
   }
 
   const json = await response.json();

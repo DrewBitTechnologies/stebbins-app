@@ -20,7 +20,7 @@ export const convertToJpeg = async (uri: string): Promise<string> => {
 
 export const validateFileSize = (
   file: ImagePicker.ImagePickerAsset, 
-  maxSizeInMB: number = 50
+  maxSizeInMB: number = 10
 ): { isValid: boolean; errorMessage?: string } => {
   const fileSizeInMB = (file.fileSize || 0) / (1024 * 1024);
   
