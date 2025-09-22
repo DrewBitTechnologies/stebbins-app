@@ -52,13 +52,14 @@ export const filterNatureMarkersByZoom = (
 export const createDisplayMarkers = (
   activeMarkerTypes: MarkerTypes,
   zoomLevel: number,
+  onMarkerPress: (marker: AnyMarker) => void,
+  getSafetyImagePath: (imageName: string) => string | undefined,
+  getPoiImagePath: (imageName: string) => string | undefined,
   natureTrailMarkers?: NatureTrailMarkerData[],
   mileMarkers?: MileMarkerTrailData[],
   safetyMarkers?: SafetyMarkerData[],
   poiMarkers?: POIMarkerData[],
-  onMarkerPress: (marker: AnyMarker) => void,
-  getSafetyImagePath: (imageName: string) => string | undefined,
-  getPoiImagePath: (imageName: string) => string | undefined
+  
 ): DisplayMarker[] => {
   let markersToDisplay: DisplayMarker[] = [];
 
