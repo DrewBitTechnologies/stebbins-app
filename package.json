@@ -16,8 +16,6 @@
     "test:watch": "cd testing && npm run test:watch"
   },
   "dependencies": {
-    "@expo/config-plugins": "~10.1.1",
-    "@expo/prebuild-config": "9.0.0",
     "@expo/vector-icons": "^14.1.0",
     "@likashefqet/react-native-image-zoom": "^4.3.0",
     "@react-native-async-storage/async-storage": "2.1.2",
@@ -26,8 +24,7 @@
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
     "@rnmapbox/maps": "^10.1.39",
-    "eas-cli": "^16.12.0",
-    "expo": "53.0.20",
+    "expo": "~53.0.23",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.6",
     "expo-file-system": "~18.1.10",
@@ -39,11 +36,11 @@
     "expo-linear-gradient": "~14.1.5",
     "expo-linking": "~7.1.5",
     "expo-location": "~18.1.6",
-    "expo-router": "~5.1.0",
+    "expo-router": "~5.1.7",
     "expo-splash-screen": "~0.30.9",
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.5",
-    "expo-system-ui": "~5.0.9",
+    "expo-system-ui": "~5.0.11",
     "expo-web-browser": "~14.2.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
@@ -61,6 +58,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.0.10",
+    "dotenv": "^16.4.5",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
     "typescript": "~5.8.3"
