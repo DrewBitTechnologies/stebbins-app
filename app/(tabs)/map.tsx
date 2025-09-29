@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import NetInfo from '@react-native-community/netinfo';
-import { getStyleUrl, checkMapState, checkMapForUpdate,CENTER_LONGITUDE,CENTER_LATITUDE,DEFAULT_ZOOM,BOUNDS,MIN_ZOOM } from '@/utility/mapbox-utils';
+import { getStyleUrl, checkMapForUpdate, CENTER_LONGITUDE, CENTER_LATITUDE, DEFAULT_ZOOM, BOUNDS, MIN_ZOOM } from '@/utility/mapbox-utils';
 import { AnyMarker, MarkerTypes,createDisplayMarkers } from '@/utility/marker-utils';
 import { useToast, getMarkerTypeDisplayName } from '@/utility/toast-notifications';
 import { getImageSource } from '@/utility/image-source';
@@ -32,9 +32,10 @@ const DEVICE_HEIGHT = Dimensions.get('window').height;
 export default function MapScreen() {
   const mapview = useRef<MapboxGL.MapView | null>(null);
   const camera = useRef<MapboxGL.Camera>(null);
+  const hasInitialized = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMapCached, setIsMapCached] = useState<boolean | null>(null);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [isInfoModalVisible, setInfoModalVisible] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState<AnyMarker | null>(null);
   const [mapKey, setMapKey] = useState(0);
@@ -59,12 +60,16 @@ export default function MapScreen() {
   useEffect(() => {
     // Set up network info listener
     const unsubscribe = NetInfo.addEventListener(state => {
-      setIsConnected(state.isConnected ?? false);
+      const connected = state.isConnected ?? false;
+      console.log('Network state changed:', connected ? 'online' : 'offline');
+      setIsConnected(connected);
     });
 
     // Get initial network state
     NetInfo.fetch().then(state => {
-      setIsConnected(state.isConnected ?? false);
+      const connected = state.isConnected ?? false;
+      console.log('Initial network state:', connected ? 'online' : 'offline');
+      setIsConnected(connected);
     });
 
     return () => {
@@ -74,6 +79,14 @@ export default function MapScreen() {
 
   useEffect(() => {
     const initializeApp = async () => {
+      // Only initialize once
+      if (hasInitialized.current) return;
+
+      // Wait for network state to be determined
+      if (isConnected === null) return;
+
+      hasInitialized.current = true;
+
       // 1. Check for location permission
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -83,9 +96,32 @@ export default function MapScreen() {
         setLocationPermission(true);
       }
 
-      // 2. Check for offline map state
-      const mapCached = await checkMapState(isConnected);
-      setIsMapCached(mapCached);
+      // 2. Check if offline map is actually downloaded
+      console.log('Checking if offline map exists...');
+      const { isMapDownloaded } = await import('@/utility/mapbox-utils');
+      const mapDownloaded = await isMapDownloaded();
+      console.log('Map downloaded:', mapDownloaded, 'Network connected:', isConnected);
+
+      // 2b. If map not downloaded and we're online, automatically download it
+      if (!mapDownloaded && isConnected) {
+        console.log('Map not downloaded, automatically downloading...');
+        try {
+          await checkMapForUpdate(
+            isConnected,
+            getStyleUrl(MAPBOX_STYLE_URL),
+            () => {
+              console.log('Auto-download successful');
+              setIsMapCached(true);
+            },
+            setMapKey
+          );
+        } catch (error) {
+          console.log('Auto-download failed:', error);
+        }
+      } else {
+        // Set map cached state based on whether map is downloaded OR we're online
+        setIsMapCached(mapDownloaded || isConnected);
+      }
 
       // 3. All checks are done, stop loading
       setIsLoading(false);
@@ -102,9 +138,7 @@ export default function MapScreen() {
       }, 500);
     };
 
-    if (isConnected !== null) { // Wait for network state to be determined
-      initializeApp();
-    }
+    initializeApp();
   }, [isConnected]);
 
   const selectedMarkerImageSource = selectedMarker ? 
@@ -144,8 +178,8 @@ export default function MapScreen() {
     }
 
     checkMapForUpdate(
-      isConnected, 
-      getStyleUrl(MAPBOX_STYLE_URL), 
+      isConnected ?? false,
+      getStyleUrl(MAPBOX_STYLE_URL),
       () => {}, // onSuccess callback if needed
       setMapKey
     );

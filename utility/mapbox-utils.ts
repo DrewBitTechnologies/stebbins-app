@@ -48,26 +48,12 @@ export const downloadOfflineMap = async (styleURL: string): Promise<void> => {
 
 export const isMapDownloaded = async (): Promise<boolean> => {
   try {
+    console.log(`Checking for offline pack: "${MAP_PACK}"`);
     const pack = await MapboxGL.offlineManager.getPack(MAP_PACK);
+    console.log('Offline pack found:', pack ? 'YES' : 'NO');
     return !!pack;
   } catch (error: any) {
-    return false;
-  }
-};
-
-export const checkMapState = async (isConnected: boolean): Promise<boolean> => {
-  try {
-    if (!await isMapDownloaded()) {
-      if (isConnected) {
-        // Note: Caller should provide styleURL when calling downloadOfflineMap
-        return true; // Map needs to be downloaded
-      } else {
-        return false; // No map and no connection
-      }
-    } else {
-      return true; // Map is cached
-    }
-  } catch (error: any) {
+    console.log('Error checking offline pack:', error.message);
     return false;
   }
 };
