@@ -4,17 +4,74 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Animated, Text, Pressable } from 'react-native';
 import { ColorPalette } from '@/assets/dev/color_palette';
 import { useRef, useEffect } from 'react';
+import { useReportDraft } from '@/contexts/report-draft';
 
 export default function TabsLayout() {
   // Get the safe area insets
   const insets = useSafeAreaInsets();
-  
+
+  // Get report draft notification status
+  const { shouldShowNotification } = useReportDraft();
+
   // Create animated values for each tab
   const homeScale = useRef(new Animated.Value(1)).current;
   const mapScale = useRef(new Animated.Value(1)).current;
   const guideScale = useRef(new Animated.Value(1)).current;
   const reportScale = useRef(new Animated.Value(1)).current;
   const donateScale = useRef(new Animated.Value(1)).current;
+
+  // Create animated values for report tab bounce and rotation
+  const reportBounce = useRef(new Animated.Value(0)).current;
+  const reportRotation = useRef(new Animated.Value(0)).current;
+
+  // Bouncing and rotating animation for report tab notification
+  useEffect(() => {
+    if (shouldShowNotification) {
+      const bounceAnimation = Animated.loop(
+        Animated.sequence([
+          // Bounce up and down with smooth continuous rotation
+          Animated.parallel([
+            // Bounce sequence
+            Animated.sequence([
+              Animated.timing(reportBounce, {
+                toValue: -12,
+                duration: 300,
+                useNativeDriver: true,
+              }),
+              Animated.timing(reportBounce, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true,
+              }),
+            ]),
+            // Continuous rotation throughout the entire bounce
+            Animated.timing(reportRotation, {
+              toValue: 1,
+              duration: 600, // Same total duration as bounce cycle
+              useNativeDriver: true,
+            }),
+          ]),
+          // Reset rotation instantly for next cycle
+          Animated.timing(reportRotation, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+          Animated.delay(1000), // Pause between flip cycles
+        ])
+      );
+      bounceAnimation.start();
+
+      return () => {
+        bounceAnimation.stop();
+        reportBounce.setValue(0);
+        reportRotation.setValue(0);
+      };
+    } else {
+      reportBounce.setValue(0);
+      reportRotation.setValue(0);
+    }
+  }, [shouldShowNotification, reportBounce, reportRotation]);
 
   // Animation function for tab press
   const animateTabPress = (scaleValue: Animated.Value) => {
@@ -33,14 +90,16 @@ export default function TabsLayout() {
   };
 
   // Animated tab button component
-  const AnimatedTabButton = ({ 
-    children, 
-    onPress, 
-    accessibilityState, 
-    isFocused, 
-    iconName, 
-    label, 
+  const AnimatedTabButton = ({
+    children,
+    onPress,
+    accessibilityState,
+    isFocused,
+    iconName,
+    label,
     scaleValue,
+    bounceValue,
+    rotationValue,
     ...props
   }: {
     children?: React.ReactNode;
@@ -50,6 +109,8 @@ export default function TabsLayout() {
     iconName: string;
     label: string;
     scaleValue: Animated.Value;
+    bounceValue?: Animated.Value;
+    rotationValue?: Animated.Value;
     [key: string]: any;
   }) => {
     // Extract focused state from aria-selected prop
@@ -71,6 +132,14 @@ export default function TabsLayout() {
     const iconColor = isTabFocused ? ColorPalette.primary_blue : '#8E8E93';
     const textColor = isTabFocused ? ColorPalette.primary_blue : '#8E8E93';
 
+    // Interpolate rotation value from 0-1 to 0deg to -360deg (counter-clockwise)
+    const rotation = rotationValue
+      ? rotationValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: ['0deg', '-360deg'],
+        })
+      : '0deg';
+
     return (
       <Pressable
         {...props}
@@ -83,20 +152,32 @@ export default function TabsLayout() {
           paddingBottom: 6,
         }}
       >
-        <Animated.View 
+        <Animated.View
           style={{
             alignItems: 'center',
             justifyContent: 'center',
             transform: [{ scale: scaleValue }]
           }}
         >
-          <Ionicons
-            name={isTabFocused ? iconName : `${iconName}-outline` as any}
-            size={24}
-            color={iconColor}
-            style={{ marginBottom: 2 }}
-          />
-          <Text 
+          {/* Icon with bounce and rotation */}
+          <Animated.View
+            style={{
+              transform: [
+                { translateY: bounceValue || 0 },
+                { rotate: rotation }
+              ]
+            }}
+          >
+            <Ionicons
+              name={isTabFocused ? iconName : `${iconName}-outline` as any}
+              size={24}
+              color={iconColor}
+              style={{ marginBottom: 2 }}
+            />
+          </Animated.View>
+
+          {/* Text without rotation */}
+          <Text
             style={{
               fontSize: 10,
               color: textColor,
@@ -177,6 +258,8 @@ export default function TabsLayout() {
                 iconName="warning"
                 label="Report"
                 scaleValue={reportScale}
+                bounceValue={reportBounce}
+                rotationValue={reportRotation}
               />
             ),
           }}

@@ -2,7 +2,7 @@ import { ReportData, useScreen } from '@/contexts/api';
 import { API_BASE_URL, BEARER_TOKEN, REPORT_FILES_FOLDER_ID } from '@/contexts/api.config';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 import ScreenHeader from '@/components/screen-header';
 import Card from '@/components/card';
@@ -14,9 +14,11 @@ import { pickFiles, removeFile, removeAllFiles } from '@/utility/file-management
 import { submitCompleteReport, ContactInfo } from '@/utility/report-api';
 import { ColorPalette }from '@/assets/dev/color_palette';
 import * as Haptics from 'expo-haptics';
+import { useReportDraft, ReportDraftData } from '@/contexts/report-draft';
 
 export default function ReportScreen() {
   const { data: reportData, getImagePath } = useScreen<ReportData>('report');
+  const { saveDraft, loadDraft, clearDraft, checkForDraft } = useReportDraft();
   const [description, setDescription] = useState('');
   const [files, setFiles] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [contact, setContact] = useState<ContactInfo>({
@@ -27,10 +29,85 @@ export default function ReportScreen() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
+  const [hasDraftLoaded, setHasDraftLoaded] = useState(false);
+  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   const MAX_TOTAL_SIZE_MB = 50;
   const MAX_TOTAL_SIZE_BYTES = MAX_TOTAL_SIZE_MB * 1024 * 1024;
-  
+
+  // Load draft on mount
+  useEffect(() => {
+    const loadSavedDraft = async () => {
+      const draft = await loadDraft();
+      if (draft) {
+        setDescription(draft.description);
+        setContact(draft.contact);
+
+        // Convert draft files back to ImagePickerAsset format
+        const draftFiles: ImagePicker.ImagePickerAsset[] = draft.files.map(file => ({
+          uri: file.uri,
+          fileName: file.fileName,
+          fileSize: file.fileSize,
+          mimeType: file.mimeType,
+          width: file.width ?? 0,
+          height: file.height ?? 0,
+          assetId: null,
+          duration: null,
+          type: 'image' as const,
+        }));
+        setFiles(draftFiles);
+        setHasDraftLoaded(true);
+
+        Alert.alert(
+          'Draft Loaded',
+          'Your previous report draft has been restored. You can continue editing or clear it.',
+          [{ text: 'OK' }]
+        );
+      }
+    };
+
+    loadSavedDraft();
+  }, []);
+
+  // Auto-save draft with debouncing (500ms after last change)
+  const debouncedSave = useCallback(() => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+
+    saveTimerRef.current = setTimeout(() => {
+      const draftData: ReportDraftData = {
+        description,
+        contact,
+        files: files.map(file => ({
+          uri: file.uri,
+          fileName: file.fileName || '',
+          fileSize: file.fileSize || 0,
+          mimeType: file.mimeType || '',
+          width: file.width,
+          height: file.height,
+        })),
+        savedAt: Date.now(),
+      };
+
+      saveDraft(draftData);
+    }, 500);
+  }, [description, contact, files, saveDraft]);
+
+  // Trigger auto-save on any form field change
+  useEffect(() => {
+    if (hasDraftLoaded || description || files.length > 0 ||
+        contact.firstName || contact.lastName || contact.email || contact.phone) {
+      debouncedSave();
+    }
+
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, [description, contact, files, debouncedSave, hasDraftLoaded]);
+
   // Calculate current total file size
   const getTotalFileSize = (fileList: ImagePicker.ImagePickerAsset[]): number => {
     return fileList.reduce((total, file) => {
@@ -100,6 +177,35 @@ export default function ReportScreen() {
   };
 
 
+  const handleClearDraft = async () => {
+    try {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    } catch (error) {
+      console.log('Haptic feedback not supported');
+    }
+
+    Alert.alert(
+      'Clear Draft',
+      'Are you sure you want to clear this draft? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear',
+          style: 'destructive',
+          onPress: async () => {
+            await clearDraft();
+            setFiles([]);
+            setDescription('');
+            setContact({ firstName: '', lastName: '', email: '', phone: '' });
+            setHasDraftLoaded(false);
+
+            Alert.alert('Draft Cleared', 'Your draft has been cleared successfully.', [{ text: 'OK' }]);
+          },
+        },
+      ]
+    );
+  };
+
   const handleSubmit = async () => {
     if (isSubmitting) return;
 
@@ -108,10 +214,10 @@ export default function ReportScreen() {
     } catch (error) {
       console.log('Haptic feedback not supported');
     }
-    
+
     const hasFiles = files.length > 0;
     const hasDescription = description.trim().length > 0;
-    
+
     if (!hasFiles && !hasDescription) {
       Alert.alert(
         'Cannot Submit Empty Form',
@@ -120,9 +226,9 @@ export default function ReportScreen() {
       );
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const result = await submitCompleteReport(
         files,
@@ -138,20 +244,24 @@ export default function ReportScreen() {
         REPORT_FILES_FOLDER_ID!
       );
 
-      // Success!
+      // Success! Clear the draft
+      await clearDraft();
+      await checkForDraft();
+
       Alert.alert(
-        'Success', 
+        'Success',
         `Report submitted successfully with ${result.fileCount} file(s)`,
         [{ text: 'OK', onPress: () => {
           setFiles([]);
           setDescription('');
           setContact({ firstName: '', lastName: '', email: '', phone: '' });
+          setHasDraftLoaded(false);
         }}]
       );
 
     } catch (error) {
       Alert.alert(
-        'Error', 
+        'Error',
         `Failed to submit report: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     } finally {
@@ -343,8 +453,22 @@ export default function ReportScreen() {
         loading={isSubmitting}
         loadingText="Submitting..."
         disabled={isSubmitting}
-        style={{ marginBottom: 20 }}
+        style={{ marginBottom: 12 }}
       />
+
+      {(hasDraftLoaded || description || files.length > 0 ||
+        contact.firstName || contact.lastName || contact.email || contact.phone) && (
+        <Button
+          title="Clear Draft"
+          onPress={handleClearDraft}
+          icon="trash"
+          backgroundColor={[ColorPalette.primary_red, ColorPalette.primary_red] as const}
+          textColor={ColorPalette.white}
+          iconColor={ColorPalette.white}
+          disabled={isSubmitting}
+          style={{ marginBottom: 20 }}
+        />
+      )}
 
       {/* Privacy Notice */}
       <View style={styles.privacyNotice}>
