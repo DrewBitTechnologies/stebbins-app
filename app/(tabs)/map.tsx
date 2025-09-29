@@ -91,7 +91,15 @@ export default function MapScreen() {
       setIsLoading(false);
 
       // 4. Wait a bit for map to fully initialize before rendering markers
-      setTimeout(() => setMapReady(true), 300);
+      setTimeout(() => {
+        setMapReady(true);
+        // Center the map when it first loads
+        camera.current?.setCamera({
+          centerCoordinate: [CENTER_LONGITUDE, CENTER_LATITUDE],
+          zoomLevel: DEFAULT_ZOOM,
+          animationDuration: 1000,
+        });
+      }, 500);
     };
 
     if (isConnected !== null) { // Wait for network state to be determined

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native';
+import { Modal, StatusBar, StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Card from './card';
 import { ColorPalette } from '@/assets/dev/color_palette';
@@ -11,36 +11,38 @@ interface DetailModalProps {
   variant?: 'compact' | 'default';
 }
 
-export default function DetailModal({ 
-  visible, 
-  onClose, 
-  children, 
-  variant = 'default' 
+export default function DetailModal({
+  visible,
+  onClose,
+  children,
+  variant = 'default'
 }: DetailModalProps) {
   const BLUE = '#022851';
-  
+
   return (
-    <Modal 
-      animationType="fade" 
-      transparent={true} 
-      visible={visible} 
+    <Modal
+      animationType="fade"
+      transparent={false}
+      visible={visible}
       onRequestClose={onClose}
+      statusBarTranslucent
     >
+      <StatusBar backgroundColor="#000000" barStyle="light-content" />
       <View style={styles.outerContainer}>
-        <View style={styles.modalContainer}>
-          <Card 
-            variant="default" 
-            margin="none" 
-            style={variant === 'compact' ? styles.compactModal : styles.defaultModal}
-          >
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {children}
-            </ScrollView>
-          </Card>
-        </View>
-        
-        <TouchableOpacity 
-          style={styles.closeButton} 
+          <View style={styles.modalContainer}>
+            <Card
+              variant="default"
+              margin="none"
+              style={variant === 'compact' ? styles.compactModal : styles.defaultModal}
+            >
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {children}
+              </ScrollView>
+            </Card>
+          </View>
+
+        <TouchableOpacity
+          style={styles.closeButton}
           onPress={onClose}
         >
           <Ionicons name="close" size={28} color={ColorPalette.primary_blue} />
@@ -53,11 +55,10 @@ export default function DetailModal({
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 60,
   },
   modalContainer: {
     width: '100%',
