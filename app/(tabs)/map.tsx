@@ -42,6 +42,7 @@ export default function MapScreen() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const { showToast } = useToast();
   const [locationPermission, setLocationPermission] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
 
   const [activeMarkerTypes, setActiveMarkerTypes] = useState<MarkerTypes>({
     nature: true,
@@ -88,6 +89,9 @@ export default function MapScreen() {
 
       // 3. All checks are done, stop loading
       setIsLoading(false);
+
+      // 4. Wait a bit for map to fully initialize before rendering markers
+      setTimeout(() => setMapReady(true), 300);
     };
 
     if (isConnected !== null) { // Wait for network state to be determined
@@ -114,13 +118,13 @@ export default function MapScreen() {
     return createDisplayMarkers(
       activeMarkerTypes,
       zoomLevel,
+      setSelectedMarker,
+      getSafetyImagePath,
+      getPoiImagePath,
       natureTrailMarkers || undefined,
       mileMarkers || undefined,
       safetyMarkers || undefined,
-      poiMarkers || undefined,
-      setSelectedMarker,
-      getSafetyImagePath,
-      getPoiImagePath
+      poiMarkers || undefined
     );
   }, [isLoading, activeMarkerTypes, zoomLevel, natureTrailMarkers, mileMarkers, safetyMarkers, poiMarkers, setSelectedMarker, getSafetyImagePath, getPoiImagePath]);
 
@@ -221,24 +225,38 @@ export default function MapScreen() {
             
             {locationPermission && <MapboxGL.UserLocation visible={true} />}
 
-            {displayedMarkers.map((marker) => (
-              <MapboxGL.MarkerView key={marker.id} id={marker.id} coordinate={marker.coordinate} anchor={{ x: 0.5, y: 1 }}>
-                <TouchableOpacity onPress={marker.onPress} disabled={!marker.onPress} style={styles.markerWrapper}>
-                  {marker.iconUri ? (
-                    <Image source={{ uri: marker.iconUri }} style={styles.customMarkerIcon} />
-                  ) : (
-                    <>
-                      <View style={styles.markerContainer}>
-                        <Text style={styles.markerText} adjustsFontSizeToFit numberOfLines={1}>
-                          {marker.label}
-                        </Text>
-                      </View>
-                      <View style={styles.markerPin} />
-                    </>
-                  )}
-                </TouchableOpacity>
-              </MapboxGL.MarkerView>
-            ))}
+            {mapReady && displayedMarkers.length > 0 && displayedMarkers.map((marker) => {
+              // Ensure marker has valid coordinate before rendering
+              if (!marker.coordinate || marker.coordinate.length !== 2) {
+                return null;
+              }
+
+              return (
+                <MapboxGL.MarkerView
+                  key={marker.id}
+                  id={marker.id}
+                  coordinate={marker.coordinate}
+                  anchor={{ x: 0.5, y: 1 }}
+                  allowOverlap={true}
+                  allowOverlapWithPuck={true}
+                >
+                  <TouchableOpacity onPress={marker.onPress} disabled={!marker.onPress} style={styles.markerWrapper}>
+                    {marker.iconUri ? (
+                      <Image source={{ uri: marker.iconUri }} style={styles.customMarkerIcon} />
+                    ) : (
+                      <>
+                        <View style={styles.markerContainer}>
+                          <Text style={styles.markerText} adjustsFontSizeToFit numberOfLines={1}>
+                            {marker.label}
+                          </Text>
+                        </View>
+                        <View style={styles.markerPin} />
+                      </>
+                    )}
+                  </TouchableOpacity>
+                </MapboxGL.MarkerView>
+              );
+            })}
           </MapboxGL.MapView>
           <View style={styles.buttonContainer}>
             <Pressable style={[styles.mapActionButton, styles.mapButtonTop]} onPress={handleMapUpdate}>
