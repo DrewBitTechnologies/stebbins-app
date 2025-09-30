@@ -1,0 +1,1 @@
+module.exports = { manipulateAsync: () => Promise.resolve({ uri: '' }) };

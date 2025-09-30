@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { ReportDraftProvider, useReportDraft, ReportDraftData } from '../../contexts/report-draft';
 import NetInfo from '@react-native-community/netinfo';
 import React, { ReactNode } from 'react';

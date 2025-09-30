@@ -112,6 +112,7 @@ const downloadImage = async (screenName: string, imageName: string): Promise<str
 };
 
 export const processAndCacheImages = async (screenName: string, data: any[], existingImagePaths: Record<string, string> = {}) => {
+  await ensureCacheDir();
   const imagePaths = { ...existingImagePaths };
   const imagesToDownload: { imageId: string, screenName: string }[] = [];
   

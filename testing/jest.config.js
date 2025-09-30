@@ -1,6 +1,9 @@
 module.exports = {
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/setup-tests.ts'],
+  globals: {
+    __DEV__: true
+  },
   testMatch: [
     '**/__tests__/**/*.(ts|tsx|js)',
     '**/*.(test|spec).(ts|tsx|js)'
@@ -21,7 +24,10 @@ module.exports = {
     '^expo-image-picker$': '<rootDir>/__mocks__/expo-image-picker.js',
     '^@react-native-async-storage/async-storage$': '<rootDir>/__mocks__/@react-native-async-storage/async-storage.js',
     '^@react-native-community/netinfo$': '<rootDir>/__mocks__/@react-native-community/netinfo.js',
-    '^react-native$': '<rootDir>/__mocks__/react-native.js'
+    '^react-native$': '<rootDir>/__mocks__/react-native.js',
+    '^expo-font$': '<rootDir>/__mocks__/expo-font.js',
+    '^@expo/vector-icons$': '<rootDir>/__mocks__/@expo/vector-icons.js',
+    '^expo-image-manipulator$': '<rootDir>/__mocks__/expo-image-manipulator.js'
   },
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {

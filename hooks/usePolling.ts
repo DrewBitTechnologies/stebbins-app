@@ -29,7 +29,7 @@ export function usePolling(
     maxIntervalJitter = 60000 // ±1 minute
   } = options;
 
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<any>(null);
   const callbackRef = useRef(callback);
   const isRunningRef = useRef(false);
   const currentIntervalRef = useRef(baseInterval);

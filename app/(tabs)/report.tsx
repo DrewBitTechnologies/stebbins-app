@@ -18,7 +18,7 @@ import { useReportDraft, ReportDraftData } from '@/contexts/report-draft';
 
 export default function ReportScreen() {
   const { data: reportData, getImagePath } = useScreen<ReportData>('report');
-  const { saveDraft, loadDraft, clearDraft, checkForDraft } = useReportDraft();
+  const { hasDraft, saveDraft, loadDraft, clearDraft, checkForDraft } = useReportDraft();
   const [description, setDescription] = useState('');
   const [files, setFiles] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [contact, setContact] = useState<ContactInfo>({
@@ -30,7 +30,7 @@ export default function ReportScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [hasDraftLoaded, setHasDraftLoaded] = useState(false);
-  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const saveTimerRef = useRef<any>(null);
   
   const MAX_TOTAL_SIZE_MB = 50;
   const MAX_TOTAL_SIZE_BYTES = MAX_TOTAL_SIZE_MB * 1024 * 1024;
@@ -96,9 +96,18 @@ export default function ReportScreen() {
 
   // Trigger auto-save on any form field change
   useEffect(() => {
-    if (hasDraftLoaded || description || files.length > 0 ||
-        contact.firstName || contact.lastName || contact.email || contact.phone) {
+    const isFormEmpty =
+      !description &&
+      files.length === 0 &&
+      !contact.firstName &&
+      !contact.lastName &&
+      !contact.email &&
+      !contact.phone;
+
+    if (hasDraftLoaded || !isFormEmpty) {
       debouncedSave();
+    } else if (isFormEmpty) {
+      clearDraft();
     }
 
     return () => {
@@ -106,7 +115,7 @@ export default function ReportScreen() {
         clearTimeout(saveTimerRef.current);
       }
     };
-  }, [description, contact, files, debouncedSave, hasDraftLoaded]);
+  }, [description, contact, files, debouncedSave, hasDraftLoaded, clearDraft]);
 
   // Calculate current total file size
   const getTotalFileSize = (fileList: ImagePicker.ImagePickerAsset[]): number => {
@@ -456,8 +465,7 @@ export default function ReportScreen() {
         style={{ marginBottom: 12 }}
       />
 
-      {(hasDraftLoaded || description || files.length > 0 ||
-        contact.firstName || contact.lastName || contact.email || contact.phone) && (
+      {hasDraft && (
         <Button
           title="Clear Draft"
           onPress={handleClearDraft}
