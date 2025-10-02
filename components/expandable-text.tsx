@@ -15,7 +15,7 @@ interface ExpandableTextProps {
   maxLines?: number;
 }
 
-export default function ExpandableText({ text, maxLines = 3 }: ExpandableTextProps) {
+const ExpandableText: React.FC<ExpandableTextProps> = ({ text, maxLines = 3 }) => {
   const [expanded, setExpanded] = useState(false);
   const [showMoreButton, setShowMoreButton] = useState(false);
   
@@ -61,7 +61,9 @@ export default function ExpandableText({ text, maxLines = 3 }: ExpandableTextPro
       )}
     </Animated.View>
   );
-}
+};
+
+export default React.memo(ExpandableText);
 
 const styles = StyleSheet.create({
   description: {

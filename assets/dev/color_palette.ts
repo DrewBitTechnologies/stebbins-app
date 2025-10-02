@@ -89,7 +89,21 @@ export const ColorPalette = {
   border_lighter: '#e9ecef',
 
   transparent_white_primary: 'rgba(255, 255, 255, 0.9)',
-  
+
+} as const;
+
+// Filter colors - mapped to UCD palette colors
+export const FilterColors = {
+  filter_red: ColorPalette.rose,
+  filter_pink: ColorPalette.thiebaud_icing,
+  filter_orange: ColorPalette.poppy,
+  filter_yellow: ColorPalette.sunflower,
+  filter_green: ColorPalette.farmers_market,
+  filter_blue: ColorPalette.rec_pool,
+  filter_purple: ColorPalette.redbud,
+  filter_brown: ColorPalette.california,
+  filter_white: ColorPalette.white,
+  filter_white_border: ColorPalette.black_20,
 } as const;
 
 export type ColorPaletteKeys = keyof typeof ColorPalette;

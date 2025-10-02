@@ -1,6 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView, ImageBackground } from 'react-native';
 import Animated, { 
   useSharedValue, 
@@ -10,6 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { GuideDataItem, GuideData, useScreen } from '../contexts/api';
 import FilterChip from './filter-chip';
+import FilterModeToggle from './filter-mode-toggle';
 import GuideCard from './guide-card';
 import ZoomableImageModal from './zoomable-image-modal';
 import { getImageSource } from '@/utility/image-source';
@@ -18,6 +19,12 @@ import { BlurView } from 'expo-blur';
 import { ColorPalette } from '../assets/dev/color_palette';
 
 
+const monthMap: Record<string, string> = {
+  '0': 'None', '1': 'January', '2': 'February', '3': 'March',
+  '4': 'April', '5': 'May', '6': 'June', '7': 'July', '8': 'August',
+  '9': 'September', '10': 'October', '11': 'November', '12': 'December',
+};
+
 export default function GuideListScreen({ route }: { route: any }) {
   const { screenName, title } = route.params;
   const { data, getImagePath, isLoading } = useScreen<GuideDataItem[]>(screenName);
@@ -25,7 +32,6 @@ export default function GuideListScreen({ route }: { route: any }) {
   // Get the main guide screen data for background image
   const { data: guideData, getImagePath: getGuideImagePath } = useScreen<GuideData>('guide');
 
-  const [filteredData, setFilteredData] = useState<GuideDataItem[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSeasons, setSelectedSeasons] = useState<string[]>([]);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
@@ -33,6 +39,8 @@ export default function GuideListScreen({ route }: { route: any }) {
   const [allSeasons, setAllSeasons] = useState<string[]>([]);
   const [isFilterDropdownVisible, setIsFilterDropdownVisible] = useState(false);
   const [isNavigationDropdownVisible, setIsNavigationDropdownVisible] = useState(false);
+  const [colorFilterMode, setColorFilterMode] = useState<'OR' | 'AND'>('OR');
+  const [seasonFilterMode, setSeasonFilterMode] = useState<'OR' | 'AND'>('OR');
   
   // Reanimated values
   const navigationAnimation = useSharedValue(0);
@@ -88,12 +96,6 @@ export default function GuideListScreen({ route }: { route: any }) {
     return false;
   };
 
-  const monthMap: Record<string, string> = {
-    '0': 'None', '1': 'January', '2': 'February', '3': 'March',
-    '4': 'April', '5': 'May', '6': 'June', '7': 'July', '8': 'August',
-    '9': 'September', '10': 'October', '11': 'November', '12': 'December',
-  };
-
   useEffect(() => {
     if (data) {
       const colors = new Set<string>();
@@ -130,10 +132,9 @@ export default function GuideListScreen({ route }: { route: any }) {
     }
   }, [data]);
 
-  useEffect(() => {
+  const filteredData = useMemo(() => {
     if (!data) {
-      setFilteredData([]);
-      return;
+      return [];
     }
 
     let filtered = data;
@@ -145,40 +146,58 @@ export default function GuideListScreen({ route }: { route: any }) {
             return true;
           }
         }
-        return item.color?.some(color =>
-          selectedColors.includes(color.charAt(0).toUpperCase() + color.slice(1).toLowerCase())
-        );
+
+        const itemColors = item.color?.map(color =>
+          color.charAt(0).toUpperCase() + color.slice(1).toLowerCase()
+        ) || [];
+
+        if (colorFilterMode === 'AND') {
+          // AND: item must have ALL selected colors
+          return selectedColors.every(selectedColor =>
+            selectedColor === 'None' || itemColors.includes(selectedColor)
+          );
+        } else {
+          // OR: item must have AT LEAST ONE selected color
+          return itemColors.some(color => selectedColors.includes(color));
+        }
       });
     }
 
     if (selectedSeasons.length > 0) {
-      filtered = filtered.filter(item =>
-        item.season?.some(season => {
+      filtered = filtered.filter(item => {
+        const itemSeasons = item.season?.map(season => {
           const monthName = monthMap[season.toString()];
-          const displaySeason = monthName || season.charAt(0).toUpperCase() + season.slice(1).toLowerCase();
-          return selectedSeasons.includes(displaySeason);
-        })
-      );
+          return monthName || season.charAt(0).toUpperCase() + season.slice(1).toLowerCase();
+        }) || [];
+
+        if (seasonFilterMode === 'AND') {
+          // AND: item must have ALL selected seasons
+          return selectedSeasons.every(selectedSeason => itemSeasons.includes(selectedSeason));
+        } else {
+          // OR: item must have AT LEAST ONE selected season
+          return itemSeasons.some(season => selectedSeasons.includes(season));
+        }
+      });
     }
 
-    setFilteredData(filtered);
-  }, [data, selectedColors, selectedSeasons]);
+    return filtered;
+  }, [data, selectedColors, selectedSeasons, colorFilterMode, seasonFilterMode]);
 
-  const toggleColorFilter = (color: string) => {
+  const toggleColorFilter = useCallback((color: string) => {
     setSelectedColors(prev =>
       prev.includes(color)
         ? prev.filter(c => c !== color)
         : [...prev, color]
     );
-  };
+  }, []);
 
-  const toggleSeasonFilter = (season: string) => {
+  const toggleSeasonFilter = useCallback((season: string) => {
     setSelectedSeasons(prev =>
       prev.includes(season)
         ? prev.filter(s => s !== season)
         : [...prev, season]
     );
-  };
+  }, []);
 
   const clearAllFilters = () => {
     setSelectedColors([]);
@@ -251,14 +270,18 @@ export default function GuideListScreen({ route }: { route: any }) {
     closeNavigationDropdown();
   };
 
-  const renderItem = ({ item }: { item: GuideDataItem }) => (
+  const onImagePress = useCallback((imageUri: string) => {
+    setZoomedImage(imageUri);
+  }, []);
+
+  const renderItem = useCallback(({ item }: { item: GuideDataItem }) => (
     <GuideCard
       item={item}
       getImagePath={getImagePath}
-      onImagePress={setZoomedImage}
+      onImagePress={onImagePress}
       monthMap={monthMap}
     />
-  );
+  ), [getImagePath, onImagePress]);
   
 
   const renderTopNavigationComponent = () => (
@@ -390,8 +413,11 @@ export default function GuideListScreen({ route }: { route: any }) {
           {/* Color Filter Section - Always Show */}
           <View style={styles.filterSection}>
             <View style={styles.filterTitleContainer}>
-              <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green}/>
-              <Text style={styles.filterTitle}>Filter by Color</Text>
+              <View style={styles.filterTitleLeft}>
+                <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green}/>
+                <Text style={styles.filterTitle}>Filter by Color</Text>
+              </View>
+              <FilterModeToggle mode={colorFilterMode} onModeChange={setColorFilterMode} />
             </View>
             <View style={styles.chipContainer}>
               {allColors.length > 0 ? (
@@ -401,6 +427,7 @@ export default function GuideListScreen({ route }: { route: any }) {
                     label={color}
                     selected={selectedColors.includes(color)}
                     onPress={() => toggleColorFilter(color)}
+                    type="color"
                   />
                 ))
               ) : (
@@ -409,11 +436,14 @@ export default function GuideListScreen({ route }: { route: any }) {
             </View>
           </View>
           
-          {/* Season Filter Section - Always Show */}
+          {/* Season Filter Section - Always Show */}'''
           <View style={styles.filterSection}>
             <View style={styles.filterTitleContainer}>
-              <MaterialCommunityIcons name="calendar" size={25} color={ColorPalette.primary_green}/>
-              <Text style={styles.filterTitle}>Filter by Season</Text>
+              <View style={styles.filterTitleLeft}>
+                <MaterialCommunityIcons name="calendar" size={25} color={ColorPalette.primary_green}/>
+                <Text style={styles.filterTitle}>Filter by Season</Text>
+              </View>
+              <FilterModeToggle mode={seasonFilterMode} onModeChange={setSeasonFilterMode} />
             </View>
             <View style={styles.chipContainer}>
               {allSeasons.length > 0 ? (
@@ -790,6 +820,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
+    justifyContent: 'space-between',
+  },
+  filterTitleLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   chipContainer: {
     flexDirection: 'row',
@@ -887,7 +923,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: ColorPalette.primary_green,
-    marginLeft: 8,
   },
   filterFooter: {
     flexDirection: 'row',

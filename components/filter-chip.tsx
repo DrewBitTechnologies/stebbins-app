@@ -1,32 +1,48 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { ColorPalette } from '@/assets/dev/color_palette';
+import { getColorStyle } from '@/utility/color-styles';
 
 interface FilterChipProps {
   label: string;
   selected: boolean;
   onPress: () => void;
+  type?: 'color' | 'season';
 }
 
-export default function FilterChip({ label, selected, onPress }: FilterChipProps) {
+const FilterChip: React.FC<FilterChipProps> = ({ label, selected, onPress, type }) => {
+  const colorStyle = type === 'color' ? getColorStyle(label) : null;
+  const isWhite = label.toLowerCase() === 'white';
+
+  const chipStyle = colorStyle
+    ? selected
+      ? isWhite
+        ? { backgroundColor: colorStyle.selectedBg, borderColor: ColorPalette.primary_green }
+        : { backgroundColor: colorStyle.selectedBg, borderColor: colorStyle.selectedBg }
+      : { backgroundColor: colorStyle.backgroundColor, borderColor: colorStyle.borderColor }
+    : {};
+
   return (
     <TouchableOpacity
       style={[
         styles.filterChip,
-        selected && styles.filterChipSelected,
+        selected && !colorStyle && styles.filterChipSelected,
+        chipStyle,
       ]}
       onPress={onPress}
       activeOpacity={0.8}
     >
       <Text style={[
         styles.filterChipText,
-        selected && styles.filterChipTextSelected
+        selected && (isWhite ? styles.filterChipTextSelectedWhite : styles.filterChipTextSelected)
       ]}>
         {label}
       </Text>
     </TouchableOpacity>
   );
-}
+};
+
+export default React.memo(FilterChip);
 
 const styles = StyleSheet.create({
   filterChip: {
@@ -50,6 +66,10 @@ const styles = StyleSheet.create({
   },
   filterChipTextSelected: {
     color: ColorPalette.white,
+    fontWeight: '600',
+  },
+  filterChipTextSelectedWhite: {
+    color: ColorPalette.primary_green,
     fontWeight: '600',
   },
 });

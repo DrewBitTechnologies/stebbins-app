@@ -4,6 +4,7 @@ import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { GuideDataItem } from '../contexts/api';
 import ExpandableText from './expandable-text';
 import { ColorPalette } from '../assets/dev/color_palette';
+import { getColorStyle } from '../utility/color-styles';
 
 interface GuideCardProps {
   item: GuideDataItem;
@@ -12,7 +13,7 @@ interface GuideCardProps {
   monthMap: Record<string, string>;
 }
 
-export default function GuideCard({ item, getImagePath, onImagePress, monthMap }: GuideCardProps) {
+const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress, monthMap }) => {
   const imageUri = item.image ? getImagePath(item.image) : null;
 
   return (
@@ -46,13 +47,19 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
                 <Text style={styles.tagLabel}>Colors</Text>
               </View>
               <View style={styles.tagList}>
-                {item.color.map((color, index) => (
-                  <View key={index} style={styles.colorTag}>
-                    <Text style={styles.tagText}>
-                      {color.charAt(0).toUpperCase() + color.slice(1).toLowerCase()}
-                    </Text>
-                  </View>
-                ))}
+                {item.color.map((color, index) => {
+                  const colorStyle = getColorStyle(color);
+                  return (
+                    <View key={index} style={[
+                      styles.colorTag,
+                      colorStyle && { backgroundColor: colorStyle.backgroundColor, borderColor: colorStyle.borderColor }
+                    ]}>
+                      <Text style={styles.tagText}>
+                        {color.charAt(0).toUpperCase() + color.slice(1).toLowerCase()}
+                      </Text>
+                    </View>
+                  );
+                })}
               </View>
             </View>
           )}
@@ -106,7 +113,9 @@ export default function GuideCard({ item, getImagePath, onImagePress, monthMap }
       </View>
     </View>
   );
-}
+};
+
+export default React.memo(GuideCard);
 
 const styles = StyleSheet.create({
   cardContainer: {
@@ -129,7 +138,7 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     width: '100%',
-    height: 200,
+    aspectRatio: 1,
   },
   zoomIndicator: {
     position: 'absolute',
@@ -184,8 +193,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginRight: 6,
     marginBottom: 4,
-    backgroundColor: 'rgba(45, 80, 22, 0.1)',
     borderWidth: 1,
+    backgroundColor: 'rgba(45, 80, 22, 0.1)',
     borderColor: 'rgba(45, 80, 22, 0.2)',
   },
   seasonTag: {
