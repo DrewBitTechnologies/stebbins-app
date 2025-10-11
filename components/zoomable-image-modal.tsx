@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Dimensions, Image, Modal, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ColorPalette } from '@/assets/dev/color_palette';
@@ -12,6 +12,19 @@ interface ZoomableImageModalProps {
 }
 
 export default function ZoomableImageModal({ visible, imageUri, onClose }: ZoomableImageModalProps) {
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (visible && scrollViewRef.current) {
+      // Reset zoom to minimum (1x) when modal opens
+      setTimeout(() => {
+        scrollViewRef.current?.setNativeProps({
+          zoomScale: 1,
+        });
+      }, 50);
+    }
+  }, [visible]);
+
   return (
     <Modal visible={visible} transparent={false} animationType="fade" statusBarTranslucent>
       <StatusBar backgroundColor="#000000" barStyle="light-content" />
@@ -20,6 +33,7 @@ export default function ZoomableImageModal({ visible, imageUri, onClose }: Zooma
             <TouchableOpacity style={styles.modalCloseArea} onPress={onClose}>
               <View style={styles.modalContent}>
                 <ScrollView
+                  ref={scrollViewRef}
                   maximumZoomScale={3}
                   minimumZoomScale={1}
                   showsHorizontalScrollIndicator={false}
@@ -51,13 +65,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
   },
   modalContainer: {
     width: '100%',
-    maxWidth: 500,
     alignItems: 'center',
-    maxHeight: '80%',
+    maxHeight: '100%',
     flex: 1,
   },
   modalCloseArea: {
@@ -68,9 +81,8 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '100%',
-    height: screenHeight * 0.7,
+    height: screenHeight * 0.9,
     maxHeight: '100%',
-    paddingBottom: 20, // Space for close button
   },
   scrollView: {
     flex: 1,
@@ -82,16 +94,18 @@ const styles = StyleSheet.create({
   },
   zoomedImage: {
     width: '100%',
-    height: screenHeight * 0.7,
+    height: screenHeight * 0.9,
   },
   closeButton: {
+    position: 'absolute',
+    bottom: 50,
+    alignSelf: 'center',
     width: 50,
     height: 50,
     borderRadius: 25,
     backgroundColor: ColorPalette.white,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
     shadowColor: ColorPalette.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

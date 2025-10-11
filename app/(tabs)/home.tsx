@@ -46,7 +46,7 @@ export default function HomeScreen() {
       title: 'Report an Issue',
       navigateTo: '/(tabs)/report',
       icon: 'warning',
-      description: 'Help us maintain the trails',
+      description: 'Keep us informed',
       color: ColorPalette.primary_green
     },
   ];
@@ -219,8 +219,7 @@ export default function HomeScreen() {
     <ScreenBackground backgroundSource={getImageSource(homeData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
       <ScreenHeader 
         icon="leaf"
-        title="Stebbins Nature Reserve"
-        subtitle="Welcome to your outdoor adventure"
+        title="Welcome to your outdoor adventure"
       />
 
         <ReserveStatusCard />

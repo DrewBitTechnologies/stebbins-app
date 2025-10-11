@@ -22,7 +22,7 @@ export default function GuideScreen() {
       title: 'Wildflowers', 
       navigateTo: '/guides/wildflowers',
       icon: 'flower',
-      description: 'Explore seasonal blooms and meadow flowers'
+      description: 'Explore seasonal blooms'
     },
     { 
       title: 'Animals', 
@@ -34,13 +34,13 @@ export default function GuideScreen() {
       title: 'Trees and Shrubs', 
       navigateTo: '/guides/trees-and-shrubs',
       icon: 'leaf',
-      description: 'Identify native trees and woodland plants'
+      description: 'Identify common trees and plants'
     },
     { 
       title: 'Trail Tracks', 
       navigateTo: '/guides/trail-tracks',
       icon: 'footsteps',
-      description: 'Learn to read animal tracks and signs'
+      description: 'Learn to recognize animal signs'
     },
   ];
 

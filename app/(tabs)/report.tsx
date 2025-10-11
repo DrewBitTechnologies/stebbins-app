@@ -284,7 +284,7 @@ export default function ReportScreen() {
       <ScreenHeader 
         icon="warning"
         title="Report an Issue"
-        subtitle={reportData?.instruction_text || 'Help us keep the trails safe and maintained'}
+        subtitle={reportData?.instruction_text || 'Help management stay informed'}
       />
 
       <Card variant="default" margin="none" style={{ marginBottom: 20 }}>

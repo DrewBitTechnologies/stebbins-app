@@ -27,9 +27,9 @@ export default function DonateScreen() {
     return (
         <ScreenBackground backgroundSource={getImageSource(donateData, 'background', getImagePath, require('@/assets/dev/fallback.jpeg'))}>
             <ScreenHeader 
-                icon="heart"
+                icon="accessibility"
                 title="Support Our Mission"
-                subtitle="Help preserve and enhance Stebbins for future generations"
+                subtitle="Help to protect the reserve for future generations"
             />
 
             <Card variant="default" margin="none" style={{ marginBottom: 20 }}>
@@ -66,9 +66,7 @@ export default function DonateScreen() {
                     <Text style={styles.thankYouTitle}>Thank You</Text>
                 </View>
                 <Text style={styles.thankYouText}>
-                    Every donation, no matter the size, helps us maintain and improve this special place. 
-                    Your support ensures that Stebbins Cold Canyon remains a treasured destination for education, 
-                    recreation, and conservation.
+                    Thank you. Your support improves protections for Stebbins Cold Canyon that will safeguard outstanding opportunities for education, research, recreation and conservation.
                 </Text>
             </Card>
         </ScreenBackground>

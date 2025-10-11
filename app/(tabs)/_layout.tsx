@@ -115,12 +115,6 @@ export default function TabsLayout() {
   }) => {
     // Extract focused state from aria-selected prop
     const isTabFocused = isFocused || accessibilityState?.selected || props['aria-selected'] || false;
-    
-    useEffect(() => {
-      if (isTabFocused) {
-        animateTabPress(scaleValue);
-      }
-    }, [isTabFocused, scaleValue]);
 
     const handlePress = (event: any) => {
       animateTabPress(scaleValue);

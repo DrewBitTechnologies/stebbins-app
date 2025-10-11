@@ -11,9 +11,10 @@ interface GuideCardProps {
   getImagePath: (imageName: string) => string | undefined;
   onImagePress: (imageUri: string) => void;
   monthMap: Record<string, string>;
+  showFilters?: boolean;
 }
 
-const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress, monthMap }) => {
+const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress, monthMap, showFilters = true }) => {
   const imageUri = item.image ? getImagePath(item.image) : null;
 
   return (
@@ -40,7 +41,7 @@ const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress,
 
           <ExpandableText text={item.description} />
 
-          {item.color && item.color.length > 0 && (
+          {showFilters && item.color && item.color.length > 0 && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
                 <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green} />
@@ -63,7 +64,7 @@ const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress,
               </View>
             </View>
           )}
-          {(!item.color || item.color.length === 0) && (
+          {showFilters && (!item.color || item.color.length === 0) && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
                 <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green} />
@@ -77,7 +78,7 @@ const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress,
             </View>
           )}
 
-          {item.season && item.season.length > 0 && (
+          {showFilters && item.season && item.season.length > 0 && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
                 <Ionicons name="leaf" size={25} color={ColorPalette.primary_green} />
@@ -96,7 +97,7 @@ const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress,
               </View>
             </View>
           )}
-          {(!item.season || item.season.length === 0) && (
+          {showFilters && (!item.season || item.season.length === 0) && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
                 <MaterialCommunityIcons name="leaf" size={25} color={ColorPalette.primary_green} />

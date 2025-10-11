@@ -59,7 +59,7 @@ export const CACHE_DIR = FileSystem.documentDirectory + 'cache/';
 export const IMAGE_FIELD_KEYS = ['image', 'background', 'rules_image', 'safety_image', 'icon', 'map_icon', 'header_image', 'splash_image'];
 
 // --- Concurrency Configuration ---
-export const CONCURRENT_SCREENS = 5; // Process 5 screens at a time to avoid overwhelming the system
+export const CONCURRENT_SCREENS = 1; // Process 5 screens at a time to avoid overwhelming the system
 export const CONCURRENT_IMAGES = getOptimalConrurrency();
 
 // --- Helper Functions for Paths ---

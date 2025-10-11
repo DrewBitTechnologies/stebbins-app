@@ -18,6 +18,7 @@ import InfoModalContent from '@/components/info-modal-content';
 import Toast from '@/components/toast';
 import { ColorPalette } from '@/assets/dev/color_palette';
 import * as Haptics from 'expo-haptics';
+import { useFocusEffect } from '@react-navigation/native';
 
 // Initialize Mapbox
 if (MAPBOX_ACCESS_TOKEN) {
@@ -52,10 +53,10 @@ export default function MapScreen() {
     poi: true,
   });
 
-  const { data: natureTrailMarkers, getImagePath: getNatureImagePath } = useScreen<NatureTrailMarkerData[]>('nature_trail_marker');
-  const { data: mileMarkers } = useScreen<MileMarkerTrailData[]>('mile_marker');
-  const { data: safetyMarkers, getImagePath: getSafetyImagePath } = useScreen<SafetyMarkerData[]>('safety_marker');
-  const { data: poiMarkers, getImagePath: getPoiImagePath } = useScreen<POIMarkerData[]>('poi_marker');
+  const { data: natureTrailMarkers, getImagePath: getNatureImagePath, isLoading: isNatureLoading } = useScreen<NatureTrailMarkerData[]>('nature_trail_marker');
+  const { data: mileMarkers, isLoading: isMileLoading } = useScreen<MileMarkerTrailData[]>('mile_marker');
+  const { data: safetyMarkers, getImagePath: getSafetyImagePath, isLoading: isSafetyLoading } = useScreen<SafetyMarkerData[]>('safety_marker');
+  const { data: poiMarkers, getImagePath: getPoiImagePath, isLoading: isPoiLoading } = useScreen<POIMarkerData[]>('poi_marker');
 
   useEffect(() => {
     // Set up network info listener
@@ -141,6 +142,13 @@ export default function MapScreen() {
     initializeApp();
   }, [isConnected]);
 
+  useFocusEffect(
+    useCallback(() => {
+      // Show toast when screen comes into focus
+      showToast('Toggle map elements below', setToastMessage);
+    }, [showToast])
+  );
+
   const selectedMarkerImageSource = selectedMarker ? 
     getImageSource(selectedMarker, 'image', 
       'common_name' in selectedMarker ? getNatureImagePath :
@@ -155,7 +163,10 @@ export default function MapScreen() {
   const selectedMarkerIconUri = selectedMarkerIconSource && typeof selectedMarkerIconSource === 'object' && 'uri' in selectedMarkerIconSource ? selectedMarkerIconSource.uri : null;
 
   const displayedMarkers = useMemo(() => {
-    if (isLoading) return []; // Don't compute markers while loading
+    // Don't render markers until map is ready AND all marker data has loaded
+    if (!mapReady || !natureTrailMarkers || !mileMarkers || !safetyMarkers || !poiMarkers) {
+      return [];
+    }
 
     return createDisplayMarkers(
       activeMarkerTypes,
@@ -163,12 +174,12 @@ export default function MapScreen() {
       setSelectedMarker,
       getSafetyImagePath,
       getPoiImagePath,
-      natureTrailMarkers || undefined,
-      mileMarkers || undefined,
-      safetyMarkers || undefined,
-      poiMarkers || undefined
+      natureTrailMarkers,
+      mileMarkers,
+      safetyMarkers,
+      poiMarkers
     );
-  }, [isLoading, activeMarkerTypes, zoomLevel, natureTrailMarkers, mileMarkers, safetyMarkers, poiMarkers, setSelectedMarker, getSafetyImagePath, getPoiImagePath]);
+  }, [mapReady, activeMarkerTypes, zoomLevel, natureTrailMarkers, mileMarkers, safetyMarkers, poiMarkers, setSelectedMarker, getSafetyImagePath, getPoiImagePath]);
 
   const handleMapUpdate = () => {
     try {
@@ -284,7 +295,14 @@ export default function MapScreen() {
                 >
                   <TouchableOpacity onPress={marker.onPress} disabled={!marker.onPress} style={styles.markerWrapper}>
                     {marker.iconUri ? (
-                      <Image source={{ uri: marker.iconUri }} style={styles.customMarkerIcon} />
+                      <View style={styles.iconMarkerContainer}>
+                        <Image source={{ uri: marker.iconUri }} style={styles.customMarkerIcon} />
+                        <View style={styles.iconLabelContainer}>
+                          <Text style={styles.iconLabelText} numberOfLines={1}>
+                            {marker.label}
+                          </Text>
+                        </View>
+                      </View>
                     ) : (
                       <>
                         <View style={styles.markerContainer}>
@@ -390,8 +408,9 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
   },
-  markerWrapper: { 
-    alignItems: 'center' 
+  markerWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   markerContainer: {
     backgroundColor: ColorPalette.white, 
@@ -428,9 +447,33 @@ const styles = StyleSheet.create({
      borderTopColor: ColorPalette.ucd_blue 
     },
   customMarkerIcon: {
-     width: 36, 
-     height: 36, 
-     resizeMode: 'contain' 
+     width: 18,
+     height: 18,
+     resizeMode: 'contain'
+    },
+  iconMarkerContainer: {
+     alignItems: 'center',
+     pointerEvents: 'box-none'
+    },
+  iconLabelContainer: {
+     backgroundColor: 'rgba(255, 255, 255, 0.9)',
+     paddingHorizontal: 3,
+     paddingVertical: 1,
+     borderRadius: 2,
+     marginTop: 2,
+     minWidth: 20,
+     alignItems: 'center',
+     shadowColor: '#000',
+     shadowOffset: { width: 0, height: 1 },
+     shadowOpacity: 0.2,
+     shadowRadius: 2,
+     elevation: 3
+    },
+  iconLabelText: {
+     color: ColorPalette.ucd_blue,
+     fontSize: 8,
+     fontWeight: '600',
+     textAlign: 'center'
     },
   toggleContainer: {
      position: 'absolute', 

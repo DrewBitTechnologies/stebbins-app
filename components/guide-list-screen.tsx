@@ -56,7 +56,7 @@ export default function GuideListScreen({ route }: { route: any }) {
     { title: 'Mammals', route: '/guides/mammals', iconLibrary: 'Ionicons', icon: 'paw' },
     { title: 'Birds', route: '/guides/birds', iconLibrary: 'MaterialCommunityIcons', icon: 'feather' },
     { title: 'Herps', route: '/guides/herps', iconLibrary: 'MaterialCommunityIcons', icon: 'snake' },
-    { title: 'Invertebrates', route: '/guides/invertebrates', iconLibrary: 'MaterialCommunityIcons', icon: 'ladybug' },
+    { title: 'Invertebrates', route: '/guides/invertebrates', iconLibrary: 'Ionicons', icon: 'bug' },
   ];
 
   const renderCategoryIcon = (category: { iconLibrary: string; icon: string }, color: string, size: number = 25) => {
@@ -83,7 +83,7 @@ export default function GuideListScreen({ route }: { route: any }) {
   const isCurrentCategory = (categoryTitle: string) => {
     const titleLower = title.toLowerCase();
     const categoryLower = categoryTitle.toLowerCase();
-    
+
     // Check exact matches for animal subcategories and other categories
     if (categoryLower.includes('mammal') && titleLower.includes('mammal')) return true;
     if (categoryLower.includes('bird') && titleLower.includes('bird')) return true;
@@ -92,8 +92,17 @@ export default function GuideListScreen({ route }: { route: any }) {
     if (categoryLower.includes('tree') && (titleLower.includes('tree') || titleLower.includes('shrub'))) return true;
     if (categoryLower.includes('wildflower') && (titleLower.includes('wildflower') || titleLower.includes('flower'))) return true;
     if (categoryLower.includes('track') && titleLower.includes('track')) return true;
-    
+
     return false;
+  };
+
+  const shouldHideFilters = () => {
+    const titleLower = title.toLowerCase();
+    return titleLower.includes('mammal') ||
+           titleLower.includes('bird') ||
+           titleLower.includes('herp') ||
+           titleLower.includes('invertebrate') ||
+           titleLower.includes('track');
   };
 
   useEffect(() => {
@@ -135,6 +144,11 @@ export default function GuideListScreen({ route }: { route: any }) {
   const filteredData = useMemo(() => {
     if (!data) {
       return [];
+    }
+
+    // Skip filtering for guides without filters
+    if (shouldHideFilters()) {
+      return data;
     }
 
     let filtered = data;
@@ -280,6 +294,7 @@ export default function GuideListScreen({ route }: { route: any }) {
       getImagePath={getImagePath}
       onImagePress={onImagePress}
       monthMap={monthMap}
+      showFilters={!shouldHideFilters()}
     />
   ), [getImagePath, onImagePress]);
   
@@ -435,8 +450,8 @@ export default function GuideListScreen({ route }: { route: any }) {
               )}
             </View>
           </View>
-          
-          {/* Season Filter Section - Always Show */}'''
+
+          {/* Season Filter Section - Always Show */}
           <View style={styles.filterSection}>
             <View style={styles.filterTitleContainer}>
               <View style={styles.filterTitleLeft}>
@@ -554,9 +569,9 @@ export default function GuideListScreen({ route }: { route: any }) {
           onScrollBeginDrag={closeAllDropdowns}
         />
       
-      
+
       {/* Bottom Filter Component */}
-      {renderBottomFilterComponent()}
+      {!shouldHideFilters() && renderBottomFilterComponent()}
       
       {zoomedImage && (
         <ZoomableImageModal
