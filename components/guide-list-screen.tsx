@@ -2,12 +2,14 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View, ScrollView, ImageBackground } from 'react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming, 
-  interpolate 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  interpolate,
+  runOnJS
 } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { GuideDataItem, GuideData, useScreen } from '../contexts/api';
 import FilterChip from './filter-chip';
 import FilterModeToggle from './filter-mode-toggle';
@@ -98,11 +100,17 @@ export default function GuideListScreen({ route }: { route: any }) {
 
   const shouldHideFilters = () => {
     const titleLower = title.toLowerCase();
-    return titleLower.includes('mammal') ||
+    // Check if category typically has no filters
+    const isNoFilterCategory = titleLower.includes('mammal') ||
            titleLower.includes('bird') ||
            titleLower.includes('herp') ||
            titleLower.includes('invertebrate') ||
            titleLower.includes('track');
+
+    // Also hide if no meaningful filter options exist (need 2+ options to filter)
+    const hasNoMeaningfulFilters = allColors.length <= 1 && allSeasons.length <= 1;
+
+    return isNoFilterCategory || hasNoMeaningfulFilters;
   };
 
   useEffect(() => {
@@ -229,7 +237,7 @@ export default function GuideListScreen({ route }: { route: any }) {
   const navigationChevronStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        { rotate: `${interpolate(navigationAnimation.value, [0, 1], [0, 180])}deg` }
+        { rotate: `${interpolate(navigationAnimation.value, [0, 1], [0, -180])}deg` }
       ],
     };
   });
@@ -244,7 +252,7 @@ export default function GuideListScreen({ route }: { route: any }) {
   const filterChevronStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        { rotate: `${interpolate(filterAnimation.value, [0, 1], [0, -180])}deg` }
+        { rotate: `${interpolate(filterAnimation.value, [0, 1], [0, 180])}deg` }
       ],
     };
   });
@@ -284,6 +292,36 @@ export default function GuideListScreen({ route }: { route: any }) {
     closeNavigationDropdown();
   };
 
+  // Navigation pan gesture (swipe up to open, down to close)
+  const navigationPanGesture = Gesture.Pan()
+    .onEnd((event) => {
+      const threshold = 50;
+      // Swipe up (negative translationY) to open
+      if (event.translationY < -threshold && !isNavigationDropdownVisible) {
+        runOnJS(toggleNavigationDropdown)();
+      }
+      // Swipe down (positive translationY) to close
+      else if (event.translationY > threshold && isNavigationDropdownVisible) {
+        runOnJS(toggleNavigationDropdown)();
+      }
+    })
+    .minDistance(10);
+
+  // Filter pan gesture (swipe down to open, up to close)
+  const filterPanGesture = Gesture.Pan()
+    .onEnd((event) => {
+      const threshold = 50;
+      // Swipe down (positive translationY) to open
+      if (event.translationY > threshold && !isFilterDropdownVisible) {
+        runOnJS(toggleFilterDropdown)();
+      }
+      // Swipe up (negative translationY) to close
+      else if (event.translationY < -threshold && isFilterDropdownVisible) {
+        runOnJS(toggleFilterDropdown)();
+      }
+    })
+    .minDistance(10);
+
   const onImagePress = useCallback((imageUri: string) => {
     setZoomedImage(imageUri);
   }, []);
@@ -302,33 +340,35 @@ export default function GuideListScreen({ route }: { route: any }) {
   const renderTopNavigationComponent = () => (
     <View style={styles.topNavigationComponent}>
       {/* Header Section - Always Visible */}
-      <TouchableOpacity 
-        style={styles.navigationHeader}
-        onPress={toggleNavigationDropdown}
-      >
-        <View style={styles.navigationBarContent}>
-          <View style={styles.navigationBarLeft}>
-            <Ionicons name="book" size={25} color={ColorPalette.primary_green}style={styles.iconWithMargin} />
-            <View style={styles.navigationBarTextContainer}>
-              <Text style={styles.navigationBarTitle}>Navigate Guides</Text>
-              <View style={styles.navigationBarSubtitle}>
-                <Text style={styles.navigationBarSubtitleText}>
-                  Currently viewing {getFilterCategoryName()}
-                </Text>
+      <GestureDetector gesture={navigationPanGesture}>
+        <TouchableOpacity
+          style={styles.navigationHeader}
+          onPress={toggleNavigationDropdown}
+        >
+          <View style={styles.navigationBarContent}>
+            <View style={styles.navigationBarLeft}>
+              <Ionicons name="book" size={25} color={ColorPalette.primary_green}style={styles.iconWithMargin} />
+              <View style={styles.navigationBarTextContainer}>
+                <Text style={styles.navigationBarTitle}>Navigate Guides</Text>
+                <View style={styles.navigationBarSubtitle}>
+                  <Text style={styles.navigationBarSubtitleText}>
+                    Currently viewing {getFilterCategoryName()}
+                  </Text>
+                </View>
               </View>
             </View>
+            <View style={styles.navigationBarRight}>
+              <Animated.View style={navigationChevronStyle}>
+                <MaterialCommunityIcons
+                  name="chevron-up"
+                  size={25}
+                  color={ColorPalette.primary_green}
+                />
+              </Animated.View>
+            </View>
           </View>
-          <View style={styles.navigationBarRight}>
-            <Animated.View style={navigationChevronStyle}>
-              <MaterialCommunityIcons 
-                name="chevron-down"
-                size={25} 
-                color={ColorPalette.primary_green}
-              />
-            </Animated.View>
-          </View>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </GestureDetector>
       
       {/* Expanded Content - Animated Show/Hide */}
       <Animated.View style={[styles.navigationDropdownContent, navigationAnimatedStyle]}> 
@@ -425,18 +465,18 @@ export default function GuideListScreen({ route }: { route: any }) {
         </View>
         
         <ScrollView style={styles.filterScrollContent} showsVerticalScrollIndicator={false}>
-          {/* Color Filter Section - Always Show */}
-          <View style={styles.filterSection}>
-            <View style={styles.filterTitleContainer}>
-              <View style={styles.filterTitleLeft}>
-                <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green}/>
-                <Text style={styles.filterTitle}>Filter by Color</Text>
+          {/* Color Filter Section - Only show if there are 2+ options */}
+          {allColors.length > 1 && (
+            <View style={styles.filterSection}>
+              <View style={styles.filterTitleContainer}>
+                <View style={styles.filterTitleLeft}>
+                  <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green}/>
+                  <Text style={styles.filterTitle}>Filter by Color</Text>
+                </View>
+                <FilterModeToggle mode={colorFilterMode} onModeChange={setColorFilterMode} />
               </View>
-              <FilterModeToggle mode={colorFilterMode} onModeChange={setColorFilterMode} />
-            </View>
-            <View style={styles.chipContainer}>
-              {allColors.length > 0 ? (
-                allColors.map(color => (
+              <View style={styles.chipContainer}>
+                {allColors.map(color => (
                   <FilterChip
                     key={color}
                     label={color}
@@ -444,90 +484,88 @@ export default function GuideListScreen({ route }: { route: any }) {
                     onPress={() => toggleColorFilter(color)}
                     type="color"
                   />
-                ))
-              ) : (
-                <Text style={styles.noFiltersText}>No color data available</Text>
-              )}
-            </View>
-          </View>
-
-          {/* Season Filter Section - Always Show */}
-          <View style={styles.filterSection}>
-            <View style={styles.filterTitleContainer}>
-              <View style={styles.filterTitleLeft}>
-                <MaterialCommunityIcons name="calendar" size={25} color={ColorPalette.primary_green}/>
-                <Text style={styles.filterTitle}>Filter by Season</Text>
+                ))}
               </View>
-              <FilterModeToggle mode={seasonFilterMode} onModeChange={setSeasonFilterMode} />
             </View>
-            <View style={styles.chipContainer}>
-              {allSeasons.length > 0 ? (
-                allSeasons.map(season => (
+          )}
+
+          {/* Season Filter Section - Only show if there are 2+ options */}
+          {allSeasons.length > 1 && (
+            <View style={styles.filterSection}>
+              <View style={styles.filterTitleContainer}>
+                <View style={styles.filterTitleLeft}>
+                  <MaterialCommunityIcons name="calendar" size={25} color={ColorPalette.primary_green}/>
+                  <Text style={styles.filterTitle}>Filter by Season</Text>
+                </View>
+                <FilterModeToggle mode={seasonFilterMode} onModeChange={setSeasonFilterMode} />
+              </View>
+              <View style={styles.chipContainer}>
+                {allSeasons.map(season => (
                   <FilterChip
                     key={season}
                     label={season}
                     selected={selectedSeasons.includes(season)}
                     onPress={() => toggleSeasonFilter(season)}
                   />
-                ))
-              ) : (
-                <Text style={styles.noFiltersText}>No seasonal data available</Text>
-              )}
+                ))}
+              </View>
             </View>
-          </View>
+          )}
           </ScrollView>
         </View>
         </Animated.View>
       
       {/* Footer Section - Always Visible */}
-      <TouchableOpacity 
-        style={styles.bottomFilterButton}
-        onPress={toggleFilterDropdown}
-      >
-        <View style={styles.filterBarContent}>
-          <View style={styles.filterBarLeft}>
-            <MaterialCommunityIcons name="filter-variant" size={25} color={ColorPalette.primary_green}style={styles.iconWithMargin} />
-            <View style={styles.filterBarTextContainer}>
-              <Text style={styles.filterBarTitle}>Filters</Text>
-              <View style={styles.filterBarSubtitle}>
-                <Text style={styles.filterBarSubtitleText}>
-                  {filteredData.length} {filteredData.length === 1 ? 'result' : 'results'}
-                </Text>
-                {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
-                  <>
-                    <Text style={styles.filterBarDivider}> • </Text>
-                    <Text style={styles.activeFiltersText}>
-                      {selectedColors.length + selectedSeasons.length} active filter{selectedColors.length + selectedSeasons.length !== 1 ? 's' : ''}
-                    </Text>
-                  </>
-                )}
+      <GestureDetector gesture={filterPanGesture}>
+        <TouchableOpacity
+          style={styles.bottomFilterButton}
+          onPress={toggleFilterDropdown}
+        >
+          <View style={styles.filterBarContent}>
+            <View style={styles.filterBarLeft}>
+              <MaterialCommunityIcons name="filter-variant" size={25} color={ColorPalette.primary_green}style={styles.iconWithMargin} />
+              <View style={styles.filterBarTextContainer}>
+                <Text style={styles.filterBarTitle}>Filters</Text>
+                <View style={styles.filterBarSubtitle}>
+                  <Text style={styles.filterBarSubtitleText}>
+                    {filteredData.length} {filteredData.length === 1 ? 'result' : 'results'}
+                  </Text>
+                  {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
+                    <>
+                      <Text style={styles.filterBarDivider}> • </Text>
+                      <Text style={styles.activeFiltersText}>
+                        {selectedColors.length + selectedSeasons.length} active filter{selectedColors.length + selectedSeasons.length !== 1 ? 's' : ''}
+                      </Text>
+                    </>
+                  )}
+                </View>
               </View>
             </View>
+            <View style={styles.filterBarRight}>
+              <Animated.View style={filterChevronStyle}>
+                <MaterialCommunityIcons
+                  name="chevron-down"
+                  size={25}
+                  color={ColorPalette.primary_green}
+                />
+              </Animated.View>
+              {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
+                <View style={styles.activeFilterBadge}>
+                  <Text style={styles.activeFilterText}>
+                    {selectedColors.length + selectedSeasons.length}
+                  </Text>
+                </View>
+              )}
+            </View>
           </View>
-          <View style={styles.filterBarRight}>
-            <Animated.View style={filterChevronStyle}>
-              <MaterialCommunityIcons 
-                name="chevron-up"
-                size={25} 
-                color={ColorPalette.primary_green}
-              />
-            </Animated.View>
-            {(selectedColors.length > 0 || selectedSeasons.length > 0) && (
-              <View style={styles.activeFilterBadge}>
-                <Text style={styles.activeFilterText}>
-                  {selectedColors.length + selectedSeasons.length}
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </GestureDetector>
     </View>
   );
 
   if (isLoading && !data) {
     return (
-      <ImageBackground 
+      <ImageBackground
         source={getImageSource(guideData, 'background', getGuideImagePath, require('@/assets/dev/fallback.jpeg'))}
         style={styles.backgroundImage}
         resizeMode="cover"
@@ -546,8 +584,13 @@ export default function GuideListScreen({ route }: { route: any }) {
     );
   }
 
+  // Dynamic padding based on whether filters are visible
+  const dynamicPaddingStyle = {
+    paddingTop: shouldHideFilters() ? 20 : 105,
+  };
+
   return (
-    <ImageBackground 
+    <ImageBackground
       source={getImageSource(guideData, 'background', getGuideImagePath, require('@/assets/dev/fallback.jpeg'))}
       style={styles.backgroundImage}
       resizeMode="cover"
@@ -555,24 +598,25 @@ export default function GuideListScreen({ route }: { route: any }) {
     >
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
-      {renderTopNavigationComponent()}
-      
+      {/* Top Filter Component */}
+      {!shouldHideFilters() && renderBottomFilterComponent()}
+
       {/* Scrollable Content Area */}
         <FlatList
           data={filteredData}
           keyExtractor={item => item.id.toString()}
           renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, dynamicPaddingStyle]}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           style={styles.flatList}
           onScrollBeginDrag={closeAllDropdowns}
         />
-      
 
-      {/* Bottom Filter Component */}
-      {!shouldHideFilters() && renderBottomFilterComponent()}
-      
+
+      {/* Bottom Navigation Component */}
+      {renderTopNavigationComponent()}
+
       {zoomedImage && (
         <ZoomableImageModal
           visible={!!zoomedImage}
@@ -580,7 +624,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           onClose={() => setZoomedImage(null)}
         />
       )}
-      
+
     </ImageBackground>
   );
 }
@@ -626,14 +670,15 @@ const styles = StyleSheet.create({
   },
   topNavigationComponent: {
     position: 'absolute',
-    top: 0,
+    bottom: 0,
     left: 0,
     right: 0,
     backgroundColor: ColorPalette.white,
-    borderBottomRightRadius: 16,
-    borderBottomLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderTopLeftRadius: 16,
+    paddingBottom: 20,
     shadowColor: ColorPalette.black,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.5,
     shadowRadius: 3,
     elevation: 10,
@@ -641,10 +686,10 @@ const styles = StyleSheet.create({
   },
   navigationDropdownContent: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(45, 80, 22, 0.1)',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(45, 80, 22, 0.1)',
     overflow: 'hidden',
   },
   navigationContentWrapper: {
@@ -684,22 +729,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   listContent: {
-    paddingBottom: 125,
     paddingTop: 105,
+    paddingBottom: 125,
   },
   bottomFilterComponent: {
     position: 'absolute',
-    bottom: 0,
+    top: 0,
     left: 0,
     right: 0,
     backgroundColor: ColorPalette.white,
-    borderTopRightRadius: 16,
-    borderTopLeftRadius: 16,
-    paddingBottom: 20,
+    borderBottomRightRadius: 16,
+    borderBottomLeftRadius: 16,
     shadowColor: ColorPalette.black,
-                shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: 0.5,
-                shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
     elevation: 10,
     zIndex: 2,
   },
@@ -905,10 +949,10 @@ const styles = StyleSheet.create({
   },
   filterDropdownContent: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(45, 80, 22, 0.1)',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(45, 80, 22, 0.1)',
     overflow: 'hidden',
   },
   filterContentWrapper: {

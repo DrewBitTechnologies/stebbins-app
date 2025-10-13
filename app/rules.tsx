@@ -16,7 +16,7 @@ export default function RulesScreen() {
             <ScreenHeader 
                 icon="trail-sign"
                 title="Trail Rules"
-                subtitle="Please follow these guidelines to help preserve the reserve"
+                subtitle="Please follow these guidelines to help protect the reserve"
             />
 
             <Card variant="default" margin="none" style={{ alignItems: 'center', marginBottom: 20 }}>
@@ -56,7 +56,7 @@ export default function RulesScreen() {
                 <View style={styles.footerContent}>
                     <Ionicons name="heart" size={24} color={ColorPalette.primary_red} />
                     <Text style={styles.footerText}>
-                        Thank you for helping us protect and preserve this natural space for future generations.
+                        Thank you for helping us protect this natural space for future generations.
                     </Text>
                 </View>
             </Card>

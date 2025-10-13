@@ -14,7 +14,7 @@ export default function ScreenBackground({
     children, 
     backgroundSource, 
     showScrollIndicator = false,
-    paddingTop = 40
+    paddingTop = 35
 }: ScreenBackgroundProps) {
     return (
         <ImageBackground 

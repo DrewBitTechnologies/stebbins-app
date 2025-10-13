@@ -8,12 +8,10 @@ interface ScreenHeaderProps {
     subtitle?: string;
 }
 
-export default function ScreenHeader({ icon, title, subtitle }: ScreenHeaderProps) {
+export default function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
     return (
         <View style={styles.headerSection}>
-            <View style={styles.titleContainer}>
-                <Text style={styles.headerTitle}>{title}</Text>
-            </View>
+            <Text style={[styles.headerTitle, subtitle && styles.headerTitleWithSubtitle]}>{title}</Text>
             {subtitle && <Text style={styles.headerSubtitle}>{subtitle}</Text>}
         </View>
     );
@@ -22,12 +20,8 @@ export default function ScreenHeader({ icon, title, subtitle }: ScreenHeaderProp
 const styles = StyleSheet.create({
     headerSection: {
         alignItems: 'center',
-        marginBottom: 12,
+        marginBottom: 35,
         paddingHorizontal: 20,
-    },
-    titleContainer: {
-        alignItems: 'center',
-        marginBottom: 8,
     },
     headerIcon: {
         marginBottom: 12,
@@ -40,6 +34,9 @@ const styles = StyleSheet.create({
         textShadowColor: 'rgba(0,0,0,0.5)',
         textShadowOffset: { width: 0, height: 1 },
         textShadowRadius: 3,
+    },
+    headerTitleWithSubtitle: {
+        marginBottom: 8,
     },
     headerSubtitle: {
         fontSize: 16,

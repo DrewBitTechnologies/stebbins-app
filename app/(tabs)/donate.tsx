@@ -66,7 +66,7 @@ export default function DonateScreen() {
                     <Text style={styles.thankYouTitle}>Thank You</Text>
                 </View>
                 <Text style={styles.thankYouText}>
-                    Thank you. Your support improves protections for Stebbins Cold Canyon that will safeguard outstanding opportunities for education, research, recreation and conservation.
+                    Your support improves protections for Stebbins Cold Canyon that will safeguard outstanding opportunities for education, research, recreation and conservation.
                 </Text>
             </Card>
         </ScreenBackground>

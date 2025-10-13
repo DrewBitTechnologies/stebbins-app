@@ -18,7 +18,7 @@ interface ExpandableTextProps {
 const ExpandableText: React.FC<ExpandableTextProps> = ({ text, maxLines = 3 }) => {
   const [expanded, setExpanded] = useState(false);
   const [showMoreButton, setShowMoreButton] = useState(false);
-  
+
   const animationValue = useSharedValue(0);
 
   const onTextLayout = (event: any) => {

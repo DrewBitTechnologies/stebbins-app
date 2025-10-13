@@ -41,7 +41,7 @@ const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress,
 
           <ExpandableText text={item.description} />
 
-          {showFilters && item.color && item.color.length > 0 && (
+          {showFilters && item.color && item.color.length > 0 && !(item.color.length === 1 && item.color[0].toLowerCase() === 'none') && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
                 <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green} />
@@ -64,19 +64,6 @@ const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress,
               </View>
             </View>
           )}
-          {showFilters && (!item.color || item.color.length === 0) && (
-            <View style={styles.tagContainer}>
-              <View style={styles.tagHeader}>
-                <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green} />
-                <Text style={styles.tagLabel}>Colors</Text>
-              </View>
-              <View style={styles.tagList}>
-                <View style={styles.emptyTag}>
-                  <Text style={styles.emptyTagText}>None</Text>
-                </View>
-              </View>
-            </View>
-          )}
 
           {showFilters && item.season && item.season.length > 0 && (
             <View style={styles.tagContainer}>
@@ -94,19 +81,6 @@ const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress,
                     </View>
                   );
                 })}
-              </View>
-            </View>
-          )}
-          {showFilters && (!item.season || item.season.length === 0) && (
-            <View style={styles.tagContainer}>
-              <View style={styles.tagHeader}>
-                <MaterialCommunityIcons name="leaf" size={25} color={ColorPalette.primary_green} />
-                <Text style={styles.tagLabel}>Seasons</Text>
-              </View>
-              <View style={styles.tagList}>
-                <View style={styles.emptyTag}>
-                  <Text style={styles.emptyTagText}>None</Text>
-                </View>
               </View>
             </View>
           )}
