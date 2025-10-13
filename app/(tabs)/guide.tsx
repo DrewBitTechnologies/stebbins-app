@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    minHeight: 70,
   },
   iconContainer: {
     width: 56,
