@@ -361,7 +361,7 @@ export default function MapScreen() {
             source={require("@/assets/dev/stebbins-map.png")}
             style={styles.offlineMapImage}
             isDoubleTapEnabled={true}
-            maxPanPointers={1}
+            isPanEnabled={true}
           />
         </View>
       </GestureHandlerRootView>

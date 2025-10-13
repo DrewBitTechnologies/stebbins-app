@@ -1,6 +1,8 @@
-import React, { useRef, useEffect } from 'react';
-import { Dimensions, Image, Modal, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { Dimensions, Modal, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { ImageZoom } from '@likashefqet/react-native-image-zoom';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ColorPalette } from '@/assets/dev/color_palette';
 
 const { height: screenHeight } = Dimensions.get('window');
@@ -12,44 +14,19 @@ interface ZoomableImageModalProps {
 }
 
 export default function ZoomableImageModal({ visible, imageUri, onClose }: ZoomableImageModalProps) {
-  const scrollViewRef = useRef<ScrollView>(null);
-
-  useEffect(() => {
-    if (visible && scrollViewRef.current) {
-      // Reset zoom to minimum (1x) when modal opens
-      setTimeout(() => {
-        scrollViewRef.current?.setNativeProps({
-          zoomScale: 1,
-        });
-      }, 50);
-    }
-  }, [visible]);
-
   return (
     <Modal visible={visible} transparent={false} animationType="fade" statusBarTranslucent>
       <StatusBar backgroundColor="#000000" barStyle="light-content" />
       <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <TouchableOpacity style={styles.modalCloseArea} onPress={onClose}>
-              <View style={styles.modalContent}>
-                <ScrollView
-                  ref={scrollViewRef}
-                  maximumZoomScale={3}
-                  minimumZoomScale={1}
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false}
-                  style={styles.scrollView}
-                  contentContainerStyle={styles.scrollViewContent}
-                >
-                  <Image
-                    source={{ uri: imageUri }}
-                    style={styles.zoomedImage}
-                    resizeMode="contain"
-                  />
-                </ScrollView>
-              </View>
-            </TouchableOpacity>
-          </View>
+        <GestureHandlerRootView style={styles.modalContainer}>
+          <ImageZoom
+            uri={imageUri}
+            style={styles.zoomedImage}
+            isDoubleTapEnabled={true}
+            isPanEnabled={true}
+            resizeMode="contain"
+          />
+        </GestureHandlerRootView>
 
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
           <Ionicons name="close" size={28} color="#022851" />
@@ -65,36 +42,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 0,
   },
   modalContainer: {
     width: '100%',
-    alignItems: 'center',
-    maxHeight: '100%',
-    flex: 1,
-  },
-  modalCloseArea: {
-    flex: 1,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '100%',
     height: screenHeight * 0.9,
-    maxHeight: '100%',
-  },
-  scrollView: {
     flex: 1,
-  },
-  scrollViewContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   zoomedImage: {
     width: '100%',
-    height: screenHeight * 0.9,
+    height: '100%',
   },
   closeButton: {
     position: 'absolute',

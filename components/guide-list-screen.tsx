@@ -49,9 +49,9 @@ export default function GuideListScreen({ route }: { route: any }) {
   const filterAnimation = useSharedValue(0);
 
   const guideCategories = [
-    { title: 'Trees & Shrubs', route: '/guides/trees-and-shrubs', iconLibrary: 'Ionicons', icon: 'leaf' },
-    { title: 'Trail Tracks', route: '/guides/trail-tracks', iconLibrary: 'Ionicons', icon: 'footsteps' },
-    { title: 'Wildflowers', route: '/guides/wildflowers', iconLibrary: 'Ionicons', icon: 'flower' },
+    { title: 'Wildflowers', route: '/guides/wildflowers', iconLibrary: 'Ionicons', icon: 'flower', fullWidth: true },
+    { title: 'Trees & Shrubs', route: '/guides/trees-and-shrubs', iconLibrary: 'Ionicons', icon: 'leaf', fullWidth: false },
+    { title: 'Trail Tracks', route: '/guides/trail-tracks', iconLibrary: 'Ionicons', icon: 'footsteps', fullWidth: false },
   ];
 
   const animalCategories = [
@@ -384,19 +384,23 @@ export default function GuideListScreen({ route }: { route: any }) {
                   key={category.title}
                   style={[
                     styles.categoryButton,
+                    category.fullWidth && styles.categoryButtonFullWidth,
                     isCurrentCategory(category.title) && styles.categoryButtonActive
                   ]}
                   onPress={() => handleCategoryChange(category.route)}
                 >
                   {renderCategoryIcon(
-                    category, 
-                    isCurrentCategory(category.title) ? ColorPalette.white : ColorPalette.primary_green, 
+                    category,
+                    isCurrentCategory(category.title) ? ColorPalette.white : ColorPalette.primary_green,
                     25
                   )}
-                  <Text style={[
-                    styles.categoryButtonText,
-                    isCurrentCategory(category.title) && styles.categoryButtonTextActive
-                  ]}>
+                  <Text
+                    style={[
+                      styles.categoryButtonText,
+                      isCurrentCategory(category.title) && styles.categoryButtonTextActive
+                    ]}
+                    numberOfLines={1}
+                  >
                     {category.title}
                   </Text>
                 </TouchableOpacity>
@@ -418,14 +422,17 @@ export default function GuideListScreen({ route }: { route: any }) {
                   onPress={() => handleAnimalCategoryChange(category.route)}
                 >
                   {renderCategoryIcon(
-                    category, 
-                    isCurrentCategory(category.title) ? ColorPalette.white : ColorPalette.primary_green, 
+                    category,
+                    isCurrentCategory(category.title) ? ColorPalette.white : ColorPalette.primary_green,
                     25
                   )}
-                  <Text style={[
-                    styles.categoryButtonText,
-                    isCurrentCategory(category.title) && styles.categoryButtonTextActive
-                  ]}>
+                  <Text
+                    style={[
+                      styles.categoryButtonText,
+                      isCurrentCategory(category.title) && styles.categoryButtonTextActive
+                    ]}
+                    numberOfLines={1}
+                  >
                     {category.title}
                   </Text>
                 </TouchableOpacity>
@@ -910,7 +917,7 @@ const styles = StyleSheet.create({
   categoryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    gap: 8,
   },
   categoryButton: {
     flexDirection: 'row',
@@ -920,11 +927,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 8,
-    marginRight: 8,
     borderWidth: 1,
     borderColor: 'rgba(45, 80, 22, 0.2)',
-    flex: 1,
-    minWidth: 120,
+    width: '48%',
+  },
+  categoryButtonFullWidth: {
+    width: '100%',
   },
   categoryButtonActive: {
     backgroundColor: ColorPalette.primary_green,
@@ -935,7 +943,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: ColorPalette.primary_green,
     marginLeft: 8,
-    flex: 1,
+    flexShrink: 1,
   },
   categoryButtonTextActive: {
     color: ColorPalette.white,
