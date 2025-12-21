@@ -1,5 +1,5 @@
 import { GuideData, useScreen } from '@/contexts/api';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -12,7 +12,7 @@ import { ColorPalette } from '@/assets/dev/color_palette';
 interface ButtonItem {
   title: string;
   navigateTo: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: keyof typeof Ionicons.glyphMap | 'mushroom'; 
   description: string;
 }
 
@@ -31,16 +31,16 @@ export default function GuideScreen() {
       description: 'Discover local wildlife and their habitats'
     },
     { 
+      title: 'Fungi', 
+      navigateTo: '/guides/fungi',
+      icon: 'mushroom',
+      description: 'Learn to recognize fungi'
+    },
+    { 
       title: 'Trees and Shrubs', 
       navigateTo: '/guides/trees-and-shrubs',
       icon: 'leaf',
       description: 'Identify common trees and plants'
-    },
-    { 
-      title: 'Trail Tracks', 
-      navigateTo: '/guides/trail-tracks',
-      icon: 'footsteps',
-      description: 'Learn to recognize animal signs'
     },
   ];
 
@@ -72,11 +72,21 @@ export default function GuideScreen() {
           >
           <View style={styles.cardContent}>
             <View style={styles.iconContainer}>
-              <Ionicons 
-                name={item.icon} 
-                size={28} 
-                color={ColorPalette.primary_green} 
-              />
+
+              {item.icon === 'mushroom' ? (
+                 <MaterialCommunityIcons 
+                   name="mushroom"
+                   size={28}
+                   color={ColorPalette.primary_green}
+                 />
+               ) : (
+                 <Ionicons 
+                   name={item.icon as keyof typeof Ionicons.glyphMap} 
+                   size={28} 
+                   color={ColorPalette.primary_green} 
+                 />
+              )}
+
             </View>
             
             <View style={styles.textContainer}>

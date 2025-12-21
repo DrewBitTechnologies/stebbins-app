@@ -51,7 +51,7 @@ export default function GuideListScreen({ route }: { route: any }) {
   const guideCategories = [
     { title: 'Wildflowers', route: '/guides/wildflowers', iconLibrary: 'Ionicons', icon: 'flower', fullWidth: true },
     { title: 'Trees & Shrubs', route: '/guides/trees-and-shrubs', iconLibrary: 'Ionicons', icon: 'leaf', fullWidth: false },
-    { title: 'Trail Tracks', route: '/guides/trail-tracks', iconLibrary: 'Ionicons', icon: 'footsteps', fullWidth: false },
+    { title: 'Fungi', route: '/guides/fungi', iconLibrary: 'MaterialCommunityIcons', icon: 'mushroom', fullWidth: false },
   ];
 
   const animalCategories = [
