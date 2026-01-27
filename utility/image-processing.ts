@@ -1,17 +1,33 @@
 import * as ImageManipulator from 'expo-image-manipulator';
+import { writeAsync, readAsync, ExifTags } from '@lodev09/react-native-exify';
 import * as ImagePicker from 'expo-image-picker';
 import { Alert } from 'react-native';
 
 export const convertToJpeg = async (uri: string): Promise<string> => {
   try {
-    const result = await ImageManipulator.manipulateAsync(
-      uri,
-      [], // No resize, just convert
-      {
-        compress: 0.8, // Good quality compression
-        format: ImageManipulator.SaveFormat.JPEG,
+    //extract exif metadata from original image
+    let tags: ExifTags | undefined = await readAsync(uri)
+
+    if(tags == undefined){
+      tags = {
+        UserComment: 'No exif data available'
       }
-    );
+    }
+
+    //convert image to jpeg
+    const rendered_img = await ImageManipulator.useImageManipulator(uri).renderAsync()
+    const converted_img = await rendered_img.saveAsync({
+      compress: 0.8,
+      format: ImageManipulator.SaveFormat.JPEG
+    })
+
+    //write original metadata to new jpeg image
+    const result = await writeAsync(converted_img.uri, tags)
+    
+    if(result == undefined){
+      throw new Error('Metadata transfer failed')
+    }
+
     return result.uri;
   } catch (error) {
     return uri; // Return original if conversion fails
