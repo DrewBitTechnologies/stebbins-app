@@ -41,14 +41,14 @@ const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress,
 
           <ExpandableText text={item.description} />
 
-          {showFilters && item.color && item.color.length > 0 && !(item.color.length === 1 && item.color[0].toLowerCase() === 'none') && (
+          {showFilters && item.color && item.color.filter(Boolean).length > 0 && !(item.color.length === 1 && item.color[0]?.toLowerCase() === 'none') && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
                 <MaterialCommunityIcons name="palette" size={25} color={ColorPalette.primary_green} />
                 <Text style={styles.tagLabel}>Colors</Text>
               </View>
               <View style={styles.tagList}>
-                {item.color.map((color, index) => {
+                {item.color.filter(Boolean).map((color, index) => {
                   const colorStyle = getColorStyle(color);
                   return (
                     <View key={index} style={[
@@ -65,14 +65,14 @@ const GuideCard: React.FC<GuideCardProps> = ({ item, getImagePath, onImagePress,
             </View>
           )}
 
-          {showFilters && item.season && item.season.length > 0 && (
+          {showFilters && item.season && item.season.filter(Boolean).length > 0 && (
             <View style={styles.tagContainer}>
               <View style={styles.tagHeader}>
                 <Ionicons name="leaf" size={25} color={ColorPalette.primary_green} />
                 <Text style={styles.tagLabel}>Seasons</Text>
               </View>
               <View style={styles.tagList}>
-                {item.season.map((season, index) => {
+                {item.season.filter(Boolean).map((season, index) => {
                   const monthName = monthMap[season.toString()];
                   const displaySeason = monthName || season.charAt(0).toUpperCase() + season.slice(1).toLowerCase();
                   return (

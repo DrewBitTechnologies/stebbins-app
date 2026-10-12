@@ -88,6 +88,10 @@ components/
 - **Image Optimization**: CDN integration with local fallbacks
 - **Environment-Specific**: Runtime configuration for development/production
 
+## 🧭 Roadmap
+
+This app is currently a single-tenant pilot for the Stebbins Cold Canyon Reserve, but it is the testbed for a future multitenant platform serving multiple UC Davis Natural Reserves. See [ROADMAP.md](ROADMAP.md) for the planned API decoupling, dynamic filtering, UI/UX, and map-provider direction.
+
 ## 🚀 Getting Started
 
 ### Prerequisites

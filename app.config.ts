@@ -10,13 +10,6 @@ export default (): ExpoConfig => {
     icon: "./assets/images/icon.png",
     scheme: "stebbinsapp",
     userInterfaceStyle: "light",
-    splash: {
-      image: "./assets/images/white-square.png",
-      resizeMode: "contain",
-      width: "512",
-      height: "512",
-      backgroundColor: "#ffffff"
-    },
     assetBundlePatterns: [
       "**/*"
     ],
@@ -41,7 +34,6 @@ export default (): ExpoConfig => {
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION"
       ],
-      edgeToEdgeEnabled: true
     },
     web: {
       favicon: "./assets/images/favicon.png"

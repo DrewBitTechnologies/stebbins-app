@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { processAndCacheImages } from '../../../contexts/api.service';
 import { CDN_URL, IMAGE_FIELD_KEYS } from '../../../contexts/api.config';
 

@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as ApiService from '../../../contexts/api.service';
 
 // Create a partial mock where only the problematic function is mocked

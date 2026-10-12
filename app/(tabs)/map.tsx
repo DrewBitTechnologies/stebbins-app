@@ -18,7 +18,7 @@ import InfoModalContent from '@/components/info-modal-content';
 import Toast from '@/components/toast';
 import { ColorPalette } from '@/assets/dev/color_palette';
 import * as Haptics from 'expo-haptics';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "expo-router/react-navigation";
 
 // Initialize Mapbox
 if (MAPBOX_ACCESS_TOKEN) {

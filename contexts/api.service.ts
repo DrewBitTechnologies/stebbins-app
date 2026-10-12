@@ -1,5 +1,5 @@
 import * as Application from 'expo-application';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { CachedScreenData, ScreenData } from './api';
 import { API_BASE_URL, BEARER_TOKEN, CACHE_DIR, CDN_URL, IMAGE_FIELD_KEYS, CONCURRENT_IMAGES, getDataFilePath, getImageFilePath } from './api.config';
 

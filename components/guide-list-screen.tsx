@@ -123,11 +123,13 @@ export default function GuideListScreen({ route }: { route: any }) {
       data.forEach(item => {
         if (item.color && item.color.length > 0) {
           item.color.forEach(color => {
+            if (!color) return;
             colors.add(color.charAt(0).toUpperCase() + color.slice(1).toLowerCase());
           });
         }
         if (item.season && item.season.length > 0) {
           item.season.forEach(season => {
+            if (!season) return;
             const monthName = monthMap[season.toString()];
             if (monthName) {
               seasons.add(monthName);
@@ -169,7 +171,7 @@ export default function GuideListScreen({ route }: { route: any }) {
           }
         }
 
-        const itemColors = item.color?.map(color =>
+        const itemColors = item.color?.filter(Boolean).map(color =>
           color.charAt(0).toUpperCase() + color.slice(1).toLowerCase()
         ) || [];
 
@@ -187,7 +189,7 @@ export default function GuideListScreen({ route }: { route: any }) {
 
     if (selectedSeasons.length > 0) {
       filtered = filtered.filter(item => {
-        const itemSeasons = item.season?.map(season => {
+        const itemSeasons = item.season?.filter(Boolean).map(season => {
           const monthName = monthMap[season.toString()];
           return monthName || season.charAt(0).toUpperCase() + season.slice(1).toLowerCase();
         }) || [];
